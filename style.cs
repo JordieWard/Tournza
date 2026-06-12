@@ -1,7 +1,6 @@
 *{
   box-sizing: border-box;
 }
-
 :root {
   --bg: #08122A;
   --bg-2: #0b1835;
@@ -672,4 +671,3 @@ tbody tr:hover {
     width: min(1180px, calc(100% - 20px));
   }
 }
-`
