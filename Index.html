@@ -1,0 +1,406 @@
+``html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RVDC — Regional Virtual Darts Cooperation</title>
+  <meta name="description" content="Verified players. Professional events. Real rankings." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="utility-bar">
+    <div class="container utility-inner">
+      <div class="utility-left">
+        <span>UK Regional Darts</span>
+      </div>
+      <div class="utility-right">
+        <span>Verified players</span>
+        <span class="dot">•</span>
+        <span>Professional events</span>
+      </div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">R<span>V</span>DC</div>
+      <nav class="nav-links">
+        <button class="nav-link active" data-page="home">Home</button>
+        <button class="nav-link" data-page="events">Events</button>
+        <button class="nav-link" data-page="rankings">Rankings</button>
+        <button class="nav-link" data-page="players">Players</button>
+        <button class="nav-link" data-page="account">Account</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="ticker">
+    <div class="ticker-track">
+      <span><strong class="live">LIVE</strong> London Demo Open • Tonight 19:30 • 12/20</span>
+      <span>Manchester Weekly 501 • Thu 19:30 • 8/20</span>
+      <span>New rankings posted • West Midlands</span>
+      <span>Birmingham City Classic • Fri 19:00 • Best-of-7</span>
+      <span>Leeds Night Series • Sat 19:30 • 6/20</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="page active">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Regional Virtual Darts Cooperation</p>
+          <h1>Compete this week.</h1>
+          <p class="hero-text">
+            Verified players. Professional events. Real rankings.
+            Find events in your region and register in seconds.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-page="events">Browse Events</button>
+            <button class="btn btn-secondary" data-page="rankings">View Rankings</button>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-card-top">
+            <span class="pill live-pill">LIVE</span>
+            <span class="pill">501</span>
+          </div>
+          <h3>London Demo Open</h3>
+          <p class="muted">Greater London • Tonight 19:30</p>
+          <p class="muted">Capacity 20 • Entry £5</p>
+          <div class="progress">
+            <div class="progress-fill" style="width:60%"></div>
+          </div>
+          <p class="small-text">12 / 20 registered</p>
+          <button class="btn btn-primary small-btn" data-page="events">Register</button>
+        </div>
+      </div>
+
+      <div class="container metrics">
+        <div class="metric-card">
+          <h3>12</h3>
+          <p>Events this week</p>
+        </div>
+        <div class="metric-card">
+          <h3>1,248</h3>
+          <p>Active players</p>
+        </div>
+        <div class="metric-card">
+          <h3>£120</h3>
+          <p>Average prize</p>
+        </div>
+      </div>
+
+      <div class="container section-block">
+        <div class="section-header">
+          <p class="eyebrow">Events for your region</p>
+          <h2>Upcoming events</h2>
+        </div>
+
+        <div class="card-grid">
+          <article class="event-card">
+            <div class="card-tags">
+              <span class="tag blue">501</span>
+              <span class="tag">London</span>
+            </div>
+            <h3>RVDC Demo Open</h3>
+            <p class="muted">Wed 27 May • 19:30</p>
+            <p class="price">£5.00</p>
+            <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+            <p class="small-text">12 / 20 registered</p>
+            <div class="card-actions">
+              <button class="btn btn-primary small-btn" data-page="events">Register</button>
+              <button class="text-link" data-page="events">Details</button>
+            </div>
+          </article>
+
+          <article class="event-card">
+            <div class="card-tags">
+              <span class="tag blue">501</span>
+              <span class="tag">Manchester</span>
+            </div>
+            <h3>Manchester Weekly 501</h3>
+            <p class="muted">Thu 28 May • 19:30</p>
+            <p class="price">£7.00</p>
+            <div class="progress"><div class="progress-fill" style="width:40%"></div></div>
+            <p class="small-text">8 / 20 registered</p>
+            <div class="card-actions">
+              <button class="btn btn-primary small-btn" data-page="events">Register</button>
+              <button class="text-link" data-page="events">Details</button>
+            </div>
+          </article>
+
+          <article class="event-card">
+            <div class="card-tags">
+              <span class="tag blue">501</span>
+              <span class="tag">Birmingham</span>
+            </div>
+            <h3>Birmingham City Classic</h3>
+            <p class="muted">Fri 29 May • 19:00</p>
+            <p class="price">£10.00</p>
+            <div class="progress"><div class="progress-fill" style="width:75%"></div></div>
+            <p class="small-text">15 / 20 registered</p>
+            <div class="card-actions">
+              <button class="btn btn-primary small-btn" data-page="events">Register</button>
+              <button class="text-link" data-page="events">Details</button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="container section-block">
+        <div class="section-header">
+          <p class="eyebrow">How RVDC works</p>
+          <h2>Built for serious regional competition</h2>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-number">01</span>
+            <h3>Verify</h3>
+            <p>One membership. One player profile. Verified eligibility.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">02</span>
+            <h3>Register</h3>
+            <p>Choose events in your region and enter in seconds.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">03</span>
+            <h3>Check in</h3>
+            <p>Arrive ready. Check-in closes 10 minutes before start.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-number">04</span>
+            <h3>Climb</h3>
+            <p>Results feed into transparent regional rankings.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="events" class="page">
+      <div class="container page-top">
+        <p class="eyebrow">Events</p>
+        <h1 class="page-title">Find your next event</h1>
+        <p class="page-subtitle">Browse upcoming darts events across UK regions.</p>
+      </div>
+
+      <div class="container filter-row">
+        <div class="filter-box">Region: All</div>
+        <div class="filter-box">Format: 501</div>
+        <div class="filter-box">Window: Next 6 weeks</div>
+        <div class="filter-box">Eligible for you</div>
+      </div>
+
+      <div class="container two-col-layout">
+        <div class="main-col">
+          <div class="card-grid two-col">
+            <article class="event-card">
+              <div class="card-tags">
+                <span class="tag blue">501</span>
+                <span class="tag">London</span>
+              </div>
+              <h3>RVDC Demo Open</h3>
+              <p class="muted">Greater London • Wed 27 May • 19:30</p>
+              <p class="price">£5.00</p>
+              <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+              <p class="small-text">12 / 20 registered</p>
+              <div class="card-actions">
+                <button class="btn btn-primary small-btn">Register</button>
+                <button class="text-link">Details</button>
+              </div>
+            </article>
+
+            <article class="event-card">
+              <div class="card-tags">
+                <span class="tag blue">501</span>
+                <span class="tag">Manchester</span>
+              </div>
+              <h3>Manchester Weekly 501</h3>
+              <p class="muted">Greater Manchester • Thu 28 May • 19:30</p>
+              <p class="price">£7.00</p>
+              <div class="progress"><div class="progress-fill" style="width:40%"></div></div>
+              <p class="small-text">8 / 20 registered</p>
+              <div class="card-actions">
+                <button class="btn btn-primary small-btn">Register</button>
+                <button class="text-link">Details</button>
+              </div>
+            </article>
+
+            <article class="event-card">
+              <div class="card-tags">
+                <span class="tag blue">501</span>
+                <span class="tag">Birmingham</span>
+              </div>
+              <h3>Birmingham City Classic</h3>
+              <p class="muted">West Midlands • Fri 29 May • 19:00</p>
+              <p class="price">£10.00</p>
+              <div class="progress"><div class="progress-fill" style="width:75%"></div></div>
+              <p class="small-text">15 / 20 registered</p>
+              <div class="card-actions">
+                <button class="btn btn-primary small-btn">Register</button>
+                <button class="text-link">Details</button>
+              </div>
+            </article>
+
+            <article class="event-card">
+              <div class="card-tags">
+                <span class="tag blue">501</span>
+                <span class="tag">Leeds</span>
+              </div>
+              <h3>Leeds Night Series</h3>
+              <p class="muted">West Yorkshire • Sat 30 May • 19:30</p>
+              <p class="price">£8.00</p>
+              <div class="progress"><div class="progress-fill" style="width:30%"></div></div>
+              <p class="small-text">6 / 20 registered</p>
+              <div class="card-actions">
+                <button class="btn btn-primary small-btn">Register</button>
+                <button class="text-link">Details</button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <aside class="side-col">
+          <div class="side-card">
+            <h3>Upcoming</h3>
+            <ul>
+              <li>London Demo Open — Tonight 19:30</li>
+              <li>Manchester Weekly 501 — Thu 19:30</li>
+              <li>Birmingham City Classic — Fri 19:00</li>
+            </ul>
+          </div>
+
+          <div class="side-card">
+            <h3>Top regional players</h3>
+            <ol>
+              <li>J. Ward — 240 pts</li>
+              <li>M. Taylor — 225 pts</li>
+              <li>L. Singh — 210 pts</li>
+            </ol>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- RANKINGS -->
+    <section id="rankings" class="page">
+      <div class="container page-top">
+        <p class="eyebrow">Rankings</p>
+        <h1 class="page-title">Regional standings</h1>
+        <p class="page-subtitle">Transparent rankings across UK regions.</p>
+      </div>
+
+      <div class="container table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Region</th>
+              <th>Points</th>
+              <th>Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Jordan Ward</td><td>Greater London</td><td>240</td><td>8</td></tr>
+            <tr><td>2</td><td>M. Taylor</td><td>Manchester</td><td>225</td><td>8</td></tr>
+            <tr><td>3</td><td>L. Singh</td><td>West Midlands</td><td>210</td><td>7</td></tr>
+            <tr><td>4</td><td>D. Price</td><td>Leeds</td><td>196</td><td>7</td></tr>
+            <tr><td>5</td><td>C. Moore</td><td>Glasgow</td><td>181</td><td>6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="players" class="page">
+      <div class="container page-top">
+        <p class="eyebrow">Players</p>
+        <h1 class="page-title">Player directory</h1>
+        <p class="page-subtitle">Search regional players, view stats, and track progression.</p>
+      </div>
+
+      <div class="container card-grid three-col">
+        <div class="player-card">
+          <div class="avatar">JW</div>
+          <h3>Jordan Ward</h3>
+          <p class="muted">Greater London</p>
+          <p class="player-stat">Rating: 1820</p>
+          <p class="player-stat">Wins: 24</p>
+        </div>
+        <div class="player-card">
+          <div class="avatar">MT</div>
+          <h3>M. Taylor</h3>
+          <p class="muted">Greater Manchester</p>
+          <p class="player-stat">Rating: 1795</p>
+          <p class="player-stat">Wins: 21</p>
+        </div>
+        <div class="player-card">
+          <div class="avatar">LS</div>
+          <h3>L. Singh</h3>
+          <p class="muted">West Midlands</p>
+          <p class="player-stat">Rating: 1768</p>
+          <p class="player-stat">Wins: 19</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT -->
+    <section id="account" class="page">
+      <div class="container page-top">
+        <p class="eyebrow">Account</p>
+        <h1 class="page-title">Member dashboard</h1>
+        <p class="page-subtitle">Membership, verification, and registrations.</p>
+      </div>
+
+      <div class="container account-grid">
+        <div class="account-card">
+          <h3>Membership status</h3>
+          <div class="status-row"><span>RVDC Standard</span><span class="status active">Active</span></div>
+          <div class="status-row"><span>Annual plan</span><span>£12/year</span></div>
+          <div class="status-row"><span>Renewal date</span><span>27 May 2027</span></div>
+        </div>
+
+        <div class="account-card">
+          <h3>Verification</h3>
+          <div class="status-row"><span>Age check</span><span class="status active">Verified</span></div>
+          <div class="status-row"><span>Cam check</span><span class="status pending">Pending</span></div>
+          <div class="status-row"><span>Throw-line photo</span><span class="status inactive">Not uploaded</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-top">
+      <div class="footer-links">
+        <a href="#">London</a>
+        <a href="#">Manchester</a>
+        <a href="#">Birmingham</a>
+        <a href="#">Leeds</a>
+        <a href="#">Glasgow</a>
+      </div>
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>RVDC — Verified players. Professional events. Real rankings.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+`
