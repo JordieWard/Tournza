@@ -1,3 +1,4 @@
+console.log("SCRIPT LOADED");
 const navButtons = document.querySelectorAll("[data-page]");
 const pages = document.querySelectorAll(".page");
 const navLinks = document.querySelectorAll(".nav-link");
