@@ -31,4 +31,3 @@ navButtons.forEach((button) => {
     }
   });
 });
-`
