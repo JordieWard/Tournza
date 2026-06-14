@@ -1123,7 +1123,7 @@ function renderEventDetail(id){
           <div class="progress" style="margin-top:16px"><i style="width:${capPct(e)}%"></i></div>
           <div class="cap-line"><span>${e.reg} / ${e.cap} entered</span><span>${e.cap-e.reg} left</span></div>
           ${e.live?`<p class="countdown" style="margin:16px 0 0">● Check-in closes ${e.checkin} tonight</p>`:''}
-          <button class="btn btn-primary" style="width:100%;margin-top:18px" onclick="enterTournament()"> Pay £6 buy-in & enter </button>
+          <button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="1">Pay £6 buy-in &amp; enter</button>
           <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" data-link="membership">Membership required · £12/yr</button>
         </div>
         <div class="panel">
@@ -1541,9 +1541,8 @@ go((location.hash||'#home').slice(1)||'home');
       if(data.session && data.session.user) await onSignedIn(data.session.user);
       else onSignedOut();
     }catch(_){ onSignedOut(); }
-   finally{ authState.ready = true; }
-})();
-
+    finally{ authState.ready = true; }
+  })();
 </script>
 </body>
 </html>
