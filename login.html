@@ -421,6 +421,7 @@
           // Email confirmation is OFF → we're logged in. onAuthStateChange
           // will render the dashboard; loadProfile() writes the profiles row.
           showOk("Account created. Throwing you in…");
+          window.location.href = "https://tournza.co.uk/";
         } else {
           // Email confirmation is ON → must verify before logging in.
           showOk("Account created. Check your email to confirm, then log in.");
