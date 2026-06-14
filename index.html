@@ -1541,12 +1541,13 @@ go((location.hash||'#home').slice(1)||'home');
       if(data.session && data.session.user) await onSignedIn(data.session.user);
       else onSignedOut();
     }catch(_){ onSignedOut(); }
-    finally{ authState.ready = true; }
-  })();
+   finally{ authState.ready = true; }
+})();
+
 window.enterTournament = async function() {
     alert("BUTTON WORKS");
 }
-})();
+
 </script>
 </body>
 </html>
