@@ -447,6 +447,7 @@
       try {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { showErr(error.message); return; }
+      window.location.href = "https://tournza.co.uk/";
         // success → onAuthStateChange renders the dashboard
       } catch (err) {
         showErr(err.message || "Couldn’t log you in.");
