@@ -1543,25 +1543,8 @@ go((location.hash||'#home').slice(1)||'home');
     }catch(_){ onSignedOut(); }
     finally{ authState.ready = true; }
   })();
-  async function enterTournament() {
-  const { data } = await sb.auth.getSession();
-  if (!data.session) {
-    alert("Please log in first.");
-    return;
-  }
-  const user = data.session.user;
-  const eventId = location.hash.replace('#event:', '');
-  const { error } = await sb
-    .from('tournament_entries')
-    .insert({
-      tournament_id: 1,
-      player_id: user.id
-    });
-  if (error) {
-    alert(error.message);
-    return;
-  }
-  alert("Successfully entered tournament!");
+window.enterTournament = async function() {
+    alert("BUTTON WORKS");
 }
 })();
 </script>
