@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
@@ -112,6 +111,37 @@
   .btn-ghost:hover{border-color:var(--blue-2);background:rgba(46,119,255,.10)}
   .btn-sm{padding:8px 15px;font-size:13.5px}
   .nav-cta{margin-left:6px}
+  /* ---------- signed-in user menu ---------- */
+  .user-menu{position:relative;margin-left:6px}
+  .user-menu-trigger{gap:8px}
+  .user-menu-avatar{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+    font-family:var(--display);font-weight:800;font-size:12px;color:#fff;
+    background:linear-gradient(135deg,var(--blue-2),var(--blue))}
+  .user-menu-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .user-menu-caret{font-size:11px;color:var(--muted-2)}
+  .user-menu-dropdown{position:absolute;right:0;top:calc(100% + 8px);min-width:210px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.7);padding:6px;display:none;z-index:60}
+  .user-menu-dropdown.open{display:block}
+  .user-menu-dropdown a,.user-menu-dropdown button{
+    display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;
+    font-family:var(--body);font-size:14px;font-weight:600;color:var(--ivory);
+    padding:10px 12px;border-radius:8px;transition:background .15s}
+  .user-menu-dropdown a:hover,.user-menu-dropdown button:hover{background:rgba(46,119,255,.12)}
+  .user-menu-dropdown #logout-btn{color:var(--red-bright);margin-top:4px;
+    border-top:1px solid var(--line-soft);border-radius:0}
+  .mstat{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;
+    font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;vertical-align:middle}
+  .mstat.on{color:var(--green-bright);background:rgba(31,201,122,.14);border:1px solid rgba(31,201,122,.4)}
+  .mstat.off{color:var(--muted-2);background:rgba(120,150,210,.12);border:1px solid var(--line)}
+  #membership-buy-btn.is-active{background:rgba(31,201,122,.16);color:var(--green-bright);
+    border:1px solid rgba(31,201,122,.45);cursor:default}
+  .toast-pop{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);
+    z-index:200;max-width:90vw;background:var(--surface);color:var(--ivory);
+    border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:14px;font-weight:600;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.7);opacity:0;transition:opacity .2s,transform .2s}
+  .toast-pop.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast-pop.warn{border-color:rgba(255,107,114,.5);color:var(--red-bright)}
   .burger{display:none;margin-left:auto;background:none;border:1px solid var(--line);border-radius:10px;
     width:42px;height:38px;color:var(--ivory);cursor:pointer;font-size:18px}
 
@@ -329,7 +359,7 @@
     .bigstats{grid-template-columns:repeat(2,1fr)}
   }
   @media(max-width:720px){
-    nav.main,.nav-cta{display:none}
+    nav.main,.nav-cta,.user-menu{display:none}
     nav.main.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;
       background:var(--ink-2);border-bottom:1px solid var(--line);padding:14px 24px;gap:4px}
     nav.main.open a{padding:12px 14px}
@@ -359,8 +389,22 @@
         <a data-link="players">Players</a>
         <a data-link="membership">Membership</a>
         <a data-link="account">Account</a>
+        <a href="login.html" id="nav-login">Log in</a>
       </nav>
-      <button class="btn btn-primary btn-sm nav-cta" data-link="join">Join</button>
+      <a class="btn btn-primary btn-sm nav-cta" id="join-btn" href="login.html#signup">Join</a>
+      <div class="user-menu" id="user-menu" hidden>
+        <button class="btn btn-ghost btn-sm user-menu-trigger" id="user-menu-trigger" aria-haspopup="true" aria-expanded="false">
+          <span class="user-menu-avatar" id="user-menu-avatar">T</span>
+          <span class="user-menu-name" id="user-menu-name">Account</span>
+          <span class="user-menu-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="user-menu-dropdown" id="user-menu-dropdown" role="menu">
+          <a role="menuitem" data-link="account">Profile</a>
+          <a role="menuitem" data-link="account">My Tournaments</a>
+          <a role="menuitem" data-link="membership">Membership Status <span class="mstat off" id="user-menu-membership">—</span></a>
+          <button role="menuitem" type="button" id="logout-btn">Logout</button>
+        </div>
+      </div>
       <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
@@ -518,7 +562,7 @@
         <h2>One membership.<br>Every region.</h2>
         <p class="lede" style="margin-top:18px">Tournza Standard covers verification, event entry and ranking eligibility for a full season. No tiers, no upsells — everyone throws on the same terms.</p>
         <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
-          <button class="btn btn-primary" data-link="join" data-checkout="1">Join for £12</button>
+          <button class="btn btn-primary" id="membership-buy-btn" data-checkout="1">Join for £12</button>
           <button class="btn btn-ghost" data-link="events">See what's on</button>
         </div>
       </div>
@@ -603,7 +647,7 @@
       <button class="btn btn-ghost btn-sm" data-link="player:jordan-ward">View public profile →</button></div>
     <div class="dash">
       <div class="panel">
-        <span class="pill green">Active</span>
+        <span class="pill green" id="acct-membership-status">Active</span>
         <h3 style="margin:14px 0 12px">Membership</h3>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Plan</span><span>Tournza Standard</span></div>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Price</span><span>£12 / year</span></div>
@@ -796,7 +840,7 @@
         <div class="foot-col"><span class="h">Compete</span>
           <a data-link="events">Events</a><a data-link="rankings">Rankings</a><a data-link="players">Players</a><a data-link="membership">Membership</a><a data-link="rules">Fair play</a></div>
         <div class="foot-col"><span class="h">Tournza</span>
-          <a data-link="join">Join</a><a data-link="join">Contact</a><a data-link="privacy">Privacy</a><a data-link="terms">Terms</a></div>
+          <a href="login.html#signup">Join</a><a data-link="join">Contact</a><a data-link="privacy">Privacy</a><a data-link="terms">Terms</a></div>
       </div>
     </div>
     <div class="foot-bottom">
@@ -806,6 +850,8 @@
   </div>
 </footer>
 
+<!-- Supabase JS v2 (for auth / session) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =====================================================================
    LAUNCH CONFIG  —  these are live for Tournza
@@ -820,6 +866,34 @@ const FORM_ENDPOINT = "https://formspree.io/f/mykababr";                        
 const WEB3FORMS_KEY = "";                                                          // not used
 const CHECKOUT_URL  = "https://buy.stripe.com/eVq28kgwG0MpaIsf6M1ck01";            // £12 membership
 const TOURNAMENT_URL= "https://buy.stripe.com/14A3co1BMamZ7wge2I1ck00";            // £6 event buy-in
+
+/* Supabase (auth / session) — same project as login.html */
+const SUPABASE_URL = "https://uwojmyggmacoxrdolstb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HhQl-E4KZFnwuSSA_J_JXQ_cIQbilr-";
+
+/* Shared auth/membership state, kept in sync by the auth module below.
+   Other code (router, buy-in buttons) reads this to gate access. */
+const authState = { ready:false, signedIn:false, membershipActive:false, user:null };
+
+/* lightweight transient toast */
+let __toastTimer;
+function notify(msg, kind){
+  let el = document.getElementById('toast-pop');
+  if(!el){ el = document.createElement('div'); el.id='toast-pop'; el.className='toast-pop'; document.body.appendChild(el); }
+  el.textContent = msg;
+  el.className = 'toast-pop'+(kind==='warn'?' warn':'');
+  requestAnimationFrame(()=>el.classList.add('show'));
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(()=>el.classList.remove('show'), 4200);
+}
+
+/* Append the Supabase user id as Stripe's client_reference_id so the webhook
+   can attribute the payment to the right account. */
+function withRef(url, userId){
+  if(!url || !userId) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'client_reference_id=' + encodeURIComponent(userId);
+}
 
 /* ---------------- data ---------------- */
 const REGIONS = ["North East","North West","Yorkshire and the Humber","East Midlands","West Midlands","East of England","London","South East","South West","Scotland","Wales","Northern Ireland"];
@@ -1215,16 +1289,31 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('[data-link],[data-tournament],[data-checkout]');
   if(!t) return;
   e.preventDefault();
-  // event buy-in checkout (Stripe)
+  // event buy-in checkout (Stripe) — requires sign-in AND active membership
   if(t.dataset.tournament){
+    if(!authState.signedIn){
+      notify('Create an account or log in to enter a tournament.');
+      setTimeout(()=>{ window.location.href='login.html#signup'; }, 900);
+      return;
+    }
+    if(!authState.membershipActive){
+      notify('An active membership (£12/yr) is required to buy into tournaments.','warn');
+      go('membership');
+      return;
+    }
     if(TOURNAMENT_URL){ window.open(TOURNAMENT_URL,'_blank','noopener'); }
-    else { go('join'); }
+    else { go('membership'); }
     return;
   }
-  // membership checkout (Stripe)
+  // membership checkout (Stripe) — requires sign-in so the purchase ties to an account
   if(t.dataset.checkout){
-    if(CHECKOUT_URL){ window.open(CHECKOUT_URL,'_blank','noopener'); }
-    else { go('join'); }
+    if(!authState.signedIn){
+      notify('Create an account or log in to buy your membership.');
+      setTimeout(()=>{ window.location.href='login.html#signup'; }, 900);
+      return;
+    }
+    if(authState.membershipActive){ notify('Your membership is already active ✓'); return; }
+    if(CHECKOUT_URL){ window.location.href = withRef(CHECKOUT_URL, authState.user && authState.user.id); }
     return;
   }
   // carry an event into the join form (fallback path)
@@ -1233,6 +1322,11 @@ document.addEventListener('click',e=>{
     const ev=$('#jf-event'); if(ev) ev.value=t.dataset.event;
     const reason=$('#jf-reason'); if(reason) reason.value='Register for an event';
     const msg=$('#jf-msg'); if(msg && !msg.value) msg.value='I\'d like to register for: '+t.dataset.event;
+    return;
+  }
+  // the Account area requires sign-in for logged-out visitors
+  if(t.dataset.link==='account' && authState.ready && !authState.signedIn){
+    window.location.href='login.html';
     return;
   }
   go(t.dataset.link);
@@ -1311,6 +1405,145 @@ fillRegions();
 buildTicker();
 renderHome(); renderEvents(); renderRankings(); renderPlayers(); renderMembership();
 go((location.hash||'#home').slice(1)||'home');
+
+/* ---------------- auth / session (Supabase) ----------------
+   On load we check for an active session. If one exists, the Join CTA is
+   replaced by a user menu (display name or email + dropdown). If not, the
+   Join button and the normal visitor experience stay as they are. */
+(function initAuth(){
+  if(typeof supabase==='undefined') return; // CDN unavailable — leave Join visible
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  window.tournzaSupabase = sb; // handy for future use
+
+  const joinBtn   = $('#join-btn');
+  const navLogin  = $('#nav-login');
+  const userMenu  = $('#user-menu');
+  const trigger   = $('#user-menu-trigger');
+  const dropdown  = $('#user-menu-dropdown');
+  const nameOut   = $('#user-menu-name');
+  const avatarOut = $('#user-menu-avatar');
+  const logoutBtn = $('#logout-btn');
+  if(!userMenu || !trigger) return;
+
+  const displayName = user =>
+    (user.user_metadata && user.user_metadata.full_name) || user.email;
+
+  function openMenu(){ dropdown.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function closeMenu(){ dropdown.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }
+
+  // ---- membership (stored on the user's Supabase profiles row) ----
+  async function loadMembership(user){
+    try{
+      let { data, error } = await sb.from('profiles')
+        .select('membership_status').eq('id', user.id).maybeSingle();
+      if(error){ console.warn('profiles read failed:', error.message); return false; }
+      if(!data){ // first sight — create the row so status persists
+        const ins = await sb.from('profiles')
+          .insert({ id:user.id, full_name:(user.user_metadata&&user.user_metadata.full_name)||'' })
+          .select('membership_status').maybeSingle();
+        data = ins.data;
+      }
+      return !!data && String(data.membership_status).toLowerCase()==='active';
+    }catch(_){ return false; }
+  }
+  // Membership is now activated ONLY by the verified Stripe webhook (server side),
+  // never by the browser — so there's no client write path to tamper with.
+  const sleep = ms => new Promise(r=>setTimeout(r, ms));
+  function applyMembership(active){
+    authState.membershipActive = !!active;
+    const badge = $('#user-menu-membership');
+    if(badge){ badge.textContent = active?'Active':'Inactive'; badge.className = 'mstat '+(active?'on':'off'); }
+    const pill = $('#acct-membership-status');
+    if(pill){ pill.textContent = active?'Active':'Inactive'; pill.className = 'pill '+(active?'green':''); }
+    const buy = $('#membership-buy-btn');
+    if(buy){
+      buy.textContent = active ? 'Membership active ✓' : 'Join for £12';
+      buy.classList.toggle('is-active', !!active);
+    }
+  }
+  function cleanMembershipParam(){
+    try{
+      const url = new URL(location.href);
+      url.searchParams.delete('membership');
+      history.replaceState(null,'', url.pathname + (url.search||'') + (location.hash||''));
+    }catch(_){}
+  }
+
+  async function onSignedIn(user){
+    authState.signedIn = true; authState.user = user;
+    const name = displayName(user);
+    nameOut.textContent = name;
+    avatarOut.textContent = (String(name).trim()[0]||'T').toUpperCase();
+    if(joinBtn) joinBtn.hidden = true;
+    if(navLogin) navLogin.hidden = true;
+    userMenu.hidden = false;
+
+    // Did we just return from Stripe membership checkout?
+    const params = new URLSearchParams(location.search);
+    if(params.get('membership')==='success' || /membership=success/.test(location.hash)){
+      cleanMembershipParam();
+      notify('Confirming your payment…');
+      // The Stripe webhook flips membership_status to "active" server-side; it
+      // usually lands within a second or two, so poll the profile briefly.
+      let active = await loadMembership(user);
+      for(let i=0; i<6 && !active; i++){ await sleep(1500); active = await loadMembership(user); }
+      applyMembership(active);
+      notify(active
+        ? 'Membership active — you can now buy into tournaments ✓'
+        : 'Payment received — your membership will activate shortly. Refresh in a moment if it doesn’t show.');
+      return;
+    }
+    applyMembership(await loadMembership(user));
+  }
+  function onSignedOut(){
+    authState.signedIn = false; authState.user = null;
+    closeMenu();
+    userMenu.hidden = true;
+    if(joinBtn) joinBtn.hidden = false;
+    if(navLogin) navLogin.hidden = false;
+    applyMembership(false);
+    // a logged-out visitor sitting on the Account route → send to login
+    const acct = $('#route-account');
+    if(acct && acct.classList.contains('active')) window.location.href='login.html';
+  }
+
+  // dropdown open/close
+  trigger.addEventListener('click', e=>{
+    e.stopPropagation();
+    dropdown.classList.contains('open') ? closeMenu() : openMenu();
+  });
+  document.addEventListener('click', e=>{ if(!userMenu.contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMenu(); });
+  // menu items that navigate (Profile / My Tournaments / Membership Status)
+  // already route via the global [data-link] handler; just close the menu.
+  dropdown.querySelectorAll('[data-link]').forEach(a=>a.addEventListener('click', closeMenu));
+
+  // logout
+  logoutBtn.addEventListener('click', async ()=>{
+    logoutBtn.disabled = true;
+    const label = logoutBtn.textContent;
+    logoutBtn.textContent = 'Logging out…';
+    try{ await sb.auth.signOut(); }
+    finally{ logoutBtn.disabled = false; logoutBtn.textContent = label; closeMenu(); }
+  });
+
+  // keep the header in sync with sign-in / sign-out events
+  sb.auth.onAuthStateChange((_event, session)=>{
+    if(session && session.user) onSignedIn(session.user);
+    else onSignedOut();
+  });
+
+  // initial check on page load
+  (async ()=>{
+    try{
+      const { data } = await sb.auth.getSession();
+      if(data.session && data.session.user) await onSignedIn(data.session.user);
+      else onSignedOut();
+    }catch(_){ onSignedOut(); }
+    finally{ authState.ready = true; }
+  })();
+})();
 </script>
 </body>
 </html>
