@@ -1393,7 +1393,12 @@ async function loadTournamentsFromSupabase(){
   if(typeof supabase === 'undefined') return;
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const { data: entriesTest, error: entriesError } = await sb
+  .from('tournament_entries')
+  .select('*');
 
+console.log('ENTRIES TEST:', entriesTest);
+console.log('ENTRIES ERROR:', entriesError);
 const { data, error } = await sb
   .from('tournaments')
   .select(`
