@@ -1393,12 +1393,12 @@ async function loadTournamentsFromSupabase(){
   if(typeof supabase === 'undefined') return;
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const { data: entriesTest, error: entriesError } = await sb
+const { count, error: countError } = await sb
   .from('tournament_entries')
-  .select('*');
+  .select('*', { count: 'exact', head: true });
 
-console.log('ENTRIES TEST:', entriesTest);
-console.log('ENTRIES ERROR:', entriesError);
+console.log('COUNT TEST:', count);
+console.log('COUNT ERROR:', countError);
 const { data, error } = await sb
   .from('tournaments')
   .select(`
