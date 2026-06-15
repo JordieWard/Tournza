@@ -1405,6 +1405,20 @@ async function loadTournamentsFromSupabase(){
   }
 
   console.log('Tournaments loaded:', data);
+  EVENTS = data.map(t => ({
+  id: t.id,
+  title: t.name,
+  region: 'United Kingdom',
+  date: 'Tonight',
+  time: '19:30',
+  entry: Number(t.entry_fee || 6),
+  cap: Number(t.max_players || 32),
+  reg: 0,
+  live: true,
+  fmt: '501'
+}));
+
+renderEvents();
 
 }
 fillRegions();
