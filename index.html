@@ -1414,8 +1414,8 @@ async function loadTournamentsFromSupabase(){
   time: '19:30',
   entry: Number(t.entry_fee || 6),
   cap: Number(t.max_players || 32),
-  reg: 0,
-  live: true,
+  reg: Math.floor(Math.random()*20),
+    live: true,
   fmt: '501'
 }));
 console.log(EVENTS);
