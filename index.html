@@ -1405,6 +1405,7 @@ async function loadTournamentsFromSupabase(){
   }
 
   console.log('Tournaments loaded:', data);
+  console.log(SUPABASE_URL);
   EVENTS = data.map(t => ({
   id: t.id,
   title: t.name,
