@@ -1402,14 +1402,15 @@ const { data, error } = await sb
   `)
   .eq('status', 'open');
 
-  if(error){
-    console.error(error);
-    return;
-  }
+if(error){
+  console.error(error);
+  return;
+}
 
-  console.log(JSON.stringify(data, null, 2));
-  console.log(SUPABASE_URL);
-  EVENTS = data.map(t => ({
+console.log('RAW DATA:', JSON.stringify(data, null, 2));
+console.log(SUPABASE_URL);
+
+EVENTS = data.map(t => ({
   id: t.id,
   title: t.name,
   region: 'United Kingdom',
