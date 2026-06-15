@@ -900,20 +900,7 @@ const REGIONS = ["North East","North West","Yorkshire and the Humber","East Midl
 const FORMAT = "Group round robin → knockout to final";
 
 // One tournament per UK region, every evening. 32 players max, £6 buy-in.
-const EVENTS = [
-  {id:'london',     code:'TZ-LDN-0613', title:'London Evening Open',                    region:'London',                    date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:33, live:true},
-  {id:'west-midlands', code:'TZ-WM-0613', title:'West Midlands Evening Open',           region:'West Midlands',             date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:31, live:true},
-  {id:'north-west', code:'TZ-NW-0613', title:'North West Evening Open',                 region:'North West',                date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:28, live:true},
-  {id:'south-east', code:'TZ-SE-0613', title:'South East Evening Open',                 region:'South East',                date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:22, live:false},
-  {id:'yorkshire',  code:'TZ-YH-0613', title:'Yorkshire & the Humber Evening Open',     region:'Yorkshire and the Humber',  date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:19, live:false},
-  {id:'scotland',   code:'TZ-SCO-0613', title:'Scotland Evening Open',                  region:'Scotland',                  date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:18, live:false},
-  {id:'east-england', code:'TZ-EE-0613', title:'East of England Evening Open',          region:'East of England',           date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:16, live:false},
-  {id:'north-east', code:'TZ-NE-0613', title:'North East Evening Open',                 region:'North East',                date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:14, live:false},
-  {id:'wales',      code:'TZ-WAL-0613', title:'Wales Evening Open',                     region:'Wales',                     date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:13, live:false},
-  {id:'east-midlands', code:'TZ-EM-0613', title:'East Midlands Evening Open',           region:'East Midlands',             date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:11, live:false},
-  {id:'south-west', code:'TZ-SW-0613', title:'South West Evening Open',                 region:'South West',                date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:9,  live:false},
-  {id:'northern-ireland', code:'TZ-NI-0613', title:'Northern Ireland Evening Open',     region:'Northern Ireland',          date:'Tonight', time:'19:30', checkin:'19:20', fmt:'501', entry:6, cap:32, reg:7,  live:false},
-];
+let EVENTS = [];
 
 // Player profiles (static attributes). Their points/wins/events/form/recent
 // are computed automatically from RESULTS below — see buildStandings().
