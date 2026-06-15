@@ -1401,8 +1401,28 @@ function fillRegions(){
   });
   if(jf) jf.insertAdjacentHTML('beforeend','<option>Other / not listed</option>');
 }
+async function loadTournamentsFromSupabase(){
+
+  if(typeof supabase === 'undefined') return;
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data, error } = await sb
+    .from('tournaments')
+    .select('*')
+    .eq('status','open');
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  console.log('Tournaments loaded:', data);
+
+}
 fillRegions();
 buildTicker();
+  loadTournamentsFromSupabase();
 renderHome(); renderEvents(); renderRankings(); renderPlayers(); renderMembership();
 go((location.hash||'#home').slice(1)||'home');
 
