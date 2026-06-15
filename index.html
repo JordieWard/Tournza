@@ -1395,9 +1395,12 @@ async function loadTournamentsFromSupabase(){
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const { data, error } = await sb
-    .from('tournaments')
-    .select('*')
-    .eq('status','open');
+  .from('tournaments')
+  .select(`
+    *,
+    tournament_entries(id)
+  `)
+  .eq('status','open');
 
   if(error){
     console.error(error);
@@ -1414,7 +1417,7 @@ async function loadTournamentsFromSupabase(){
   time: '19:30',
   entry: Number(t.entry_fee || 6),
   cap: Number(t.max_players || 32),
-  reg: Math.floor(Math.random()*20),
+  reg: t.tournament_entries ? t.tournament_entries.length : 0,
     live: true,
   fmt: '501'
 }));
