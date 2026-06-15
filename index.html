@@ -1391,7 +1391,8 @@ function fillRegions(){
 async function loadTournamentsFromSupabase(){
 
   if(typeof supabase === 'undefined') return;
-
+console.log('URL:', SUPABASE_URL);
+console.log('KEY:', SUPABASE_KEY);
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const { count, error: countError } = await sb
   .from('tournament_entries')
@@ -1399,6 +1400,12 @@ const { count, error: countError } = await sb
 
 console.log('COUNT TEST:', count);
 console.log('COUNT ERROR:', countError);
+  const { data: directRows, error: directError } = await sb
+  .from('tournament_entries')
+  .select('*');
+
+console.log('DIRECT ROWS:', directRows);
+console.log('DIRECT ERROR:', directError);
 const { data, error } = await sb
   .from('tournaments')
   .select(`
