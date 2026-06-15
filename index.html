@@ -1394,20 +1394,20 @@ async function loadTournamentsFromSupabase(){
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const { data, error } = await sb
+const { data, error } = await sb
   .from('tournaments')
   .select(`
     *,
-    tournament_entries(id)
+    tournament_entries(*)
   `)
-  .eq('status','open');
+  .eq('status', 'open');
 
   if(error){
     console.error(error);
     return;
   }
 
-  console.log('Tournaments loaded:', data);
+  console.log(JSON.stringify(data, null, 2));
   console.log(SUPABASE_URL);
   EVENTS = data.map(t => ({
   id: t.id,
