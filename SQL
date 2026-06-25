@@ -1,0 +1,24 @@
+-- Exposes the `uk_regions` enum's values to the Supabase REST API so the site
+-- can populate the region selectors straight from the type (no hand-kept list).
+-- The site calls this via supabase.rpc('uk_regions_list').
+
+-- 1) Create / replace the function. enum_range() returns the values in the
+--    enum's declared order.
+create or replace function public.uk_regions_list()
+returns text[]
+language sql
+stable
+as $$
+  select enum_range(null::uk_regions)::text[];
+$$;
+
+-- 2) Let logged-out and logged-in visitors call it.
+grant execute on function public.uk_regions_list() to anon, authenticated;
+
+-- 3) Tell PostgREST to refresh its schema cache so the new function is exposed
+--    to the API immediately (otherwise the site may get "function not found"
+--    until the cache refreshes on its own).
+notify pgrst, 'reload schema';
+
+-- 4) VERIFY (run this on its own and check it returns the 10 regions):
+--    select public.uk_regions_list();
