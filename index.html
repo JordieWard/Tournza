@@ -425,30 +425,21 @@
           <button class="btn btn-ghost" data-link="rankings">View rankings</button>
         </div>
         <div class="hero-facts">
-          <div class="fact"><div class="k">Regions live</div><div class="v">All 12 UK regions</div></div>
+          <div class="fact"><div class="k">Regions live</div><div class="v">Every UK region</div></div>
           <div class="fact"><div class="k">Check-in rule</div><div class="v">10 min before start</div></div>
           <div class="fact"><div class="k">Membership</div><div class="v">£12 / year · £6 buy-in</div></div>
           <div class="fact"><div class="k">Format</div><div class="v">501 · nightly · 32 players</div></div>
         </div>
       </div>
       <div class="hero-side">
-        <div class="card hero-feature">
-          <div style="display:flex;gap:8px;margin-bottom:14px">
-            <span class="pill live"><span class="dot live"></span>LIVE</span>
-            <span class="pill fmt">501</span>
-          </div>
-          <h3>London Evening Open</h3>
-          <p class="mono" style="color:var(--muted-2);font-size:13px;margin:8px 0 2px">London · Tonight 19:30</p>
-          <p class="mono" style="color:var(--muted-2);font-size:13px;margin:0 0 16px">32 players · £6 buy-in</p>
-          <div class="progress"><i style="width:92%"></i></div>
-          <div class="cap-line"><span>33 / 32 entered</span><span>92%</span></div>
-          <button class="btn btn-primary" style="width:100%;margin-top:16px" data-link="event:london">View event</button>
+        <div class="card hero-feature" id="hero-feature">
+          <p class="mono" style="color:var(--muted);font-size:13px">Loading tonight’s tournaments…</p>
         </div>
         <div class="card" style="margin-top:16px">
           <h4 style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Tonight across the UK</h4>
-          <div class="stat-line"><span>West Midlands Evening Open</span><span class="mono" style="color:var(--muted-2)">31 / 32</span></div>
-          <div class="stat-line"><span>North West Evening Open</span><span class="mono" style="color:var(--muted-2)">28 / 32</span></div>
-          <div class="stat-line"><span>South East Evening Open</span><span class="mono" style="color:var(--muted-2)">22 / 32</span></div>
+          <div id="hero-tonight">
+            <p class="mono" style="color:var(--muted);font-size:13px">Loading…</p>
+          </div>
         </div>
       </div>
     </div>
@@ -896,8 +887,22 @@ function withRef(url, userId){
 }
 
 /* ---------------- data ---------------- */
+// REGIONS is interim: it drives only the players filter, which filters the
+// still-hard-coded PLAYERS list. Once players move to the database, that filter
+// will come from the uk_regions enum too. The events filter and the join form
+// are populated entirely from the live enum (loadRegionsFromEnum) — no local
+// region list backs them.
 const REGIONS = ["North East","North West","Yorkshire and the Humber","East Midlands","West Midlands","East of England","London","South East","South West","Scotland","Wales","Northern Ireland"];
 const FORMAT = "Group round robin → knockout to final";
+
+// Every event starts at the same UK time, and check-in closes 10 minutes
+// before. tournament_date is a DATE (no time), so these supply the time half.
+const EVENT_KICKOFF = '19:30';
+const EVENT_CHECKIN = (function(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  const t = ((h*60 + m - 10) % 1440 + 1440) % 1440;
+  return String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
+})(EVENT_KICKOFF);
 
 // One tournament per UK region, every evening. 32 players max, £6 buy-in.
 let EVENTS = [];
@@ -1026,6 +1031,12 @@ const FAQ = [
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 
+// Events come from the database only — there is no placeholder data. Until the
+// load resolves we show a loading line; after it, either real events or an
+// honest empty state.
+let eventsLoaded = false;
+function stateMsg(text){ return `<p style="color:var(--muted);padding:8px 0">${text}</p>`; }
+
 function capPct(e){return Math.round(e.reg/e.cap*100);}
 function eventPlayers(e){return REG.filter(p=>p.region===e.region);}
 
@@ -1033,7 +1044,7 @@ function evCard(e){
   return `<article class="card clk ev-card" data-link="event:${e.id}">
     <div class="row1">
       <span class="pill fmt">${e.fmt}</span>
-      <span class="pill">${e.region}</span>
+      ${e.region?`<span class="pill">${e.region}</span>`:''}
       ${e.live?'<span class="pill live"><span class="dot live"></span>Live</span>':''}
     </div>
     <h3>${e.title}</h3>
@@ -1048,21 +1059,72 @@ function evCard(e){
 }
 
 function renderHome(){
-  $('#home-events').innerHTML = EVENTS.slice(0,3).map(evCard).join('');
+  const el=$('#home-events'); if(!el) return;
+  if(!eventsLoaded){ el.innerHTML = stateMsg('Loading tonight’s tournaments…'); return; }
+  el.innerHTML = EVENTS.length
+    ? EVENTS.slice(0,3).map(evCard).join('')
+    : stateMsg('No tournaments scheduled right now — check back soon.');
+}
+
+// The hero feature card and the "Tonight across the UK" list are filled entirely
+// from live data. No fabricated event is ever shown: while loading they show a
+// loading line, and with no events they show an honest empty state.
+function renderHeroSide(){
+  const f=$('#hero-feature'), t=$('#hero-tonight');
+  if(!eventsLoaded){
+    if(f) f.innerHTML = stateMsg('Loading tonight’s tournaments…');
+    if(t) t.innerHTML = stateMsg('Loading…');
+    return;
+  }
+  if(!EVENTS.length){
+    if(f) f.innerHTML = `<h3>No live events right now</h3>
+      <p class="mono" style="color:var(--muted-2);font-size:13px;margin:8px 0 16px">New tournaments are added regularly — check back soon.</p>
+      <button class="btn btn-ghost" style="width:100%" data-link="events">See all events</button>`;
+    if(t) t.innerHTML = stateMsg('Nothing scheduled tonight yet.');
+    return;
+  }
+  // Feature the most prominent event: live first, then fullest.
+  const feat = [...EVENTS].sort((a,b)=>(Number(b.live)-Number(a.live)) || (capPct(b)-capPct(a)))[0];
+  if(f && feat){
+    f.innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        ${feat.live?'<span class="pill live"><span class="dot live"></span>LIVE</span>':''}
+        <span class="pill fmt">${feat.fmt}</span>
+      </div>
+      <h3>${feat.title}</h3>
+      <p class="mono" style="color:var(--muted-2);font-size:13px;margin:8px 0 2px">${feat.region?feat.region+' · ':''}${feat.date} ${feat.time}</p>
+      <p class="mono" style="color:var(--muted-2);font-size:13px;margin:0 0 16px">${feat.cap} players · £${feat.entry.toFixed(2)} buy-in</p>
+      <div class="progress"><i style="width:${capPct(feat)}%"></i></div>
+      <div class="cap-line"><span>${feat.reg} / ${feat.cap} entered</span><span>${capPct(feat)}%</span></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" data-link="event:${feat.id}">View event</button>`;
+  }
+  if(t){
+    t.innerHTML = EVENTS.slice(0,3).map(e=>
+      `<div class="stat-line"><span>${e.title}</span><span class="mono" style="color:var(--muted-2)">${e.reg} / ${e.cap}</span></div>`
+    ).join('');
+  }
 }
 function renderEvents(region){
-  let list = EVENTS;
-  if(region && region!=='All regions') list = EVENTS.filter(e=>e.region===region);
-  $('#all-events').innerHTML = list.map(evCard).join('') || '<p style="color:var(--muted)">No event for that region tonight.</p>';
+  const el=$('#all-events'); if(!el) return;
+  if(!eventsLoaded){ el.innerHTML = stateMsg('Loading tonight’s tournaments…'); return; }
+  const filtered = region && region!=='All regions';
+  const list = filtered ? EVENTS.filter(e=>e.region===region) : EVENTS;
+  if(list.length){ el.innerHTML = list.map(evCard).join(''); return; }
+  el.innerHTML = stateMsg(filtered
+    ? `No events in ${region} tonight.`
+    : 'No tournaments scheduled right now — check back soon.');
 }
 function renderEventDetail(id){
-  const e=EVENTS.find(x=>x.id===id)||EVENTS[0];
+  // DB ids are numbers but the router passes the hash arg as a string, so
+  // compare loosely. No fallback to a different event — show a message instead.
+  const e=EVENTS.find(x=>String(x.id)===String(id));
+  if(!e){ $('#event-detail').innerHTML = stateMsg('That tournament isn’t available right now. It may have finished or been removed.'); return; }
   const pot=e.reg*e.entry, full=e.cap*e.entry;
   const prize=[['1st','£'+Math.round(pot*0.5)],['2nd','£'+Math.round(pot*0.3)],['3rd','£'+Math.round(pot*0.2)]];
   const entered=eventPlayers(e), extra=Math.max(e.reg-entered.length,0);
   $('#event-detail').innerHTML=`
     <div class="row1" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <span class="pill fmt">${e.fmt}</span><span class="pill">${e.region}</span>
+      <span class="pill fmt">${e.fmt}</span>${e.region?`<span class="pill">${e.region}</span>`:''}
       <span class="pill mono">${e.code}</span>
       ${e.live?'<span class="pill live"><span class="dot live"></span>Live tonight</span>':''}
     </div>
@@ -1074,7 +1136,7 @@ function renderEventDetail(id){
           <div class="kv">
             <div class="cell"><div class="k">When</div><div class="v">${e.date} · ${e.time}</div></div>
             <div class="cell"><div class="k">Check-in closes</div><div class="v">${e.checkin}</div></div>
-            <div class="cell"><div class="k">Format</div><div class="v">${e.fmt} double-out</div></div>
+            <div class="cell"><div class="k">Format</div><div class="v">${e.fmt}</div></div>
             <div class="cell"><div class="k">Structure</div><div class="v">${FORMAT}</div></div>
             <div class="cell"><div class="k">Capacity</div><div class="v">${e.cap} players max</div></div>
             <div class="cell"><div class="k">Venue</div><div class="v">Virtual · webcam</div></div>
@@ -1380,17 +1442,63 @@ $('#join-form').addEventListener('submit',async e=>{
 
 /* init */
 function fillRegions(){
-  const ev=$('#f-region'), pl=$('#p-region'), jf=$('#jf-region');
+  // Only the players filter is seeded here (interim — see REGIONS note). The
+  // events filter (#f-region) and join form (#jf-region) are filled from the
+  // live enum in loadRegionsFromEnum(), so there's no hard-coded region data
+  // behind them.
+  const pl=$('#p-region');
   REGIONS.forEach(r=>{
-    if(ev) ev.insertAdjacentHTML('beforeend','<option>'+r+'</option>');
     if(pl) pl.insertAdjacentHTML('beforeend','<option>'+r+'</option>');
-    if(jf) jf.insertAdjacentHTML('beforeend','<option>'+r+'</option>');
   });
-  if(jf) jf.insertAdjacentHTML('beforeend','<option>Other / not listed</option>');
+}
+
+// Pull the region options straight from the Postgres `uk_regions` enum so the
+// selector is always in step with the type — no list to maintain by hand. The
+// REST API can't read the enum catalog directly, so this calls the SQL function
+// `uk_regions_list()`. If the call fails (e.g. the function isn't exposed yet),
+// it logs the reason and leaves the selectors with just their default option.
+async function loadRegionsFromEnum(){
+  if(typeof supabase==='undefined'){ console.warn('[regions] Supabase SDK not loaded'); return; }
+  let regions;
+  try{
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await sb.rpc('uk_regions_list');
+    if(error){ console.warn('[regions] uk_regions_list() call failed:', error.message || error, '— check the function exists and is granted to anon.'); return; }
+    // A function returning text[] gives a plain array. Be tolerant of a couple
+    // of other shapes too (array of {region}/{value}, or a wrapped array).
+    if(Array.isArray(data)){
+      regions = data.map(r => typeof r === 'string' ? r : (r && (r.region ?? r.value ?? Object.values(r)[0]))).filter(Boolean);
+    } else if(data && Array.isArray(data.regions)){
+      regions = data.regions;
+    }
+    if(!regions || !regions.length){ console.warn('[regions] uk_regions_list() returned no values:', data); return; }
+  }catch(e){ console.warn('[regions] could not load regions:', e); return; }
+
+  // Events filter: "All regions" first, then every enum value.
+  const ev=$('#f-region');
+  if(ev){
+    const cur=ev.value;
+    ev.innerHTML='';
+    ev.add(new Option('All regions'));                          // always first; clears the filter
+    regions.forEach(r=> ev.add(new Option(r)));                 // Option() text-encodes safely (handles the & regions)
+    if([...ev.options].some(o=>o.value===cur)) ev.value=cur;
+  }
+  // Join form: keep the empty "Choose a region" placeholder the validation
+  // checks for, then the enum values, then the catch-all — so registrations use
+  // the same region vocabulary as events.
+  const jf=$('#jf-region');
+  if(jf){
+    const cur=jf.value;
+    jf.innerHTML='';
+    jf.add(new Option('Choose a region',''));
+    regions.forEach(r=> jf.add(new Option(r)));
+    jf.add(new Option('Other / not listed'));
+    if([...jf.options].some(o=>o.value===cur)) jf.value=cur;
+  }
 }
 async function loadTournamentsFromSupabase(){
-
-  if(typeof supabase === 'undefined') return;
+ try{
+  if(typeof supabase === 'undefined') throw new Error('Supabase SDK unavailable');
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const { data, error } = await sb
   .from('tournaments')
@@ -1400,34 +1508,48 @@ const { data, error } = await sb
   `)
   .eq('status', 'open');
 
-if(error){
-  console.error(error);
-  return;
-}
+if(error) throw error;
 
-console.log('RAW DATA:', JSON.stringify(data, null, 2));
-console.log(SUPABASE_URL);
+EVENTS = (data||[]).map(t => {
+  // tournament_date is a DATE (no time), so format just the day. Parse the
+  // Y-M-D parts directly and build a local date — going via new Date(string)
+  // treats a bare date as UTC midnight and can shift the day across timezones.
+  let date = '';
+  if(t.tournament_date){
+    const [y,m,d] = String(t.tournament_date).slice(0,10).split('-').map(Number);
+    if(y && m && d) date = new Date(y, m-1, d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  }
 
-EVENTS = data.map(t => ({
-  id: t.id,
-  title: t.name,
-  region: 'United Kingdom',
-  date: 'Tonight',
-  time: '19:30',
-  entry: Number(t.entry_fee || 6),
-  cap: Number(t.max_players || 32),
-  reg: t.tournament_entries ? t.tournament_entries.length : 0,
-    live: true,
-  fmt: '501'
-}));
-console.log(EVENTS);
-renderEvents();
-
+  return {
+    id:      t.id,
+    title:   t.name,
+    // region is the uk_regions enum; no fabricated default — a row without one
+    // renders without a region pill.
+    region:  t.region || '',
+    date,
+    time:    EVENT_KICKOFF,    // every event starts at the same UK time
+    checkin: EVENT_CHECKIN,    // check-in closes 10 minutes before kick-off
+    code:    'T-' + String(t.id).padStart(4,'0'),         // no code column; derive a stable one from the id
+    entry:   Number(t.entry_fee   || 6),
+    cap:     Number(t.max_players || 32),
+    reg:     t.tournament_entries ? t.tournament_entries.length : 0,
+    live:    t.status === 'open',
+    fmt:     t.game_format || '501 Double Out'
+  };
+});
+ }catch(err){
+  console.error('Could not load tournaments:', err);
+  EVENTS = [];                          // no stale or placeholder data is kept
+ }finally{
+  eventsLoaded = true;                  // finished trying — render real events or an honest empty state
+  renderHome(); renderHeroSide(); renderEvents(); buildTicker();
+ }
 }
 fillRegions();
-buildTicker();
-  loadTournamentsFromSupabase();
-renderHome(); renderEvents(); renderRankings(); renderPlayers(); renderMembership();
+renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
+renderRankings(); renderPlayers(); renderMembership();
+loadTournamentsFromSupabase();
+loadRegionsFromEnum();
 go((location.hash||'#home').slice(1)||'home');
 
 /* ---------------- auth / session (Supabase) ----------------
