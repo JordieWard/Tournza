@@ -559,29 +559,41 @@
       finally { setLoading(btn, false); }
     });
 
-    // A password-reset email link lands here with type=recovery in the URL.
-    // Supabase is meant to also fire a distinct "PASSWORD_RECOVERY" auth
-    // event in this case, but in practice it can instead fire a generic
-    // "signed in" signal — so the URL itself, which we know for certain,
-    // is the more reliable thing to check, not which event name arrives.
-    const isRecoveryLink = location.hash.includes("type=recovery");
+    // A password-reset email link lands here with the new session's tokens
+    // in the URL itself (e.g. #access_token=...&refresh_token=...&type=recovery).
+    // Supabase can normally pick this up automatically — but if the browser
+    // was ALREADY signed in as someone (even the same person, from an older
+    // visit), that automatic handling can lose the race and just keep
+    // showing the old, already-signed-in session instead of switching to
+    // this new one. Reading the tokens ourselves and forcing them to take
+    // over removes that ambiguity entirely — it works the same regardless
+    // of whatever was happening in this browser beforehand.
+    const hashParams = new URLSearchParams(location.hash.slice(1));
+    const isRecoveryLink = hashParams.get("type") === "recovery" && hashParams.get("access_token");
 
     // ====== route on auth state ======
     sb.auth.onAuthStateChange((_event, session) => {
-      if (isRecoveryLink || _event === "PASSWORD_RECOVERY") {
-        if (session) recoverySession = session;
-        showView("reset");
-        return;
-      }
+      if (isRecoveryLink) return; // handled explicitly below instead
       if (session && session.user) renderDashboard(session);
       else { renderAuth(); clearMsg(); }
     });
 
-    // ====== initial session check (page load / refresh) ======
-    // The onAuthStateChange listener above handles the recovery case, so
-    // this check must not race it and jump to the dashboard instead.
     (async () => {
-      if (isRecoveryLink) return;
+      if (isRecoveryLink) {
+        const { data, error } = await sb.auth.setSession({
+          access_token: hashParams.get("access_token"),
+          refresh_token: hashParams.get("refresh_token"),
+        });
+        if (error || !data.session) {
+          showErr("This reset link is invalid or has expired. Request a new one below.");
+          showView("forgot");
+          return;
+        }
+        recoverySession = data.session;
+        showView("reset");
+        return;
+      }
+      // ====== initial session check (page load / refresh) ======
       const { data } = await sb.auth.getSession();
       if (data.session) renderDashboard(data.session);
       else if (location.hash === "#signup") showView("signup"); // deep link from the main site
