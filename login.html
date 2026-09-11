@@ -559,21 +559,27 @@
       finally { setLoading(btn, false); }
     });
 
+    // A password-reset email link lands here with type=recovery in the URL.
+    // Supabase is meant to also fire a distinct "PASSWORD_RECOVERY" auth
+    // event in this case, but in practice it can instead fire a generic
+    // "signed in" signal — so the URL itself, which we know for certain,
+    // is the more reliable thing to check, not which event name arrives.
+    const isRecoveryLink = location.hash.includes("type=recovery");
+
     // ====== route on auth state ======
     sb.auth.onAuthStateChange((_event, session) => {
-      // Clicking the reset-password link in their email brings them back
-      // here already signed in, specifically so they can set a new password
-      // — show that form instead of jumping straight to the dashboard.
-      if (_event === "PASSWORD_RECOVERY") { recoverySession = session; showView("reset"); return; }
+      if (isRecoveryLink || _event === "PASSWORD_RECOVERY") {
+        if (session) recoverySession = session;
+        showView("reset");
+        return;
+      }
       if (session && session.user) renderDashboard(session);
       else { renderAuth(); clearMsg(); }
     });
 
     // ====== initial session check (page load / refresh) ======
-    // A password-reset email link lands here with type=recovery in the URL;
-    // the onAuthStateChange listener above handles showing the reset form,
-    // so this check must not race it and jump to the dashboard instead.
-    const isRecoveryLink = location.hash.includes("type=recovery");
+    // The onAuthStateChange listener above handles the recovery case, so
+    // this check must not race it and jump to the dashboard instead.
     (async () => {
       if (isRecoveryLink) return;
       const { data } = await sb.auth.getSession();
