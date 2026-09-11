@@ -334,6 +334,12 @@
     const $ = (id) => document.getElementById(id);
     const authView = $("auth"), dashView = $("dashboard"), bootView = $("boot");
     const errBox = $("errBox"), okBox = $("okBox");
+    // Holds the session Supabase hands us the moment a recovery link is
+    // clicked. The auth flow only KEEPS that session reliably in memory for
+    // a short window — by the time someone finishes typing a new password
+    // and hits submit, it can quietly have been dropped. Re-asserting it
+    // from here right before saving works around that known flakiness.
+    let recoverySession = null;
 
     const showErr = (m) => { errBox.textContent = m; errBox.classList.add("show"); okBox.classList.remove("show"); };
     const showOk  = (m) => { okBox.textContent  = m; okBox.classList.add("show");  errBox.classList.remove("show"); };
@@ -525,6 +531,15 @@
       const btn = $("resetBtn");
       setLoading(btn, true, "Saving…");
       try {
+        // Restore the session explicitly — the one Supabase set up
+        // automatically when the recovery link was clicked doesn't always
+        // survive until now, so re-assert it from what we captured earlier.
+        if (recoverySession) {
+          await sb.auth.setSession({
+            access_token: recoverySession.access_token,
+            refresh_token: recoverySession.refresh_token,
+          });
+        }
         const { error } = await sb.auth.updateUser({ password });
         if (error) { showErr(error.message); return; }
         showOk("Password updated. Taking you to your account…");
@@ -549,7 +564,7 @@
       // Clicking the reset-password link in their email brings them back
       // here already signed in, specifically so they can set a new password
       // — show that form instead of jumping straight to the dashboard.
-      if (_event === "PASSWORD_RECOVERY") { showView("reset"); return; }
+      if (_event === "PASSWORD_RECOVERY") { recoverySession = session; showView("reset"); return; }
       if (session && session.user) renderDashboard(session);
       else { renderAuth(); clearMsg(); }
     });
