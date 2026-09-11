@@ -252,6 +252,28 @@
           <input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••" required />
         </div>
         <button class="btn" type="submit" id="loginBtn">Log in</button>
+        <button class="btn ghost" type="button" id="forgotLink" style="margin-top:2px">Forgot password?</button>
+      </form>
+
+      <!-- Request a password reset email -->
+      <form id="forgotForm" novalidate>
+        <p class="tagline" style="margin:0 0 4px">Enter your email and we'll send you a link to reset your password.</p>
+        <div class="field">
+          <label for="forgotEmail">Email</label>
+          <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+        <button class="btn" type="submit" id="forgotBtn">Send reset link</button>
+        <button class="btn ghost" type="button" id="backToLoginLink">Back to log in</button>
+      </form>
+
+      <!-- Shown after clicking the reset link in their email -->
+      <form id="resetForm" novalidate>
+        <p class="tagline" style="margin:0 0 4px">Choose a new password for your account.</p>
+        <div class="field">
+          <label for="resetPassword">New password</label>
+          <input id="resetPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required />
+        </div>
+        <button class="btn" type="submit" id="resetBtn">Set new password</button>
       </form>
 
       <!-- Sign up -->
@@ -329,15 +351,27 @@
     // ---- tab switching ----
     const tabLogin = $("tabLogin"), tabSignup = $("tabSignup");
     const loginForm = $("loginForm"), signupForm = $("signupForm");
-    function selectTab(login) {
+    const forgotForm = $("forgotForm"), resetForm = $("resetForm");
+    const forgotLink = $("forgotLink"), backToLoginLink = $("backToLoginLink");
+
+    // showView covers all four forms. Login/signup use the tab strip;
+    // forgot/reset hide it (there's nothing to switch between while resetting).
+    function showView(name) {
       clearMsg();
-      tabLogin.classList.toggle("active", login);
-      tabSignup.classList.toggle("active", !login);
-      loginForm.classList.toggle("active", login);
-      signupForm.classList.toggle("active", !login);
+      const tabs = document.querySelector(".tabs");
+      tabs.style.display = (name === "login" || name === "signup") ? "" : "none";
+      tabLogin.classList.toggle("active", name === "login");
+      tabSignup.classList.toggle("active", name === "signup");
+      loginForm.classList.toggle("active", name === "login");
+      signupForm.classList.toggle("active", name === "signup");
+      forgotForm.classList.toggle("active", name === "forgot");
+      resetForm.classList.toggle("active", name === "reset");
     }
+    function selectTab(login) { showView(login ? "login" : "signup"); }
     tabLogin.addEventListener("click", () => selectTab(true));
     tabSignup.addEventListener("click", () => selectTab(false));
+    forgotLink.addEventListener("click", () => showView("forgot"));
+    backToLoginLink.addEventListener("click", () => showView("login"));
 
     function setLoading(btn, on, label) {
       btn.disabled = on;
@@ -457,6 +491,51 @@
       }
     });
 
+    // ====== forgot password: request the reset email ======
+    forgotForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearMsg();
+      const email = $("forgotEmail").value.trim();
+      if (!email) { showErr("Enter your email address."); return; }
+
+      const btn = $("forgotBtn");
+      setLoading(btn, true, "Sending…");
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: "https://tournza.co.uk/login.html",
+        });
+        if (error) { showErr(error.message); return; }
+        // Same message whether or not the email exists — don't reveal which
+        // addresses have accounts.
+        showOk("If an account exists for that email, a reset link is on its way. Check your inbox.");
+      } catch (err) {
+        showErr(err.message || "Something went wrong sending the reset email.");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    // ====== reset password: set a new one after clicking the email link ======
+    resetForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearMsg();
+      const password = $("resetPassword").value;
+      if (password.length < 6) { showErr("Password must be at least 6 characters."); return; }
+
+      const btn = $("resetBtn");
+      setLoading(btn, true, "Saving…");
+      try {
+        const { error } = await sb.auth.updateUser({ password });
+        if (error) { showErr(error.message); return; }
+        showOk("Password updated. Taking you to your account…");
+        setTimeout(() => { window.location.href = "https://tournza.co.uk/"; }, 1200);
+      } catch (err) {
+        showErr(err.message || "Couldn’t update your password.");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
     // ====== log out ======
     $("logoutBtn").addEventListener("click", async () => {
       const btn = $("logoutBtn");
@@ -467,14 +546,24 @@
 
     // ====== route on auth state ======
     sb.auth.onAuthStateChange((_event, session) => {
+      // Clicking the reset-password link in their email brings them back
+      // here already signed in, specifically so they can set a new password
+      // — show that form instead of jumping straight to the dashboard.
+      if (_event === "PASSWORD_RECOVERY") { showView("reset"); return; }
       if (session && session.user) renderDashboard(session);
       else { renderAuth(); clearMsg(); }
     });
 
     // ====== initial session check (page load / refresh) ======
+    // A password-reset email link lands here with type=recovery in the URL;
+    // the onAuthStateChange listener above handles showing the reset form,
+    // so this check must not race it and jump to the dashboard instead.
+    const isRecoveryLink = location.hash.includes("type=recovery");
     (async () => {
+      if (isRecoveryLink) return;
       const { data } = await sb.auth.getSession();
       if (data.session) renderDashboard(data.session);
+      else if (location.hash === "#signup") showView("signup"); // deep link from the main site
     })();
   })();
   </script>
