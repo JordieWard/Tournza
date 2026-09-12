@@ -1128,6 +1128,7 @@ function renderEventDetail(id){
   const pot=e.reg*e.entry, full=e.cap*e.entry;
   const prize=[['1st','£'+Math.round(pot*0.5)],['2nd','£'+Math.round(pot*0.3)],['3rd','£'+Math.round(pot*0.2)]];
   const entered=eventPlayers(e), extra=Math.max(e.reg-entered.length,0);
+  const alreadyIn = !!(authState.user && entered.some(p=>String(p.id)===String(authState.user.id)));
   $('#event-detail').innerHTML=`
     <div class="row1" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <span class="pill fmt">${e.fmt}</span>${e.region?`<span class="pill">${e.region}</span>`:''}
@@ -1178,7 +1179,9 @@ function renderEventDetail(id){
           <div class="progress" style="margin-top:16px"><i style="width:${capPct(e)}%"></i></div>
           <div class="cap-line"><span>${e.reg} / ${e.cap} entered</span><span>${e.cap-e.reg} left</span></div>
           ${e.live?`<p class="countdown" style="margin:16px 0 0">● Check-in closes ${e.checkin} tonight</p>`:''}
-          <button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="${e.id}">Pay £6 buy-in &amp; enter</button>
+          ${alreadyIn
+            ? `<button class="btn btn-primary" style="width:100%;margin-top:18px" disabled>You’re entered ✓</button>`
+            : `<button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="${e.id}">Pay £6 buy-in &amp; enter</button>`}
           <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" data-link="membership">Membership required · £12/yr</button>
         </div>
         <div class="panel">
