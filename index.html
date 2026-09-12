@@ -104,6 +104,7 @@
     font-weight:700;font-family:var(--display);letter-spacing:.01em;border-radius:999px;
     padding:11px 20px;border:1px solid transparent;font-size:15px;transition:transform .15s,background .18s,border-color .18s,color .18s;
   }
+  .btn[hidden]{display:none} /* .btn's own display:inline-flex above otherwise overrides the browser's built-in hidden behaviour */
   .btn:active{transform:translateY(1px)}
   .btn-primary{background:var(--blue);color:#fff}
   .btn-primary:hover{background:var(--blue-2)}
