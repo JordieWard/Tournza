@@ -478,7 +478,7 @@
 <div class="route" id="route-events">
   <section class="block">
     <span class="eyebrow">Events</span>
-    <div class="section-head"><div><h2>Tonight's tournaments</h2><p class="lede">One tournament per UK region, every evening. 32 players, group round robin into a knockout final, £6 buy-in.</p></div></div>
+    <div class="section-head"><div><h2>What's on &amp; coming up</h2><p class="lede">One tournament per UK region, every evening. 32 players, group round robin into a knockout final, £6 buy-in.</p></div></div>
     <div class="filters">
       <div class="fld"><label class="flab" for="f-region">Region</label>
         <select id="f-region"><option>All regions</option></select></div>
@@ -836,7 +836,7 @@
         <div class="foot-col"><span class="h">Compete</span>
           <a data-link="events">Events</a><a data-link="rankings">Rankings</a><a data-link="players">Players</a><a data-link="membership">Membership</a><a data-link="rules">Fair play</a></div>
         <div class="foot-col"><span class="h">Tournza</span>
-          <a href="login.html#signup">Join</a><a data-link="join">Contact</a><a data-link="privacy">Privacy</a><a data-link="terms">Terms</a></div>
+          <a href="login.html#signup" id="foot-join">Join</a><a data-link="join">Contact</a><a data-link="privacy">Privacy</a><a data-link="terms">Terms</a></div>
       </div>
     </div>
     <div class="foot-bottom">
@@ -1056,9 +1056,11 @@ function evCard(e){
 function renderHome(){
   const el=$('#home-events'); if(!el) return;
   if(!eventsLoaded){ el.innerHTML = stateMsg('Loading tonight’s tournaments…'); return; }
-  el.innerHTML = EVENTS.length
-    ? EVENTS.slice(0,3).map(evCard).join('')
-    : stateMsg('No tournaments scheduled right now — check back soon.');
+  const todayIso = new Date().toISOString().slice(0,10);
+  const tonight = EVENTS.filter(e=>e.iso===todayIso);
+  el.innerHTML = tonight.length
+    ? tonight.slice(0,3).map(evCard).join('')
+    : stateMsg('No tournaments scheduled tonight — check back soon.');
 }
 
 // The hero feature card and the "Tonight across the UK" list are filled entirely
@@ -1071,15 +1073,17 @@ function renderHeroSide(){
     if(t) t.innerHTML = stateMsg('Loading…');
     return;
   }
-  if(!EVENTS.length){
-    if(f) f.innerHTML = `<h3>No live events right now</h3>
+  const todayIso = new Date().toISOString().slice(0,10);
+  const tonight = EVENTS.filter(e=>e.iso===todayIso);
+  if(!tonight.length){
+    if(f) f.innerHTML = `<h3>No live events tonight</h3>
       <p class="mono" style="color:var(--muted-2);font-size:13px;margin:8px 0 16px">New tournaments are added regularly — check back soon.</p>
       <button class="btn btn-ghost" style="width:100%" data-link="events">See all events</button>`;
     if(t) t.innerHTML = stateMsg('Nothing scheduled tonight yet.');
     return;
   }
   // Feature the most prominent event: live first, then fullest.
-  const feat = [...EVENTS].sort((a,b)=>(Number(b.live)-Number(a.live)) || (capPct(b)-capPct(a)))[0];
+  const feat = [...tonight].sort((a,b)=>(Number(b.live)-Number(a.live)) || (capPct(b)-capPct(a)))[0];
   if(f && feat){
     f.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:14px">
@@ -1094,7 +1098,7 @@ function renderHeroSide(){
       <button class="btn btn-primary" style="width:100%;margin-top:16px" data-link="event:${feat.id}">View event</button>`;
   }
   if(t){
-    t.innerHTML = EVENTS.slice(0,3).map(e=>
+    t.innerHTML = tonight.slice(0,3).map(e=>
       `<div class="stat-line"><span>${e.title}</span><span class="mono" style="color:var(--muted-2)">${e.reg} / ${e.cap}</span></div>`
     ).join('');
   }
@@ -1354,6 +1358,11 @@ function buildTicker(){
 
 /* ---------------- router ---------------- */
 const ROUTES=['home','events','event','rankings','players','player','membership','join','account','privacy','terms','rules'];
+// True once we've left the homepage and created a browser-history "anchor"
+// for it — see go() below. Reset to false once we're back on it, so leaving
+// again later still sets up a fresh anchor for the next Back press.
+let __homeAnchorSet = false;
+
 function go(target){
   let [name,arg]=String(target).split(':');
   if(!ROUTES.includes(name)) name='home';
@@ -1370,8 +1379,27 @@ function go(target){
   // close mobile nav
   $('#nav').classList.remove('open'); $('#burger').setAttribute('aria-expanded','false');
   window.scrollTo({top:0,behavior:'instant' in window?'instant':'auto'});
-  history.replaceState(null,'',target===('home')?'#':'#'+target);
+
+  const url = target===('home')?'#':'#'+target;
+  if(name==='home'){
+    __homeAnchorSet = false; // back on home — next time we leave, anchor it again
+    history.replaceState(null,'',url);
+  }else if(!__homeAnchorSet){
+    // First step away from home: plant one history entry for "home" underneath
+    // this page, so there's somewhere for the Back button to land on.
+    // Everything after this still uses replaceState, so clicking around the
+    // site doesn't keep stacking up extra history entries beyond this one.
+    history.pushState(null,'','#');
+    history.pushState(null,'',url);
+    __homeAnchorSet = true;
+  }else{
+    history.replaceState(null,'',url);
+  }
 }
+
+// The Back button popping to that anchor entry doesn't rerender anything on
+// its own — this is what actually shows the homepage when it happens.
+window.addEventListener('popstate', () => { go('home'); });
 
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-link],[data-tournament],[data-checkout]');
@@ -1680,6 +1708,7 @@ go((location.hash||'#home').slice(1)||'home');
   window.tournzaSupabase = sb; // handy for future use
 
   const joinBtn   = $('#join-btn');
+  const footJoin  = $('#foot-join');
   const navLogin  = $('#nav-login');
   const userMenu  = $('#user-menu');
   const trigger   = $('#user-menu-trigger');
@@ -1758,6 +1787,7 @@ go((location.hash||'#home').slice(1)||'home');
     nameOut.textContent = name;
     avatarOut.textContent = (String(name).trim()[0]||'T').toUpperCase();
     if(joinBtn) joinBtn.hidden = true;
+    if(footJoin) footJoin.hidden = true;
     if(navLogin) navLogin.hidden = true;
     userMenu.hidden = false;
 
@@ -1911,6 +1941,7 @@ go((location.hash||'#home').slice(1)||'home');
     closeMenu();
     userMenu.hidden = true;
     if(joinBtn) joinBtn.hidden = false;
+    if(footJoin) footJoin.hidden = false;
     if(navLogin) navLogin.hidden = false;
     applyMembership(false);
     // a logged-out visitor sitting on the Account route → send to login
