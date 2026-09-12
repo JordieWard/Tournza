@@ -1170,7 +1170,7 @@ function renderEventDetail(id){
         </div>
         <div class="panel">
           <h3 style="font-size:19px">Prize pool</h3>
-          <p style="color:var(--muted-2);font-size:14px;margin:6px 0 14px">£${e.entry} buy-in per player — £${TOURNZA_FEE_PER_ENTRY} kept per entry, £${prizePerEntry} into the prize pool. Currently <strong style="color:var(--ivory)">£${pot}</strong> from ${e.reg} entries · up to £${full} at a full house. Paid via Stripe on the day.</p>
+          <p style="color:var(--muted-2);font-size:14px;margin:6px 0 14px">Currently <strong style="color:var(--ivory)">£${pot}</strong> from ${e.reg} entries · up to £${full} at a full house. Paid via Stripe on the day.</p>
           ${prize.map(p=>`<div class="prize-row"><span class="pos">${p[0]}</span><span>${p[1]}</span></div>`).join('')}
         </div>
         <div class="panel">
