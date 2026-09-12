@@ -1596,9 +1596,13 @@ const { data, error } = await sb
     *,
     tournament_entries(*, players(id, name, region))
   `)
-  .eq('status', 'open');
+  .eq('status', 'open')
+  .gte('tournament_date', new Date().toISOString().slice(0,10)); // today onward — yesterday's auto-created event shouldn't linger forever
 
 if(error) throw error;
+
+const __todayIso = new Date().toISOString().slice(0,10);
+const __nowHHMM = new Date().toLocaleTimeString('en-GB', { hour12:false, hour:'2-digit', minute:'2-digit' });
 
 EVENTS = (data||[]).map(t => {
   // tournament_date is a DATE (no time). Keep the raw Y-M-D as `iso` for sorting
@@ -1629,7 +1633,9 @@ EVENTS = (data||[]).map(t => {
       .map(te => te.players)
       .filter(Boolean)
       .map(p => ({ id: p.id, name: p.name || 'Player', region: p.region || '' })),
-    live:    t.status === 'open',
+    // "Live" now means what it says — kick-off has actually arrived today —
+    // rather than just "open for registration" (which stays true all day).
+    live:    iso === __todayIso && __nowHHMM >= EVENT_KICKOFF,
     fmt:     t.game_format || '501 Double Out'
   };
 });
