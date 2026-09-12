@@ -668,7 +668,7 @@
     <div class="legal">
       <span class="eyebrow">Legal</span>
       <h2 style="margin-top:10px">Privacy Policy</h2>
-      <p class="updated">Last updated: 13 June 2026</p>
+      <p class="updated">Last updated: 12 September 2026</p>
       <div class="admin">This policy reflects how Tournza handles your data. Please keep it up to date if your practices change; it is provided as a general policy and not as legal advice.</div>
 
       <h3>1. Who we are</h3>
@@ -676,37 +676,46 @@
 
       <h3>2. What we collect</h3>
       <ul>
+        <li>Account details when you sign up: your name, email address, and a password (stored securely and never visible to us — see Section 4).</li>
         <li>Details you give us through the join/contact form: your name, email address, region, the reason you're contacting us and any message.</li>
         <li>Your confirmation that you are 18 or over.</li>
-        <li>Event registrations and results, and any membership records.</li>
-        <li>Fair-play verification you provide for events (for example a camera check and a throw-line photo).</li>
-        <li>Payment is handled by our payment provider (Stripe). We receive confirmation of payment but <strong>do not collect or store your card details</strong>.</li>
+        <li>Event registrations, results, and rankings data, and your membership status.</li>
+        <li>Fair-play verification status (age check and cam check) once completed.</li>
+        <li>Payment is handled by our payment provider (Stripe). We receive confirmation of payment and, for members, an ongoing subscription reference so membership can renew automatically — but we <strong>do not collect or store your card details</strong> ourselves.</li>
       </ul>
 
       <h3>3. How we use it and our lawful basis</h3>
       <ul>
-        <li><strong>To run your membership and event entries</strong> — lawful basis: performance of a contract.</li>
+        <li><strong>To run your account, membership, and event entries</strong> — lawful basis: performance of a contract.</li>
         <li><strong>To verify eligibility and protect fair play</strong> — lawful basis: legitimate interests in running fair, secure competition.</li>
+        <li><strong>To send you service emails</strong> — confirming a payment, entry, or password reset — lawful basis: performance of a contract / legitimate interests in operating the service.</li>
         <li><strong>To send you optional updates about events</strong> — lawful basis: your consent, which you can withdraw at any time.</li>
       </ul>
 
-      <h3>4. Who we share it with</h3>
-      <p>We do not sell your data. We use a small number of processors only to deliver the service: our form provider (<strong>Formspree</strong>) transmits form submissions to us, and our payment provider (<strong>Stripe</strong>) processes membership payments. Beyond what these providers handle, your data is <strong>stored locally on our own secured device in the UK</strong> rather than in a hosted database. We may disclose data if required by law.</p>
+      <h3>4. Who we share it with, and where it's stored</h3>
+      <p>We do not sell your data. Your account and event data is stored in a <strong>hosted database provided by Supabase</strong> (which also handles secure sign-in — your password is encrypted and never visible to us or anyone else), not on a local device. We use a small number of other processors to deliver the service:</p>
+      <ul>
+        <li><strong>Supabase</strong> — hosts our database and handles account sign-in.</li>
+        <li><strong>Stripe</strong> — processes membership and event payments, and manages your subscription if you're a member.</li>
+        <li><strong>Formspree</strong> — transmits join/contact form submissions to us.</li>
+        <li><strong>Resend</strong> — delivers service emails (payment confirmations, entry confirmations, password resets) on our behalf.</li>
+      </ul>
+      <p>We may disclose data if required by law.</p>
 
       <h3>5. International transfers</h3>
-      <p>Some providers (such as Formspree and Stripe) may process data outside the UK. Where they do, they rely on appropriate safeguards such as UK-approved standard contractual clauses, as set out in their own terms.</p>
+      <p>Our processors (Supabase, Stripe, Formspree, and Resend) may process or store data outside the UK, including in the United States or EU. Where they do, they rely on appropriate safeguards such as UK-approved standard contractual clauses, as set out in their own terms.</p>
 
       <h3>6. How long we keep it</h3>
       <p>We keep your personal data only for as long as necessary for the purposes above and to meet our legal, accounting and regulatory obligations under applicable UK legislation, after which it is securely deleted. Records tied to payments are retained for the period required by law.</p>
 
       <h3>7. How we protect it</h3>
-      <p>Data stored locally is held on a password-protected, encrypted device with access limited to authorised people, and backed up securely. We review access regularly.</p>
+      <p>Your data is held in encrypted, access-controlled systems provided by our processors above, protected by row-level access rules so accounts can only access their own data. Passwords are encrypted by our authentication provider and are never visible to us. Card details never touch our systems — Stripe handles these directly. We review access regularly.</p>
 
       <h3>8. Your rights</h3>
       <p>Under UK GDPR you can ask us to access, correct, delete, restrict or port your data, and object to certain processing. You can withdraw consent at any time. To make a request, email <strong>admin@tournza.co.uk</strong>. You also have the right to complain to the Information Commissioner's Office (ICO) at ico.org.uk.</p>
 
-      <h3>9. Cookies</h3>
-      <p>This site is static and does not set tracking cookies by default. If we add analytics later, we will update this policy and seek consent where required.</p>
+      <h3>9. Cookies and similar storage</h3>
+      <p>This site does not use tracking or marketing cookies. Signing in uses your browser's local storage to keep you logged in — this is strictly necessary for the account and membership features to work, not for tracking, and doesn't require separate cookie consent. If we add analytics or marketing cookies later, we will update this policy and seek consent where required.</p>
 
       <h3>10. Children</h3>
       <p>Tournza is for players aged 18 and over. We do not knowingly collect data from under-18s.</p>
