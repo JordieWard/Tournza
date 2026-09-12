@@ -266,6 +266,14 @@
         <button class="btn ghost" type="button" id="backToLoginLink">Back to log in</button>
       </form>
 
+      <!-- Shown when arriving from an email link — a real click here (not
+           an automatic page visit) is what actually verifies the link, so
+           email security scanners that auto-visit links can't burn it. -->
+      <form id="confirmForm" novalidate>
+        <p class="tagline" id="confirmText" style="margin:0 0 4px">Click below to continue.</p>
+        <button class="btn" type="submit" id="confirmBtn">Continue</button>
+      </form>
+
       <!-- Shown after clicking the reset link in their email -->
       <form id="resetForm" novalidate>
         <p class="tagline" style="margin:0 0 4px">Choose a new password for your account.</p>
@@ -285,6 +293,12 @@
         <div class="field">
           <label for="suEmail">Email</label>
           <input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label for="suRegion">Your region</label>
+          <select id="suRegion" required>
+            <option value="">Choose your region</option>
+          </select>
         </div>
         <div class="field">
           <label for="suPassword">Password</label>
@@ -354,14 +368,26 @@
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Fill the signup region dropdown from the same live list every other
+    // region selector on the site uses — no separate hard-coded list here.
+    (async () => {
+      try {
+        const { data, error } = await sb.rpc("uk_regions_list");
+        if (error || !data) return;
+        const sel = $("suRegion");
+        data.forEach((r) => sel.add(new Option(r, r)));
+      } catch (_) {}
+    })();
+
     // ---- tab switching ----
     const tabLogin = $("tabLogin"), tabSignup = $("tabSignup");
     const loginForm = $("loginForm"), signupForm = $("signupForm");
     const forgotForm = $("forgotForm"), resetForm = $("resetForm");
+    const confirmForm = $("confirmForm");
     const forgotLink = $("forgotLink"), backToLoginLink = $("backToLoginLink");
 
-    // showView covers all four forms. Login/signup use the tab strip;
-    // forgot/reset hide it (there's nothing to switch between while resetting).
+    // showView covers all forms. Login/signup use the tab strip;
+    // forgot/reset/confirm hide it (nothing to switch between in those).
     function showView(name) {
       clearMsg();
       const tabs = document.querySelector(".tabs");
@@ -372,6 +398,7 @@
       signupForm.classList.toggle("active", name === "signup");
       forgotForm.classList.toggle("active", name === "forgot");
       resetForm.classList.toggle("active", name === "reset");
+      confirmForm.classList.toggle("active", name === "confirm");
     }
     function selectTab(login) { showView(login ? "login" : "signup"); }
     tabLogin.addEventListener("click", () => selectTab(true));
@@ -399,9 +426,10 @@
 
       if (!data) {
         const fullName = (user.user_metadata && user.user_metadata.full_name) || "";
+        const region = (user.user_metadata && user.user_metadata.region) || null;
         const ins = await sb
           .from("profiles")
-          .insert({ id: user.id, full_name: fullName, email: user.email })
+          .insert({ id: user.id, full_name: fullName, email: user.email, region })
           .select("full_name, membership_status")
           .maybeSingle();
         if (ins.error) { console.error(ins.error); return null; }
@@ -441,10 +469,11 @@
       clearMsg();
       const full_name = $("suName").value.trim();
       const email = $("suEmail").value.trim();
+      const region = $("suRegion").value;
       const password = $("suPassword").value;
 
-      if (!full_name || !email || password.length < 6) {
-        showErr("Enter your name, email, and a password of at least 6 characters.");
+      if (!full_name || !email || !region || password.length < 6) {
+        showErr("Enter your name, email, region, and a password of at least 6 characters.");
         return;
       }
 
@@ -453,7 +482,7 @@
       try {
         const { data, error } = await sb.auth.signUp({
           email, password,
-          options: { data: { full_name } } // stored on the auth user as metadata
+          options: { data: { full_name, region } } // stored on the auth user as metadata
         });
         if (error) { showErr(error.message); return; }
 
@@ -559,27 +588,70 @@
       finally { setLoading(btn, false); }
     });
 
-    // A password-reset email link lands here with the new session's tokens
-    // in the URL itself (e.g. #access_token=...&refresh_token=...&type=recovery).
-    // Supabase can normally pick this up automatically — but if the browser
-    // was ALREADY signed in as someone (even the same person, from an older
-    // visit), that automatic handling can lose the race and just keep
-    // showing the old, already-signed-in session instead of switching to
-    // this new one. Reading the tokens ourselves and forcing them to take
-    // over removes that ambiguity entirely — it works the same regardless
-    // of whatever was happening in this browser beforehand.
+    // New-format email links point at THIS page with the raw token as a
+    // query param (?token_hash=...&type=...) instead of straight at
+    // Supabase's verify endpoint — see send-auth-email for why. We only
+    // verify it when the confirm button is actually clicked, not just
+    // because the page loaded, so an email scanner visiting the link
+    // automatically can't burn it before the real person gets to it.
+    const queryParams = new URLSearchParams(location.search);
+    const pendingTokenHash = queryParams.get("token_hash");
+    const pendingType = queryParams.get("type");
+
+    if (pendingTokenHash && pendingType) {
+      const confirmText = $("confirmText");
+      confirmText.textContent = pendingType === "recovery"
+        ? "Click below to reset your password."
+        : "Click below to confirm and continue.";
+      showView("confirm");
+
+      confirmForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearMsg();
+        const btn = $("confirmBtn");
+        setLoading(btn, true, "Confirming…");
+        try {
+          const { data, error } = await sb.auth.verifyOtp({
+            token_hash: pendingTokenHash,
+            type: pendingType,
+          });
+          history.replaceState(null, "", location.pathname); // token's used either way; don't leave it sitting in the address bar
+          if (error || !data.session) {
+            showErr("This link is invalid or has expired. Request a new one below.");
+            showView("forgot");
+            return;
+          }
+          if (pendingType === "recovery") {
+            recoverySession = data.session;
+            showView("reset");
+          } else {
+            renderDashboard(data.session);
+          }
+        } catch (err) {
+          showErr(err.message || "Something went wrong confirming this link.");
+        } finally {
+          setLoading(btn, false);
+        }
+      });
+    }
+
+    // Older already-sent emails may still use the previous link format,
+    // which redirects back here with session tokens straight in the URL
+    // (#access_token=...&type=recovery). Handled as a fallback so those
+    // don't just break outright.
     const hashParams = new URLSearchParams(location.hash.slice(1));
-    const isRecoveryLink = hashParams.get("type") === "recovery" && hashParams.get("access_token");
+    const isLegacyRecoveryLink = hashParams.get("type") === "recovery" && hashParams.get("access_token");
 
     // ====== route on auth state ======
     sb.auth.onAuthStateChange((_event, session) => {
-      if (isRecoveryLink) return; // handled explicitly below instead
+      if (pendingTokenHash || isLegacyRecoveryLink) return; // handled explicitly instead
       if (session && session.user) renderDashboard(session);
       else { renderAuth(); clearMsg(); }
     });
 
     (async () => {
-      if (isRecoveryLink) {
+      if (pendingTokenHash) return; // handled by the confirm button above
+      if (isLegacyRecoveryLink) {
         const { data, error } = await sb.auth.setSession({
           access_token: hashParams.get("access_token"),
           refresh_token: hashParams.get("refresh_token"),
