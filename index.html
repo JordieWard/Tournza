@@ -502,7 +502,11 @@
 <div class="route" id="route-rankings">
   <section class="block">
     <span class="eyebrow">Rankings</span>
-    <div class="section-head"><div><h2>National standings</h2><p class="lede">Points are awarded by finishing place at every regional event and update automatically. Tap a player to open their profile.</p></div></div>
+    <div class="section-head"><div><h2 id="rank-title">National standings</h2><p class="lede">Points are awarded by finishing place at every regional event and update automatically. Tap a player to open their profile.</p></div></div>
+    <div class="filters">
+      <div class="fld"><label class="flab" for="rank-region">Region</label>
+        <select id="rank-region"><option>All regions</option></select></div>
+    </div>
     <div class="detail-grid" style="grid-template-columns:1.6fr .9fr">
       <div class="tbl-wrap">
         <table>
@@ -642,6 +646,12 @@
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Plan</span><span>Tournza Standard</span></div>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Price</span><span>£12 / year</span></div>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Member since</span><span id="acct-member-since">—</span></div>
+        <div class="stat-line"><span class="mono" style="color:var(--muted)">Your region</span>
+          <select id="acct-region" style="background:transparent;color:var(--ivory);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:13px">
+            <option value="">Not set</option>
+          </select>
+        </div>
+        <p class="mono" style="color:var(--muted);font-size:11px;margin:2px 0 0">You can only enter tournaments in your own region.</p>
         <div class="stat-line" id="acct-renewal-line" hidden><span class="mono" style="color:var(--muted)" id="acct-renewal-label">Renews</span><span id="acct-renewal-date">—</span></div>
         <button class="btn btn-ghost btn-sm" id="acct-manage-plan" style="margin-top:16px;width:100%" data-link="membership">Manage plan</button>
       </div>
@@ -870,7 +880,7 @@ const SUPABASE_KEY = "sb_publishable_HhQl-E4KZFnwuSSA_J_JXQ_cIQbilr-";
 
 /* Shared auth/membership state, kept in sync by the auth module below.
    Other code (router, buy-in buttons) reads this to gate access. */
-const authState = { ready:false, signedIn:false, membershipActive:false, user:null };
+const authState = { ready:false, signedIn:false, membershipActive:false, userRegion:null, user:null };
 
 /* lightweight transient toast */
 let __toastTimer;
@@ -1200,14 +1210,22 @@ function renderEventDetail(id){
 }
 
 function renderRankings(){
-  const body=$('#rank-body');
+  const body=$('#rank-body'), title=$('#rank-title');
+  const region = $('#rank-region')?.value || 'All regions';
+  const byRegion = region && region !== 'All regions';
+  if(title) title.textContent = byRegion ? region+' standings' : 'National standings';
   if(body){
     if(!playersLoaded){
       body.innerHTML = `<tr><td colspan="6">${stateMsg('Loading rankings…')}</td></tr>`;
     }else if(!REG.length){
       body.innerHTML = `<tr><td colspan="6">${stateMsg('No ranked players yet — results will appear here once the first events are logged.')}</td></tr>`;
     }else{
-      body.innerHTML = REG.map(p=>`
+      // Regional view re-ranks 1, 2, 3… within that region rather than just
+      // filtering the national list (which would leave gaps like #4, #9, #15).
+      const list = byRegion
+        ? REG.filter(p=>p.region===region).map((p,i)=>({...p, rank:i+1}))
+        : REG;
+      body.innerHTML = list.length ? list.map(p=>`
         <tr class="clk" data-link="player:${p.id}">
           <td class="rank ${p.rank===1?'top':''}">${p.rank}</td>
           <td><strong>${p.name}</strong></td>
@@ -1215,7 +1233,7 @@ function renderRankings(){
           <td class="num pts">${p.points}</td>
           <td class="num" style="color:var(--muted-2)">${p.wins}</td>
           <td class="num" style="color:var(--muted-2)">${p.events}</td>
-        </tr>`).join('');
+        </tr>`).join('') : `<tr><td colspan="6">${stateMsg('No ranked players in '+region+' yet.')}</td></tr>`;
     }
   }
   const feed=$('#results-feed');
@@ -1225,11 +1243,12 @@ function renderRankings(){
     }else if(!WINNERS.length){
       feed.innerHTML = stateMsg('No results logged yet.');
     }else{
-      feed.innerHTML = WINNERS.slice(0,8).map(w=>`
+      const winnersList = byRegion ? WINNERS.filter(w=>w.region===region) : WINNERS;
+      feed.innerHTML = winnersList.length ? winnersList.slice(0,8).map(w=>`
         <div class="reg-row" ${w.id?`data-link="player:${w.id}" style="cursor:pointer"`:''}>
           <span class="dot live"></span>
           <span>${w.region}<br><span class="mono" style="color:var(--muted);font-size:11px">${w.name} · winner</span></span>
-        </div>`).join('');
+        </div>`).join('') : stateMsg('No results in '+region+' yet.');
     }
   }
 }
@@ -1418,6 +1437,16 @@ document.addEventListener('click',e=>{
       go('membership');
       return;
     }
+    const targetEvent = EVENTS.find(x=>String(x.id)===String(t.dataset.tournament));
+    if(!authState.userRegion){
+      notify('Set your region in your account before entering a tournament.','warn');
+      go('account');
+      return;
+    }
+    if(targetEvent && targetEvent.region && targetEvent.region!==authState.userRegion){
+      notify(`This tournament is in ${targetEvent.region}. You can only enter tournaments in your own region (${authState.userRegion}).`,'warn');
+      return;
+    }
     // Ask our own server code to create a fresh, one-time Stripe checkout for
     // THIS tournament and THIS user, then send the browser there. This is
     // more reliable than a shared link with a URL parameter tacked on — the
@@ -1489,6 +1518,7 @@ $('#burger').addEventListener('click',()=>{
 /* player search + region filter */
 $('#p-search').addEventListener('input',renderPlayers);
 $('#p-region').addEventListener('change',renderPlayers);
+$('#rank-region').addEventListener('change',renderRankings);
 /* events filters — region + date both re-render the list */
 $('#f-region').addEventListener('change',renderEvents);
 $('#f-window').addEventListener('change',renderEvents);
@@ -1595,6 +1625,15 @@ async function loadRegionsFromEnum(){
     pf.add(new Option('All regions'));
     regions.forEach(r=> pf.add(new Option(r)));
     if([...pf.options].some(o=>o.value===cur)) pf.value=cur;
+  }
+  // Rankings filter: same pattern again.
+  const rf=$('#rank-region');
+  if(rf){
+    const cur=rf.value;
+    rf.innerHTML='';
+    rf.add(new Option('All regions'));
+    regions.forEach(r=> rf.add(new Option(r)));
+    if([...rf.options].some(o=>o.value===cur)) rf.value=cur;
   }
 }
 // Build a local Date from a Y-M-D string. Never `new Date("YYYY-MM-DD")` — a
@@ -1729,14 +1768,19 @@ go((location.hash||'#home').slice(1)||'home');
   async function loadMembership(user){
     try{
       let { data, error } = await sb.from('profiles')
-        .select('membership_status').eq('id', user.id).maybeSingle();
+        .select('membership_status, region').eq('id', user.id).maybeSingle();
       if(error){ console.warn('profiles read failed:', error.message); return false; }
       if(!data){ // first sight — create the row so status persists
         const ins = await sb.from('profiles')
-          .insert({ id:user.id, full_name:(user.user_metadata&&user.user_metadata.full_name)||'' })
-          .select('membership_status').maybeSingle();
+          .insert({
+            id:user.id,
+            full_name:(user.user_metadata&&user.user_metadata.full_name)||'',
+            region:(user.user_metadata&&user.user_metadata.region)||null
+          })
+          .select('membership_status, region').maybeSingle();
         data = ins.data;
       }
+      authState.userRegion = data?.region || null;
       return !!data && String(data.membership_status).toLowerCase()==='active';
     }catch(_){ return false; }
   }
@@ -1838,7 +1882,7 @@ go((location.hash||'#home').slice(1)||'home');
     try{
       const [{ data: profile }, { data: entries }] = await Promise.all([
         sb.from('profiles')
-          .select('full_name, membership_status, created_at, age_verified, cam_verified, stripe_customer_id, current_period_end, cancel_at_period_end')
+          .select('full_name, membership_status, created_at, age_verified, cam_verified, stripe_customer_id, current_period_end, cancel_at_period_end, region')
           .eq('id', user.id).maybeSingle(),
         sb.from('tournament_entries')
           .select('id, tournaments(id, name, tournament_date)')
@@ -1864,6 +1908,33 @@ go((location.hash||'#home').slice(1)||'home');
     if(since) since.textContent = profile.created_at
       ? (parseLocalDate(String(profile.created_at).slice(0,10))||new Date(profile.created_at)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
       : '—';
+
+    const regionSel = $('#acct-region');
+    if(regionSel && !regionSel.dataset.wired){
+      regionSel.dataset.wired = '1'; // only build the options + listener once; value updates separately below
+      sb.rpc('uk_regions_list').then(({data})=>{
+        (data||[]).forEach(r=> regionSel.add(new Option(r, r)));
+        regionSel.value = profile.region || '';
+      });
+      regionSel.addEventListener('change', async ()=>{
+        const newRegion = regionSel.value;
+        regionSel.disabled = true;
+        try{
+          const { error } = await sb.from('profiles').update({ region: newRegion }).eq('id', authState.user.id);
+          if(error) throw error;
+          authState.userRegion = newRegion;
+          if(acctData) acctData.profile.region = newRegion;
+          notify('Region updated ✓');
+        }catch(err){
+          console.error('Could not update region:', err);
+          notify('Could not update your region — try again.','warn');
+        }finally{
+          regionSel.disabled = false;
+        }
+      });
+    }else if(regionSel){
+      regionSel.value = profile.region || '';
+    }
 
     const renewalLine = $('#acct-renewal-line'), renewalLabel = $('#acct-renewal-label'), renewalDate = $('#acct-renewal-date');
     if(renewalLine){
