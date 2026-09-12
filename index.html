@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
@@ -647,11 +648,11 @@
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Price</span><span>£12 / year</span></div>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Member since</span><span id="acct-member-since">—</span></div>
         <div class="stat-line"><span class="mono" style="color:var(--muted)">Your region</span>
-          <select id="acct-region" style="background:transparent;color:var(--ivory);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:13px">
+          <select id="acct-region" style="min-width:0">
             <option value="">Not set</option>
           </select>
         </div>
-        <p class="mono" style="color:var(--muted);font-size:11px;margin:2px 0 0">You can only enter tournaments in your own region.</p>
+        <p class="mono" style="color:var(--muted);font-size:11px;margin:2px 0 0" id="acct-region-note">You can only enter tournaments in your own region.</p>
         <div class="stat-line" id="acct-renewal-line" hidden><span class="mono" style="color:var(--muted)" id="acct-renewal-label">Renews</span><span id="acct-renewal-date">—</span></div>
         <button class="btn btn-ghost btn-sm" id="acct-manage-plan" style="margin-top:16px;width:100%" data-link="membership">Manage plan</button>
       </div>
@@ -1909,13 +1910,17 @@ go((location.hash||'#home').slice(1)||'home');
       ? (parseLocalDate(String(profile.created_at).slice(0,10))||new Date(profile.created_at)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
       : '—';
 
-    const regionSel = $('#acct-region');
+    const regionSel = $('#acct-region'), regionNote = $('#acct-region-note');
     if(regionSel && !regionSel.dataset.wired){
-      regionSel.dataset.wired = '1'; // only build the options + listener once; value updates separately below
+      regionSel.dataset.wired = '1'; // only build the options + listener once; value/lock state updates separately below
       sb.rpc('uk_regions_list').then(({data})=>{
         (data||[]).forEach(r=> regionSel.add(new Option(r, r)));
         regionSel.value = profile.region || '';
+        regionSel.disabled = !!profile.region;
       });
+      if(regionNote) regionNote.textContent = profile.region
+        ? 'Your region is locked. Contact admin@tournza.co.uk if this needs to change.'
+        : 'Choose once — you won’t be able to change it yourself afterward.';
       regionSel.addEventListener('change', async ()=>{
         const newRegion = regionSel.value;
         regionSel.disabled = true;
@@ -1924,16 +1929,20 @@ go((location.hash||'#home').slice(1)||'home');
           if(error) throw error;
           authState.userRegion = newRegion;
           if(acctData) acctData.profile.region = newRegion;
-          notify('Region updated ✓');
+          if(regionNote) regionNote.textContent = 'Your region is locked. Contact admin@tournza.co.uk if this needs to change.';
+          notify('Region set ✓');
         }catch(err){
           console.error('Could not update region:', err);
           notify('Could not update your region — try again.','warn');
-        }finally{
-          regionSel.disabled = false;
+          regionSel.disabled = false; // let them retry — only re-lock on genuine success
         }
       });
     }else if(regionSel){
       regionSel.value = profile.region || '';
+      regionSel.disabled = !!profile.region;
+      if(regionNote) regionNote.textContent = profile.region
+        ? 'Your region is locked. Contact admin@tournza.co.uk if this needs to change.'
+        : 'Choose once — you won’t be able to change it yourself afterward.';
     }
 
     const renewalLine = $('#acct-renewal-line'), renewalLabel = $('#acct-renewal-label'), renewalDate = $('#acct-renewal-date');
