@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
@@ -454,7 +453,7 @@
     <div class="steps">
       <div class="step"><div class="n">01</div><h4>Verify</h4><p>One membership, one player profile, verified eligibility before you throw.</p></div>
       <div class="step"><div class="n">02</div><h4>Enter</h4><p>Pick tonight's tournament in your region and pay the £6 buy-in — capped at 32 players.</p></div>
-      <div class="step"><div class="n">03</div><h4>Check in</h4><p>Check-in closes ten minutes before the start time. Cam on, throw-line set.</p></div>
+      <div class="step"><div class="n">03</div><h4>Check in</h4><p>Check-in closes ten minutes before the start time. Cam on and ready to play.</p></div>
       <div class="step"><div class="n">04</div><h4>Climb</h4><p>Results feed straight into transparent regional rankings. No politics.</p></div>
     </div>
   </section>
@@ -758,10 +757,10 @@
       <p>Membership costs <strong>£12 per year</strong>, billed through Stripe, and renews annually unless cancelled before the renewal date. Membership covers your verified profile and eligibility to register for events. Each event also carries a <strong>£6 buy-in</strong>, shown and paid at the point of entry.</p>
 
       <h3>4. Events, fees and prizes</h3>
-      <p>We run one tournament per UK region every evening. Each event is capped at <strong>32 players</strong> and played as a group round robin followed by a knockout to the final, 501 double-out. The <strong>£6 buy-in</strong> is paid via Stripe and entry closes at the published check-in time. We may amend, reschedule or cancel an event; if we cancel an event you've paid to enter, we'll refund that buy-in.</p>
+      <p>We run one tournament per UK region every evening. Each event is capped at <strong>32 players</strong> and played as a group round robin followed by a knockout to the final, 501 double-out. The <strong>£6 buy-in</strong> is paid via Stripe and entry closes at the published check-in time. Of each £6 buy-in, Tournza keeps £1 and the remaining <strong>£5 goes into that event's prize pool</strong>. We may amend, reschedule or cancel an event; if we cancel an event you've paid to enter, we'll refund that buy-in.</p>
 
       <h3>5. Fair play and conduct</h3>
-      <p>You agree to play honestly, complete any camera check and throw-line verification we ask for, and follow our fair-play rules. We may disqualify, suspend or remove players for cheating, abuse or breaching these terms, without refund where appropriate.</p>
+      <p>You agree to play honestly, complete any camera check we ask for, and follow our fair-play rules. We may disqualify, suspend or remove players for cheating, abuse or breaching these terms, without refund where appropriate.</p>
 
       <h3>6. Payments and refunds</h3>
       <p>Payments are processed securely by Stripe. Except where required by law or stated above, membership fees and event entries are non-refundable once an event has started.</p>
@@ -792,8 +791,7 @@
 
       <h3>1. Setup &amp; equipment</h3>
       <ul>
-        <li>Regulation board: bullseye <strong>1.73 m</strong> from the floor; oche (throw line) <strong>2.37 m</strong> from the face of the board.</li>
-        <li>Upload a throw-line photo before your first event so officials can confirm your distance.</li>
+        <li>Regulation board: bullseye <strong>1.73 m</strong> from the floor, played at the standard <strong>2.37 m</strong> oche distance.</li>
         <li>Use a steel-tip or soft-tip board appropriate to the event listing, in good condition with clear numbers.</li>
       </ul>
 
@@ -801,7 +799,7 @@
       <ul>
         <li>Your webcam must show <strong>both the board and your throwing action</strong> clearly for the whole match.</li>
         <li>Keep the board well lit and unobstructed. Don't move or re-angle the camera mid-leg.</li>
-        <li>Officials may ask for a quick camera/oche recheck at any time.</li>
+        <li>Officials may ask for a quick camera recheck at any time.</li>
       </ul>
 
       <h3>3. Match play</h3>
@@ -903,6 +901,10 @@ function notify(msg, kind){
 // Players now live in the database, so that filter is filled from the same
 // uk_regions enum as everything else (see loadRegionsFromEnum).
 const FORMAT = "Group round robin → knockout to final";
+// Of every £6 buy-in, Tournza keeps £1 and the rest goes into that event's
+// prize pool. Named here once so it's the single place to change if the
+// split ever changes.
+const TOURNZA_FEE_PER_ENTRY = 1;
 
 // Every event starts at the same UK time, and check-in closes 10 minutes
 // before. tournament_date is a DATE (no time), so these supply the time half.
@@ -1024,11 +1026,11 @@ const INCLUDES = [
   'Full ranking eligibility and points tracking',
   'Detailed match stats: average, checkout %, 180s',
   'Regional leaderboards and player search',
-  'Fair-play cam verification and throw-line checks',
+  'Fair-play cam verification',
 ];
 const FAQ = [
   ['What does the £12 membership cover?','Membership gives you a verified profile, ranking eligibility and the ability to enter events for a full year. Each event then has a £6 buy-in, paid when you register.'],
-  ['How does verification work?','You complete a one-off age check and a camera check, then upload a throw-line photo so officials can confirm your oche distance. Once cleared you can enter any event.'],
+  ['How does verification work?','You complete a one-off age check and a camera check. Once cleared you can enter any event.'],
   ['What format are events?','Every region runs one tournament each evening, capped at 32 players: a group round robin followed by a knockout to the final, 501 double-out.'],
   ['When does check-in close?','Check-in closes ten minutes before the published start time. Miss it and your place may be released to a reserve.'],
   ['How are prizes paid?','Prizes are paid to verified winners via Stripe, on the day of winning or within 24 hours.'],
@@ -1141,7 +1143,8 @@ function renderEventDetail(id){
   // compare loosely. No fallback to a different event — show a message instead.
   const e=EVENTS.find(x=>String(x.id)===String(id));
   if(!e){ $('#event-detail').innerHTML = stateMsg('That tournament isn’t available right now. It may have finished or been removed.'); return; }
-  const pot=e.reg*e.entry, full=e.cap*e.entry;
+  const prizePerEntry = Math.max(0, e.entry - TOURNZA_FEE_PER_ENTRY);
+  const pot=e.reg*prizePerEntry, full=e.cap*prizePerEntry;
   const prize=[['1st','£'+Math.round(pot*0.5)],['2nd','£'+Math.round(pot*0.3)],['3rd','£'+Math.round(pot*0.2)]];
   const entered=eventPlayers(e), extra=Math.max(e.reg-entered.length,0);
   const alreadyIn = !!(authState.user && entered.some(p=>String(p.id)===String(authState.user.id)));
@@ -1167,7 +1170,7 @@ function renderEventDetail(id){
         </div>
         <div class="panel">
           <h3 style="font-size:19px">Prize pool</h3>
-          <p style="color:var(--muted-2);font-size:14px;margin:6px 0 14px">Pool grows with entries (£${e.entry} buy-in). Currently <strong style="color:var(--ivory)">£${pot}</strong> from ${e.reg} entries · up to £${full} at a full house. Paid via Stripe on the day.</p>
+          <p style="color:var(--muted-2);font-size:14px;margin:6px 0 14px">£${e.entry} buy-in per player — £${TOURNZA_FEE_PER_ENTRY} kept per entry, £${prizePerEntry} into the prize pool. Currently <strong style="color:var(--ivory)">£${pot}</strong> from ${e.reg} entries · up to £${full} at a full house. Paid via Stripe on the day.</p>
           ${prize.map(p=>`<div class="prize-row"><span class="pos">${p[0]}</span><span>${p[1]}</span></div>`).join('')}
         </div>
         <div class="panel">
@@ -1175,7 +1178,6 @@ function renderEventDetail(id){
           <ul class="rules">
             <li>Verified Tournza membership required to enter</li>
             <li>Age check and cam check must be cleared before check-in</li>
-            <li>Throw-line photo confirms a regulation oche distance</li>
             <li>501 double-out · group round robin then knockout to the final</li>
             <li>Check-in closes at ${e.checkin} — late entries released to reserves</li>
           </ul>
