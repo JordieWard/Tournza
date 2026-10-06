@@ -368,6 +368,14 @@
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Where to go after logging in. Pages like the match room send people here
+    // as login.html?next=/match-room-v11.html?match=ABC123 — only same-site
+    // paths are honoured, anything else falls back to the home page.
+    const afterLogin = (() => {
+      const n = new URLSearchParams(location.search).get("next") || "";
+      return /^\/(?!\/)/.test(n) ? "https://tournza.co.uk" + n : "https://tournza.co.uk/";
+    })();
+
     // Fill the signup region dropdown from the same live list every other
     // region selector on the site uses — no separate hard-coded list here.
     (async () => {
@@ -490,7 +498,7 @@
           // Email confirmation is OFF → we're logged in. onAuthStateChange
           // will render the dashboard; loadProfile() writes the profiles row.
           showOk("Account created. Throwing you in…");
-          window.location.href = "https://tournza.co.uk/";
+          window.location.href = afterLogin;
         } else {
           // Email confirmation is ON → must verify before logging in.
           showOk("Account created. Check your email to confirm, then log in.");
@@ -517,7 +525,7 @@
       try {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { showErr(error.message); return; }
-      window.location.href = "https://tournza.co.uk/";
+      window.location.href = afterLogin;
         // success → onAuthStateChange renders the dashboard
       } catch (err) {
         showErr(err.message || "Couldn’t log you in.");
