@@ -351,6 +351,37 @@
   .back:hover{color:var(--ivory)}
 
 
+  /* ---------- site-wide diagonal theme (blue) ----------
+     Every page except Friendlies: the same diagonal backdrop, heading
+     gradient and nav-bar edge as Friendlies, in the logo's blue (#005bfe).
+     Friendlies swaps all three to pink (see the friendlies block below). */
+  :root{
+    --logo-blue:#005bfe;
+    --logo-blue-2:#4d8dff;
+    --logo-line:rgba(77,141,255,.42);
+  }
+  body:not(.fr-on)::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      linear-gradient(115deg, transparent 0 46%, rgba(77,141,255,.55) 46% 46.15%, transparent 46.15% 100%),
+      linear-gradient(115deg, transparent 0 49%, rgba(0,91,254,.17) 49% 63%, rgba(0,91,254,.07) 63% 71%, transparent 71% 100%),
+      linear-gradient(115deg, transparent 0 74%, rgba(77,141,255,.30) 74% 74.12%, transparent 74.12% 100%);
+  }
+  body:not(.fr-on) header{border-bottom-color:var(--logo-line);box-shadow:0 1px 0 rgba(0,91,254,.45)}
+  body:not(.fr-on) .ticker{border-bottom-color:var(--logo-line)}
+  .route:not(#route-friendlies) h1,
+  .route:not(#route-friendlies) h2{
+    background:linear-gradient(100deg,#fff 0%,#fff 38%,var(--logo-blue-2) 72%,var(--logo-blue) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  /* each page's main title at the Friendlies size */
+  :is(#route-events,#route-rankings,#route-players,#route-account) .section-head h2,
+  #route-membership .price-hero h2,
+  :is(#route-join,#route-privacy,#route-terms,#route-rules) h2[style*="margin-top"],
+  #route-event h2, #route-player .profile-hero h2{
+    font-size:clamp(44px,7vw,84px);letter-spacing:-.03em;
+  }
+
   /* ---------- friendlies (its own pink theme, same Tournza system) ----------
      The pink is the opponent colour from the match room, so the lobby and the
      playing platform read as one place. Scoped to #route-friendlies + the nav
