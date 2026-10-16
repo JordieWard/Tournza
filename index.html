@@ -2204,11 +2204,17 @@ document.addEventListener('click', async e=>{
     frRenderChallenges();
   });
   if(t.dataset.frAccept) return run('Starting…', async ()=>{
-    const c = await rpc('respond_challenge', { p_challenge: t.dataset.frAccept, p_accept: true });
-    if(c && c.match_code) frOpen(c.match_code);
+    const id = t.dataset.frAccept;
+    const c = await rpc('respond_challenge', { p_challenge: id, p_accept: true });
+    // only an accepted challenge opens a match; anything else is a plain no, said plainly
+    if(c && c.status==='accepted' && c.match_code){ frOpen(c.match_code); return; }
+    FR.incoming = FR.incoming.filter(x=>x.id!==id); frRenderChallenges();
+    frErr(c && c.status==='expired'   ? 'That challenge ran out before you accepted it.'
+        : c && c.status==='cancelled' ? 'That challenge is off — the player has checked in to a tournament.'
+        : 'That challenge is no longer open.');
   });
   if(t.dataset.frDecline) return run(null, async ()=>{
-    await rpc('respond_challenge', { p_challenge: t.dataset.frDecline, p_accept: false });
+    await rpc('respond_challenge', { p_challenge: t.dataset.frDecline, p_accept: false });   // declined, or already expired — gone either way
     FR.incoming = FR.incoming.filter(c=>c.id!==t.dataset.frDecline); frRenderChallenges();
   });
   if(t.dataset.frCancel) return run(null, async ()=>{
