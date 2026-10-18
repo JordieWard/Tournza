@@ -537,6 +537,155 @@
     .ev-group td.hide-sm,.ev-group th.hide-sm{display:none}
   }
 
+
+  /* ---------- player profile (Stage 6) ----------
+     Tournza navy + electric blue, lifted: electric cyan for key figures and the
+     form line, magenta used sparingly for wins and personal bests. */
+  #route-player{--pf-cyan:#00e0ff;--pf-cyan-2:#5cecff;--pf-cyan-soft:rgba(0,224,255,.12);--pf-cyan-line:rgba(0,224,255,.42);
+    --pf-blue:#2f7bff;--pf-mag:#e83cff;--pf-mag-soft:rgba(232,60,255,.14);--pf-mag-line:rgba(232,60,255,.5);
+    --pf-card:linear-gradient(165deg,#13244a 0%,#0c1832 55%,#091327 100%);--pf-edge:rgba(110,160,255,.22)}
+  /* hero */
+  .pf-hero{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;
+    padding:30px 32px;border:1px solid rgba(47,123,255,.45);border-radius:20px;overflow:hidden;isolation:isolate;
+    background:radial-gradient(120% 140% at 0% 0%,rgba(47,123,255,.42),transparent 55%),
+               radial-gradient(70% 120% at 100% 100%,rgba(232,60,255,.16),transparent 60%),
+               linear-gradient(120deg,#0e2150,#0a1735 60%,#081128);
+    box-shadow:0 20px 50px rgba(2,8,24,.55),inset 0 1px 0 rgba(255,255,255,.06)}
+  .pf-hero::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--pf-blue),var(--pf-cyan) 55%,var(--pf-mag))}
+  .pf-hero .ava.lg{width:92px;height:92px;font-size:32px;background:linear-gradient(135deg,var(--pf-blue),var(--pf-cyan));
+    box-shadow:0 12px 34px rgba(0,180,255,.45),inset 0 1px 0 rgba(255,255,255,.35)}
+  .pf-hero h2{margin:2px 0 10px}
+  .pf-hero .badges{gap:8px}
+  .pf-chip{display:inline-flex;align-items:baseline;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--pf-edge);
+    background:rgba(7,16,31,.55);font-family:var(--mono);font-size:12px;color:var(--ivory-dim)}
+  .pf-chip b{font-family:var(--display);font-weight:800;font-size:15px;color:var(--ivory)}
+  .pf-chip.win{border-color:var(--pf-mag-line);background:var(--pf-mag-soft)}
+  .pf-chip.win b{color:var(--pf-mag)}
+  .pf-chip.pod{border-color:var(--pf-cyan-line);background:var(--pf-cyan-soft)}
+  .pf-chip.pod b{color:var(--pf-cyan)}
+  .pf-pts{text-align:right;padding-left:26px;border-left:1px solid rgba(110,160,255,.2)}
+  .pf-pts .v{font-family:var(--display);font-weight:900;font-size:clamp(60px,7.5vw,92px);line-height:.85;letter-spacing:-.03em;
+    background:linear-gradient(180deg,#ffffff 0%,var(--pf-cyan-2) 45%,var(--pf-cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 18px rgba(0,224,255,.35))}
+  .pf-pts .l{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--pf-cyan-2);margin-top:10px}
+  .pf-section{margin-top:34px}
+  .pf-section > .eyebrow{display:inline-block;margin-bottom:14px}
+  /* stat cards */
+  .pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .pf-stats .b{position:relative;padding:20px 20px 18px;border-radius:16px;border:1px solid var(--pf-edge);background:var(--pf-card);
+    box-shadow:0 10px 26px rgba(2,8,24,.4),inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden}
+  .pf-stats .b .v{font-family:var(--display);font-weight:900;font-size:clamp(30px,3.4vw,40px);line-height:1;color:var(--ivory);letter-spacing:-.02em}
+  .pf-stats .b .v small{font-family:var(--mono);font-weight:400;font-size:12px;color:var(--muted-2);margin-left:5px;letter-spacing:.04em}
+  .pf-stats .b .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted-2);margin-top:10px}
+  .pf-stats .b.key{border-color:var(--pf-cyan-line);background:radial-gradient(120% 90% at 0% 0%,rgba(0,224,255,.18),transparent 60%),var(--pf-card)}
+  .pf-stats .b.key .v{color:var(--pf-cyan);text-shadow:0 0 22px rgba(0,224,255,.35)}
+  .pf-stats .b.pb::before{content:"PB";position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    color:var(--pf-mag);border:1px solid var(--pf-mag-line);border-radius:999px;padding:2px 7px}
+  .pf-stats .b.pb .v{color:#fff}
+  .pf-stats .b.na .v{color:var(--muted)}
+  .pf-stats .b.na::before{display:none}
+  .pf-grid{display:grid;grid-template-columns:1.65fr .85fr;gap:20px;margin-top:22px}
+  .pf-grid > div{min-width:0}
+  .pf-panel{border:1px solid var(--pf-edge);border-radius:18px;padding:24px;background:var(--pf-card);
+    box-shadow:0 14px 34px rgba(2,8,24,.45),inset 0 1px 0 rgba(255,255,255,.04)}
+  .pf-panel h3{font-size:19px;margin:0}
+  .pf-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  /* form chart */
+  .pf-chart{position:relative;border-color:rgba(0,224,255,.32);
+    background:radial-gradient(90% 70% at 50% 0%,rgba(0,224,255,.10),transparent 70%),linear-gradient(180deg,#0d1d40 0%,#081329 100%);
+    box-shadow:0 18px 44px rgba(0,10,30,.6),0 0 0 1px rgba(0,224,255,.06),inset 0 1px 0 rgba(255,255,255,.06)}
+  .pf-legend{display:flex;gap:14px;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-legend span{display:inline-flex;align-items:center;gap:6px}
+  .pf-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .pf-legend .w i{background:var(--pf-mag);box-shadow:0 0 8px var(--pf-mag)}
+  .pf-legend .p i{background:var(--pf-cyan);box-shadow:0 0 8px var(--pf-cyan)}
+  .pf-legend .o i{background:#0a1631;border:2px solid var(--pf-cyan)}
+  .pf-graph{position:relative;height:240px;margin:30px 10px 0 40px}
+  .pf-graph svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .pf-graph svg.ln{filter:drop-shadow(0 0 6px rgba(0,224,255,.75)) drop-shadow(0 0 14px rgba(0,224,255,.35))}
+  .pf-graph .gl{position:absolute;left:0;right:0;border-top:1px solid rgba(120,160,230,.12)}
+  .pf-graph .gl.base{border-top-color:rgba(120,160,230,.32)}
+  .pf-graph .gl span{position:absolute;left:-40px;top:-8px;width:30px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-graph .unit{position:absolute;left:-40px;top:-28px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted)}
+  .pf-dot{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:0;padding:0;background:transparent;cursor:pointer;display:grid;place-items:center;z-index:2}
+  .pf-dot i{display:block;width:16px;height:16px;border-radius:50%;background:#0a1631;border:3px solid var(--pf-cyan);
+    box-shadow:0 0 10px rgba(0,224,255,.75);transition:transform .15s}
+  .pf-dot.pod i{background:var(--pf-cyan);border-color:#bff8ff}
+  .pf-dot.win i{background:var(--pf-mag);border-color:#ffd6ff;box-shadow:0 0 14px rgba(232,60,255,.9),0 0 26px rgba(232,60,255,.45)}
+  .pf-dot:hover i,.pf-dot:focus-visible i,.pf-dot.on i{transform:scale(1.3)}
+  .pf-dot:focus-visible{outline:2px solid var(--pf-cyan);outline-offset:2px}
+  .pf-dot b{position:absolute;bottom:31px;padding:2px 7px;border-radius:7px;font-family:var(--display);font-weight:800;font-size:12.5px;
+    color:var(--ivory);background:rgba(7,16,35,.85);border:1px solid rgba(0,224,255,.3);white-space:nowrap}
+  .pf-dot.win b{color:#fff;border-color:var(--pf-mag-line);background:rgba(60,10,70,.85)}
+  .pf-xl{position:relative;height:20px;margin:12px 10px 0 40px;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-xl span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+  .pf-tip{position:absolute;z-index:5;min-width:180px;max-width:240px;padding:12px 14px;border-radius:12px;pointer-events:none;
+    background:rgba(5,12,28,.97);border:1px solid var(--pf-cyan-line);box-shadow:0 16px 36px rgba(0,0,0,.55),0 0 20px rgba(0,224,255,.15);
+    transform:translate(-50%,calc(-100% - 26px));font-size:13px;line-height:1.4;opacity:0;transition:opacity .12s}
+  .pf-tip.show{opacity:1}
+  .pf-tip.below{transform:translate(-50%,26px)}
+  .pf-tip .p{white-space:nowrap}
+  .pf-tip strong{display:block;font-family:var(--display);font-size:14.5px;color:var(--ivory)}
+  .pf-tip .m{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-tip .f{margin-top:6px;color:var(--ivory-dim)}
+  .pf-tip .p{font-family:var(--display);font-weight:900;color:var(--pf-cyan);font-size:20px;margin-top:2px}
+  .pf-tip.win{border-color:var(--pf-mag-line);box-shadow:0 16px 36px rgba(0,0,0,.55),0 0 22px rgba(232,60,255,.2)}
+  .pf-tip.win .p{color:var(--pf-mag)}
+  /* career */
+  .pf-career .row{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0;border-bottom:1px solid rgba(120,160,230,.12)}
+  .pf-career .row:last-child{border-bottom:none;padding-bottom:0}
+  .pf-career .row span{font-family:var(--mono);font-size:12.5px;color:var(--muted-2)}
+  .pf-career .row strong{font-family:var(--display);font-weight:900;font-size:24px;color:var(--ivory)}
+  .pf-career .row.hi strong{color:var(--pf-cyan)}
+  .pf-career .row.w strong{color:var(--pf-mag)}
+  .pf-career .row.best strong{font-size:18px}
+  /* history */
+  .pf-hist{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:14px;margin-top:-8px}
+  .pf-hist th{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:400;padding:4px 12px 2px;background:none}
+  .pf-hist td{padding:14px 12px;vertical-align:middle;background:rgba(7,16,35,.55);border-top:1px solid rgba(120,160,230,.10);border-bottom:1px solid rgba(120,160,230,.10)}
+  .pf-hist td:first-child{border-left:3px solid transparent;border-radius:12px 0 0 12px;padding-left:16px}
+  .pf-hist td:last-child{border-radius:0 12px 12px 0;padding-right:16px}
+  .pf-hist td.num{text-align:right;font-family:var(--display);font-weight:900;font-size:19px}
+  .pf-hist th.num{text-align:right}
+  .pf-hist .ev strong{display:block;font-size:15px}
+  .pf-hist .ev span{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-hist tr.win td{background:rgba(232,60,255,.10);border-color:rgba(232,60,255,.30)}
+  .pf-hist tr.win td:first-child{border-left-color:var(--pf-mag)}
+  .pf-hist tr.pod td{background:rgba(0,224,255,.06);border-color:rgba(0,224,255,.22)}
+  .pf-hist tr.pod td:first-child{border-left-color:var(--pf-cyan)}
+  .pf-fin{display:inline-flex;align-items:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;
+    padding:5px 11px;border-radius:999px;border:1px solid var(--pf-edge);color:var(--ivory-dim);white-space:nowrap}
+  .pf-fin.win{background:linear-gradient(90deg,var(--pf-mag),#b03cff);border-color:transparent;color:#fff;font-weight:500;box-shadow:0 0 16px rgba(232,60,255,.4)}
+  .pf-fin.pod{border-color:var(--pf-cyan-line);color:var(--pf-cyan);background:var(--pf-cyan-soft)}
+  .pf-pos{font-family:var(--mono);font-size:12px;color:var(--muted-2);white-space:nowrap}
+  .pf-pts-cell.win{color:var(--pf-mag)}
+  .pf-pts-cell.pod{color:var(--pf-cyan)}
+  @media (max-width:920px){ .pf-grid{grid-template-columns:1fr} .pf-stats{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:720px){
+    .pf-hero{grid-template-columns:auto 1fr;padding:22px 18px;gap:16px;border-radius:18px}
+    .pf-hero .ava.lg{width:64px;height:64px;font-size:24px}
+    .pf-pts{grid-column:1 / -1;text-align:left;display:flex;align-items:baseline;gap:14px;padding:16px 0 0;border-left:0;border-top:1px solid rgba(110,160,255,.2)}
+    .pf-pts .v{font-size:64px}
+    .pf-pts .l{margin-top:0}
+    .pf-stats{gap:10px}
+    .pf-stats .b{padding:16px 14px;border-radius:14px}
+    .pf-stats .b .v{font-size:30px}
+    .pf-panel{padding:18px 16px;border-radius:16px}
+    .pf-graph{height:200px;margin:30px 6px 0 32px}
+    .pf-graph .gl span{left:-32px;width:24px}
+    .pf-graph .unit{left:-32px}
+    .pf-xl{margin:12px 6px 0 32px;font-size:10px}
+    .pf-xl.dense span:nth-child(even){display:none}
+    .pf-dot b{font-size:11px;padding:1px 5px;bottom:29px}
+    .pf-tip{min-width:150px;max-width:200px;padding:10px 12px;font-size:12px}
+    .pf-tip strong{font-size:13.5px}
+    .pf-tip .p{font-size:16px}
+    .pf-hist .pos-col{display:none}
+    .pf-hist td{padding:12px 10px}
+    .pf-hist td:first-child{padding-left:12px}
+    .pf-hist td.num{font-size:17px}
+  }
+
   /* ---------- responsive ---------- */
   @media(max-width:920px){
     .hero-grid{grid-template-columns:1fr;gap:36px}
@@ -1177,12 +1326,11 @@ let REG = [];
 let WINNERS = [];
 let playersLoaded = false;
 
-// Ranking points by finishing place, and the two pure helpers that turn a
-// position into points / a human label. These don't care where the data came
-// from, so they're unchanged from the old in-code version.
-const POS_PTS = {1:25, 2:18, 3:15, 4:12, 5:10, 6:8, 7:6, 8:4};      // 9th+ = 2 pts
-function placePts(n){ return POS_PTS[n] || 2; }
-function finishLabel(n){ return n===1?'Winner':n===2?'Runner-up':n<=4?'Semi-final':n<=8?'Quarter-final':'Group stage'; }
+// Ranking points are worked out by the server when a tournament finishes
+// (results.ranking_points, from the player's finish and the size of the
+// field) — the page only adds them up. This turns a finish into a label.
+const FINISH = { winner:'Winner', runner_up:'Runner-up', sf:'Semi-final', qf:'Quarter-final', r16:'Last 16', group:'Group stage' };
+function finishLabel(outcome){ return FINISH[outcome] || '—'; }
 
 // Load real players + real results from Supabase and rebuild standings from
 // them — the direct database-backed replacement for the old hard-coded
@@ -1204,7 +1352,8 @@ async function loadPlayersFromSupabase(){
     // slice(-8) form strip below reads left-to-right as "oldest → newest".
     const { data: results, error: rErr } = await sb
       .from('results')
-      .select('player_id, position, tournaments(name, tournament_date)')
+      .select('player_id, position, outcome, ranking_points, tournaments(name, tournament_date, region)')
+      .not('outcome', 'is', null)
       .order('created_at', { ascending: true });
     if(rErr) throw rErr;
 
@@ -1221,6 +1370,9 @@ async function loadPlayersFromSupabase(){
       e180: p.e180 ?? 0,
       hi: p.hi_checkout ?? null,
       bestLeg: p.best_leg ?? null,
+      first9: p.first9_avg ?? null,
+      c100: p.count_100 ?? null,
+      c140: p.count_140 ?? null,
       // Filled in below from `results` — matches the old computed fields.
       points: 0, wins: 0, events: 0, recent: [], form: []
     }));
@@ -1232,27 +1384,28 @@ async function loadPlayersFromSupabase(){
       const iso = t.tournament_date ? String(t.tournament_date).slice(0,10) : '';
       const dt = parseLocalDate(iso);
       const date = dt ? dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
-      p.points += placePts(r.position);
+      p.points += Number(r.ranking_points) || 0;
       p.events += 1;
-      if(r.position===1) p.wins += 1;
-      p.recent.push({ title: t.name || 'Tournament', date, pos: r.position, pts: placePts(r.position) });
+      if(r.outcome==='winner') p.wins += 1;
+      p.recent.push({ title: t.name || 'Tournament', date, outcome: r.outcome, position: r.position ?? null, pts: Number(r.ranking_points) || 0 });
     });
-    PLAYERS.forEach(p=>{ p.form = p.recent.slice(-8).map(r=>r.pos<=2?'W':'L'); });
+    // form: W = reached the final (winner or runner-up), L = out before it
+    PLAYERS.forEach(p=>{ p.form = p.recent.slice(-8).map(r=>(r.outcome==='winner'||r.outcome==='runner_up')?'W':'L'); });
 
     // Ranked list: players who've actually played at least one real event.
     REG = PLAYERS.filter(p=>p.events>0).sort((a,b)=> b.points-a.points || b.wins-a.wins);
     REG.forEach((p,i)=>p.rank=i+1);
 
-    // Winners feed: every result where position === 1, most recent first.
+    // Winners feed: every tournament winner, most recent first.
     WINNERS = (results||[])
-      .filter(r=>r.position===1)
+      .filter(r=>r.outcome==='winner')
       .map(r=>{
         const p=byId[r.player_id];
         const t=r.tournaments||{};
         const iso = t.tournament_date ? String(t.tournament_date).slice(0,10) : '';
         const dt = parseLocalDate(iso);
         const date = dt ? dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
-        return { title: t.name||'Tournament', region: p?p.region:'', date, name: p?p.name:'—', id: p?p.id:'' };
+        return { title: t.name||'Tournament', region: t.region || (p?p.region:''), date, name: p?p.name:'—', id: p?p.id:'' };
       })
       .reverse(); // most recently added first
   }catch(err){
@@ -1560,58 +1713,173 @@ function sparkline(form){
   </svg>`;
 }
 
+/* ---------------- player profile (Stage 6) ----------------
+   Everything here comes from what the database stores: `results` (one row
+   per finished tournament: finish, joint position, ranking points — worked
+   out by the server from the agreed table) and the player's tournament stats
+   (recalculated by the server from played tournament matches only;
+   Friendlies are kept separate). Nothing is estimated or invented: a missing
+   value shows as "—", and a player with no finished tournaments gets an
+   honest empty state. */
+const PF_PODIUM = { winner:1, runner_up:1, sf:1 };
+function pfEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function pfOrdinal(n){ const s = n%100>=11 && n%100<=13 ? 'th' : ({1:'st',2:'nd',3:'rd'})[n%10] || 'th'; return n + s; }
+// "1st", "2nd", "joint 3rd" … (everyone out at the same stage shares a position)
+function pfPlace(r){ if(r.position==null) return ''; return (r.outcome==='winner'||r.outcome==='runner_up' ? '' : 'joint ') + pfOrdinal(r.position); }
+function pfNum(v, dp){ if(v==null || v==='') return null; const n = Number(v); return isFinite(n) ? (dp==null ? n : n.toFixed(dp)) : null; }
+
+// smooth line through the points that never overshoots them (monotone cubic):
+// it can't suggest a tournament scored more, or less than 0, than it did
+function pfSmooth(P){
+  const n = P.length; if(n < 2) return '';
+  const d = [], m = [];
+  for(let i=0;i<n-1;i++) d.push((P[i+1][1]-P[i][1])/(P[i+1][0]-P[i][0]));
+  m[0] = d[0]; m[n-1] = d[n-2];
+  for(let i=1;i<n-1;i++) m[i] = d[i-1]*d[i] <= 0 ? 0 : (d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){
+    if(d[i] === 0){ m[i] = 0; m[i+1] = 0; continue; }
+    const a = m[i]/d[i], b = m[i+1]/d[i], h = a*a + b*b;
+    if(h > 9){ const t = 3/Math.sqrt(h); m[i] = t*a*d[i]; m[i+1] = t*b*d[i]; }
+  }
+  let path = `M${P[0][0]},${P[0][1]}`;
+  for(let i=0;i<n-1;i++){
+    const h = (P[i+1][0]-P[i][0])/3;
+    path += ` C${P[i][0]+h},${P[i][1]+m[i]*h} ${P[i+1][0]-h},${P[i+1][1]-m[i+1]*h} ${P[i+1][0]},${P[i+1][1]}`;
+  }
+  return path;
+}
+function pfGraph(list){
+  // points earned at each tournament, oldest → newest (never cumulative)
+  const max = Math.max(...list.map(r=>r.pts), 1);
+  const top = [4,8,16,32].find(x=>x>=max) || max;
+  const n = list.length;
+  const X = i => n===1 ? 50 : 4 + i*(92/(n-1));               // % across
+  const Y = v => 100 - (v/top)*100;                            // % down
+  const P = list.map((r,i)=>[X(i), Y(r.pts)]);
+  const curve = pfSmooth(P);
+  const grid = [top, top*3/4, top/2, top/4, 0].map(v=>`<div class="gl${v===0?' base':''}" style="top:${Y(v)}%"><span>${Number.isInteger(v)?v:''}</span></div>`).join('');
+  const dots = list.map((r,i)=>{
+    const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
+    const label = `${r.title}, ${r.date}: ${finishLabel(r.outcome)}, ${pfPlace(r)}, ${r.pts} ranking point${r.pts===1?'':'s'}`;
+    return `<button type="button" class="pf-dot ${cls}" style="left:${X(i)}%;top:${Y(r.pts)}%" data-pf-i="${i}" aria-label="${pfEsc(label)}"><b>+${r.pts}</b><i></i></button>`;
+  }).join('');
+  return `<div class="pf-graph" id="pf-graph"><span class="unit">PTS</span>${grid}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="pf-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#00e0ff" stop-opacity=".38"/><stop offset=".6" stop-color="#2f7bff" stop-opacity=".10"/><stop offset="1" stop-color="#2f7bff" stop-opacity="0"/></linearGradient></defs>
+        ${n>1 ? `<path d="${curve} L${P[n-1][0]},100 L${P[0][0]},100 Z" fill="url(#pf-fill)"/>` : ''}
+      </svg>
+      ${n>1 ? `<svg class="ln" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="${curve}" fill="none" stroke="#00e0ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>` : ''}
+      ${dots}
+      <div class="pf-tip" id="pf-tip" role="status"></div>
+    </div>
+    <div class="pf-xl${n>5?' dense':''}" aria-hidden="true">${list.map((r,i)=>`<span style="left:${X(i)}%">${pfEsc(r.date)}</span>`).join('')}</div>`;
+}
+
 function renderPlayerProfile(id){
   const el=$('#player-profile'); if(!el) return;
   if(!playersLoaded){ el.innerHTML = stateMsg('Loading player…'); return; }
   const p=PLAYERS.find(x=>String(x.id)===String(id));
   if(!p){ el.innerHTML = stateMsg('That player profile isn’t available.'); return; }
+  const hist = p.recent;                                   // oldest → newest
+  const wins = hist.filter(r=>r.outcome==='winner').length;
+  const podiums = hist.filter(r=>PF_PODIUM[r.outcome]).length;
+  const best = hist.length ? hist.reduce((a,r)=> (r.position!=null && (a==null || r.position<a.position)) ? r : a, null) : null;
+  // tournament stats (server-calculated); "—" where there's nothing yet
+  const hasDarts = p.avg!=null || p.first9!=null;
+  const S = (v, dp, unit) => { const x = pfNum(v, dp); return x==null ? null : x + (unit||''); };
+  const count = v => hasDarts && v!=null ? String(v) : null;
+  const stats = [
+    ['3-dart average', S(p.avg, 2), 'key'],
+    ['First 9 average', S(p.first9, 2), 'key'],
+    ['Checkout %', S(p.checkout, 1, '%')],
+    ['Highest checkout', p.hi!=null ? String(p.hi) : null, 'pb'],
+    ['100+', count(p.c100)],
+    ['140+', count(p.c140)],
+    ['180s', count(p.e180)],
+    ['Best leg', p.bestLeg!=null ? `${p.bestLeg}<small>darts</small>` : null, 'pb'],
+  ];
+  const recent = hist.slice(-10);
   el.innerHTML=`
-    <div class="profile-hero">
-      <div class="ava lg">${p.initials}</div>
+    <div class="pf-hero profile-hero">
+      <div class="ava lg">${pfEsc(p.initials)}</div>
       <div class="meta">
-        <span class="eyebrow">${p.rank?('Rank #'+p.rank+' · '):''}${p.region}</span>
-        <h2>${p.name}</h2>
+        <span class="eyebrow">${p.rank?('Rank #'+p.rank+' · '):''}${pfEsc(p.region)}</span>
+        <h2>${pfEsc(p.name)}</h2>
         <div class="badges">
-          <span class="pill green">${p.points} ranking pts</span>
-          <span class="pill">${p.events} events</span>
-          ${p.rating!=null?`<span class="pill fmt">Rating ${p.rating}</span>`:''}
+          <span class="pf-chip"><b>${hist.length}</b> tournament${hist.length===1?'':'s'}</span>
+          <span class="pf-chip ${wins?'win':''}"><b>${wins}</b> win${wins===1?'':'s'}</span>
+          <span class="pf-chip ${podiums?'pod':''}"><b>${podiums}</b> podium${podiums===1?'':'s'}</span>
+          ${p.rating!=null?`<span class="pf-chip">Rating <b>${pfEsc(p.rating)}</b></span>`:''}
         </div>
+      </div>
+      <div class="pf-pts"><div class="v">${p.points}</div><div class="l">Ranking points</div></div>
+    </div>
+
+    <div class="pf-section">
+      <span class="eyebrow">Tournament stats</span>
+      <div class="pf-stats">
+        ${stats.map(([l,v,k])=>`<div class="b ${k||''} ${v==null?'na':''}"><div class="v">${v==null?'—':v}</div><div class="l">${l}</div></div>`).join('')}
       </div>
     </div>
-    <div class="bigstats">
-      <div class="b"><div class="v">${p.avg ?? '—'}</div><div class="l">3-dart average</div></div>
-      <div class="b"><div class="v">${p.checkout!=null?p.checkout+'%':'—'}</div><div class="l">Checkout %</div></div>
-      <div class="b"><div class="v">${p.e180}</div><div class="l">180s this season</div></div>
-      <div class="b"><div class="v">${p.hi ?? '—'}</div><div class="l">Highest checkout</div></div>
+
+    <div class="pf-grid">
+      <div class="pf-panel pf-chart">
+        <div class="pf-head"><h3>Recent form</h3>
+          ${recent.length ? `<div class="pf-legend" aria-hidden="true"><span class="w"><i></i>Win</span><span class="p"><i></i>Podium</span><span class="o"><i></i>Other</span></div>` : ''}</div>
+        ${recent.length ? pfGraph(recent) : stateMsg('No completed tournaments yet — form appears after the first finished night.')}
+      </div>
+      <div class="pf-panel pf-career">
+        <div class="pf-head" style="margin-bottom:4px"><h3>Career</h3></div>
+        <div class="row hi"><span>Ranking points</span><strong>${p.points}</strong></div>
+        <div class="row"><span>Tournaments</span><strong>${hist.length}</strong></div>
+        <div class="row ${wins?'w':''}"><span>Wins</span><strong>${wins}</strong></div>
+        <div class="row"><span>Podiums</span><strong>${podiums}</strong></div>
+        <div class="row best"><span>Best finish</span><strong>${best ? finishLabel(best.outcome) : '—'}</strong></div>
+      </div>
     </div>
-    <div class="detail-grid" style="margin-top:24px">
-      <div class="panel">
-        <h3 style="font-size:19px">Recent results</h3>
-        <div class="tbl-wrap" style="margin-top:14px;border:none">
-          ${p.recent.length ? `<table>
-            <thead><tr><th>Event</th><th>Date</th><th>Finish</th><th class="num">Pts</th></tr></thead>
-            <tbody>
-              ${p.recent.slice(-6).reverse().map(r=>`<tr><td><strong>${r.title}</strong></td><td style="color:var(--muted-2)">${r.date}</td>
-                <td>${finishLabel(r.pos)}</td><td class="num pts">+${r.pts}</td></tr>`).join('')}
-            </tbody>
-          </table>` : stateMsg('No results logged for this player yet.')}
-        </div>
-      </div>
-      <div>
-        <div class="panel">
-          <h3 style="font-size:18px">Recent form</h3>
-          ${p.form.length ? `<div class="form-strip">${p.form.slice(-8).map(f=>`<div class="f ${f.toLowerCase()}">${f}</div>`).join('')}</div>${sparkline(p.form)}` : stateMsg('No form yet.')}
-        </div>
-        <div class="panel">
-          <h3 style="font-size:18px;margin-bottom:8px">Career stats</h3>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Wins</span><span>${p.wins}</span></div>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Best leg</span><span>${p.bestLeg!=null?p.bestLeg+' darts':'—'}</span></div>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">180s</span><span>${p.e180}</span></div>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Checkout %</span><span>${p.checkout!=null?p.checkout+'%':'—'}</span></div>
-        </div>
-      </div>
+
+    <div class="pf-panel" style="margin-top:20px">
+      <div class="pf-head"><h3>Tournament history</h3></div>
+      ${hist.length ? `<table class="pf-hist">
+        <thead><tr><th>Event</th><th>Finish</th><th class="pos-col">Position</th><th class="num">Pts</th></tr></thead>
+        <tbody>${recent.slice().reverse().map(r=>{
+          const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
+          return `<tr class="${cls}">
+            <td class="ev"><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></td>
+            <td><span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span></td>
+            <td class="pos-col"><span class="pf-pos">${pfPlace(r)}</span></td>
+            <td class="num pf-pts-cell ${cls}">+${r.pts}</td></tr>`; }).join('')}</tbody>
+      </table>` : stateMsg('No completed tournaments yet.')}
     </div>`;
+  PF.list = recent;
 }
+
+// tooltip: hover, keyboard focus or tap on a point
+const PF = { list: [] };
+function pfShow(btn){
+  const tip = $('#pf-tip'), g = $('#pf-graph'); if(!tip || !g) return;
+  const r = PF.list[Number(btn.dataset.pfI)]; if(!r) return;
+  $$('.pf-dot.on').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  tip.innerHTML = `<strong>${pfEsc(r.title)}</strong><span class="m">${pfEsc(r.date)}</span>
+    <div class="f">${finishLabel(r.outcome)} · ${pfPlace(r)}</div><div class="p">+${r.pts} ranking point${r.pts===1?'':'s'}</div>`;
+  tip.classList.toggle('win', r.outcome==='winner');
+  const gb = g.getBoundingClientRect(), bb = btn.getBoundingClientRect();
+  let x = bb.left + bb.width/2 - gb.left;
+  x = Math.max(90, Math.min(gb.width - 90, x));               // keep it inside the panel on a phone
+  const y = bb.top + bb.height/2 - gb.top;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  tip.classList.toggle('below', y < gb.height * 0.45);          // high points: open downwards so it stays in the card
+  tip.classList.add('show');
+}
+function pfHide(){ const tip=$('#pf-tip'); if(tip) tip.classList.remove('show'); $$('.pf-dot.on').forEach(b=>b.classList.remove('on')); }
+// (hover is for a mouse; on a touch screen a tap shows it and a tap elsewhere hides it)
+document.addEventListener('pointerover', e=>{ if(e.pointerType!=='mouse') return; const b=e.target.closest && e.target.closest('.pf-dot'); if(b) pfShow(b); });
+document.addEventListener('pointerout', e=>{ if(e.pointerType!=='mouse') return; const b=e.target.closest && e.target.closest('.pf-dot'); if(b && !b.contains(e.relatedTarget)) pfHide(); });
+document.addEventListener('focusin', e=>{ const b=e.target.closest && e.target.closest('.pf-dot'); if(b) pfShow(b); });
+document.addEventListener('focusout', e=>{ if(e.target.closest && e.target.closest('.pf-dot') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.pf-dot'))) pfHide(); });
+document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.pf-dot'); if(b){ pfShow(b); } else if(!(e.target.closest && e.target.closest('#pf-graph'))) pfHide(); });
 
 function renderMembership(){
   $('#incl').innerHTML = INCLUDES.map(t=>`<li><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8.2" stroke="#1fc97a" stroke-width="1.4"/><path d="M5.4 9.2l2.3 2.3 4.6-4.8" stroke="#1fc97a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${t}</span></li>`).join('');
