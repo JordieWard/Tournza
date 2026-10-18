@@ -1973,9 +1973,9 @@ EVENTS = (data||[]).map(t => {
       .map(te => te.players)
       .filter(Boolean)
       .map(p => ({ id: p.id, name: p.name || 'Player', region: p.region || '' })),
-    // "Live" now means what it says — kick-off has actually arrived today —
-    // rather than just "open for registration" (which stays true all day).
-    live:    iso === __todayIso && __nowHHMM >= EVENT_KICKOFF,
+    // "Live" = drawn and being played (groups or knockout). An undrawn,
+    // cancelled or finished night is never live, whatever the time.
+    live:    t.phase === 'groups' || t.phase === 'knockout',
     fmt:     t.game_format || '501 Double Out'
   };
 });
