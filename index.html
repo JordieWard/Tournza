@@ -2310,7 +2310,7 @@ async function frEnter(){
     const { data:p } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
     if(p && p.full_name) FR.name = p.full_name;
   }catch(_){}
-  if(!FR.name) FR.name = String(user.email||'Player').split('@')[0];
+  if(!FR.name || FR.name.indexOf('@') >= 0) FR.name = 'Player';   // never an email or part of one (others see this name)
   gate.hidden = true; app.hidden = false;
   frRenderPlayers(); frRenderStats(null); frRenderHistory(null);
   frJoinLobby();
