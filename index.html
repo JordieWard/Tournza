@@ -482,6 +482,61 @@
     #route-friendlies tbody td,#route-friendlies thead th{padding:12px 10px}
   }
 
+
+  /* ---------- tournament night (event page, Stage 5) ---------- */
+  .ev-night{margin-bottom:18px}
+  .ev-clock{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+  .ev-clock > div{background:var(--ink-2);padding:12px 14px}
+  .ev-clock .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .ev-clock .v{font-family:var(--display);font-weight:800;font-size:19px;margin-top:3px}
+  .ev-clock .now{background:var(--surface)}
+  .ev-clock .now .k{color:var(--blue-2)}
+  .ev-clock .done .v{color:var(--muted)}
+  .ev-note{font-size:14px;color:var(--muted-2);margin:0}
+  .ev-note strong{color:var(--ivory)}
+  .ev-me .panel{border-color:rgba(46,119,255,.45)}
+  .ev-me h3{font-size:17px;margin:4px 0 6px}
+  .ev-me p{font-size:14px;color:var(--muted-2);margin:0 0 12px}
+  .ev-me .btn{width:100%}
+  .ev-me .ev-warn{border:1px solid rgba(214,59,67,.45);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:13.5px;color:var(--ivory-dim)}
+  .ev-me .ev-msg{font-family:var(--mono);font-size:12px;color:var(--red-bright);margin:10px 0 0;min-height:1em}
+  .ev-night .panel > h3{margin:0 0 14px}
+  .ev-groups{display:grid;grid-template-columns:1fr;gap:22px}
+  .ev-group td:nth-child(2){white-space:nowrap}
+  .ev-group h4{font-family:var(--display);font-size:16px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .ev-group table{font-size:13.5px}
+  .ev-group td,.ev-group th{padding:8px 8px}
+  .ev-group tr.q td:first-child{box-shadow:inset 3px 0 0 var(--green-bright)}
+  .ev-group tr.me td{background:rgba(46,119,255,.10)}
+  .ev-fx{list-style:none;margin:10px 0 0;padding:0;font-size:13px}
+  .ev-fx li{display:flex;justify-content:space-between;gap:10px;padding:6px 2px;border-top:1px solid var(--line-soft);color:var(--ivory-dim)}
+  .ev-fx .sc{font-family:var(--mono);color:var(--ivory);white-space:nowrap}
+  .ev-flag{font-family:var(--mono);font-size:11.5px;color:var(--red-bright);margin:8px 0 0}
+  .ev-bracket{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:14px;overflow-x:auto;padding-bottom:6px}
+  .detail-grid > div{min-width:0}   /* wide content (the bracket) scrolls inside its panel, never widens the page */
+  .ev-round h4{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .ev-round{display:flex;flex-direction:column;gap:10px}
+  .ev-tie{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden}
+  .ev-tie > div{background:var(--ink-2);padding:8px 10px;display:flex;justify-content:space-between;gap:8px;font-size:13.5px}
+  .ev-tie .w{color:var(--ivory);font-weight:700}
+  .ev-tie .tbd{color:var(--muted);font-family:var(--mono);font-size:12px}
+  .ev-tie .sc{font-family:var(--mono)}
+  .ev-tie .st{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);justify-content:flex-start}
+  .ev-tie .st.live{color:var(--red-bright)}
+  .ev-tie .st.held{color:var(--red-bright)}
+  .ev-podium{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden}
+  .ev-podium > div{background:var(--ink-2);padding:14px 16px}
+  .ev-podium .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .ev-podium .v{font-family:var(--display);font-weight:800;font-size:18px;margin-top:4px}
+  .ev-podium .champ{grid-column:1 / -1}
+  .ev-podium .champ .v{font-size:28px;font-weight:900;color:var(--blue-2)}
+  @media (max-width:720px){
+    .ev-clock{grid-template-columns:repeat(2,1fr)}
+    .ev-groups{grid-template-columns:1fr}
+    .ev-bracket{grid-auto-flow:row;grid-auto-columns:auto}   /* rounds stack on a phone */
+    .ev-group td.hide-sm,.ev-group th.hide-sm{display:none}
+  }
+
   /* ---------- responsive ---------- */
   @media(max-width:920px){
     .hero-grid{grid-template-columns:1fr;gap:36px}
@@ -1351,11 +1406,12 @@ function renderEventDetail(id){
     <h2 style="max-width:18ch">${e.title}</h2>
     <div class="detail-grid" style="margin-top:26px">
       <div>
+        <div id="ev-night" class="ev-night"></div>
         <div class="panel">
           <h3 style="font-size:19px">Event details</h3>
           <div class="kv">
             <div class="cell"><div class="k">When</div><div class="v">${e.date} · ${e.time}</div></div>
-            <div class="cell"><div class="k">Check-in closes</div><div class="v">${e.checkin}</div></div>
+            <div class="cell"><div class="k">Entries close · check-in</div><div class="v">${EV_ENTRIES} · 19:00–${e.checkin}</div></div>
             <div class="cell"><div class="k">Format</div><div class="v">${e.fmt}</div></div>
             <div class="cell"><div class="k">Structure</div><div class="v">${FORMAT}</div></div>
             <div class="cell"><div class="k">Capacity</div><div class="v">${e.cap} players max</div></div>
@@ -1373,7 +1429,9 @@ function renderEventDetail(id){
             <li>Verified Tournza membership required to enter</li>
             <li>Age check and cam check must be cleared before check-in</li>
             <li>501 double-out · group round robin then knockout to the final</li>
-            <li>Check-in closes at ${e.checkin} — late entries released to reserves</li>
+            <li>Entries close at ${EV_ENTRIES} on the night</li>
+            <li>Check in between 19:00 and ${e.checkin} on the night — no check-in, no place, and the buy-in isn’t refunded</li>
+            <li>Draw at ${EV_DRAW}. Fewer than 4 checked in, or no draw by ${EV_LATE}: the night is cancelled and every buy-in refunded</li>
           </ul>
           <p class="form-note" style="margin-top:14px">Full <a data-link="rules" style="color:var(--blue-2)">fair-play rules</a> apply to every event.</p>
         </div>
@@ -1386,6 +1444,7 @@ function renderEventDetail(id){
         </div>
       </div>
       <div class="sticky-reg">
+        <div id="ev-me"></div>
         <div class="panel">
           <div class="price" style="font-size:34px">£${e.entry.toFixed(2)}<small>Buy-in</small></div>
           <div class="progress" style="margin-top:16px"><i style="width:${capPct(e)}%"></i></div>
@@ -1393,7 +1452,7 @@ function renderEventDetail(id){
           ${e.live?`<p class="countdown" style="margin:16px 0 0">● Check-in closes ${e.checkin} tonight</p>`:''}
           ${alreadyIn
             ? `<button class="btn btn-primary" style="width:100%;margin-top:18px" disabled>You’re entered ✓</button>`
-            : `<button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="${e.id}">Pay £6 buy-in &amp; enter</button>`}
+            : `<button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="${e.id}" id="ev-buy">Pay £6 buy-in &amp; enter</button>`}
           <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" data-link="membership">Membership required · £12/yr</button>
         </div>
         <div class="panel">
@@ -1404,6 +1463,7 @@ function renderEventDetail(id){
         </div>
       </div>
     </div>`;
+  evMount(e);
 }
 
 function renderRankings(){
@@ -1590,7 +1650,7 @@ function go(target){
     || (name==='event'&&a.dataset.link==='events')
     || (name==='player'&&a.dataset.link==='players')
     || (name==='join'&&a.dataset.link==='membership' && false)));
-  if(name==='event') renderEventDetail(arg);
+  if(name==='event') renderEventDetail(arg); else evLeave();
   if(name==='player') renderPlayerProfile(arg);
   if(name==='account' && window.renderAccountDashboard) window.renderAccountDashboard();
   document.body.classList.toggle('fr-on', name==='friendlies');   // Friendlies' own pink theme
@@ -1657,11 +1717,16 @@ document.addEventListener('click',e=>{
         const { data, error } = await sb.functions.invoke('create-tournament-checkout', {
           body: { tournamentId: t.dataset.tournament }
         });
-        if(error || !data || !data.url) throw error || new Error('No checkout URL returned');
+        if(error){
+          let why = '';
+          try{ why = ((await error.context.json()) || {}).error || ''; }catch(_){}
+          const e2 = new Error(why || error.message || 'Checkout refused'); e2.why = why; throw e2;
+        }
+        if(!data || !data.url) throw new Error('No checkout URL returned');
         window.location.href = data.url;
       }catch(err){
         console.error('Could not start checkout:', err);
-        notify('Could not start checkout — please try again in a moment.','warn');
+        notify(err && err.why ? err.why : 'Could not start checkout — please try again in a moment.','warn');
         t.disabled = false; t.textContent = label;
       }
     })();
@@ -2234,6 +2299,275 @@ document.addEventListener('submit', e=>{
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible' && FR.live && FR.user) frRefresh(); });
 window.addEventListener('pageshow', ev=>{ if(ev.persisted && FR.live && FR.user) frRefresh(); });
 
+/* ---------------- tournament night (event page) ----------------
+   Everything on an event page after entries: check-in (19:00–19:20 UK),
+   the draw, group tables, the knockout bracket, "Play your match" and the
+   final placings. Reads only what the database already makes public
+   (tournaments, entries, groups, fixtures, tz_group_table) plus the
+   signed-in player's own match / Friendly. Every action is a server call
+   that does its own checking (check_in, leave_friendly_match); the page
+   never decides anything. Refreshes live, with a 15-second backstop. */
+const EV = { id:null, sb:null, user:null, timer:null, chan:null, data:null, busy:false, msg:'' };
+const EV_STAGE = { r16:'Last 16', qf:'Quarter-finals', sf:'Semi-finals', final:'Final' };
+const EV_STAGE_ONE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
+const EV_OUT = { winner:'Winner', runner_up:'Runner-up', sf:'Semi-finals', qf:'Quarter-finals', r16:'Last 16', group:'Group stage' };
+
+function evEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// UK wall-clock now, as 'YYYY-MM-DD' and 'HH:MM' (BST/GMT safe)
+function evUkNow(){
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone:'Europe/London', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' })
+    .formatToParts(new Date()).map(x=>[x.type, x.value]));
+  return { iso: `${p.year}-${p.month}-${p.day}`, hm: `${p.hour}:${p.minute}` };
+}
+// The night (UK time). The server enforces every one of these; the page only shows them.
+//   19:00 check-in opens · 19:15 entries close · 19:20 check-in closes
+//   19:30 draw (or cancelled, fewer than 4) · 19:35 not drawn → cancelled, players released
+const EV_ENTRIES = '19:15';
+const EV_DRAW = EVENT_KICKOFF;          // 19:30: the draw, and the first matches straight after
+const EV_LATE = '19:35';
+// where tonight is: 'before' | 'checkin' | 'closed' | 'late' (only meaningful while phase = open)
+// 'late' = 19:35 has passed with no draw: the server will never draw it now,
+// and check-ins no longer block Friendlies.
+function evWindow(iso){
+  const n = evUkNow();
+  if(n.iso < iso) return 'before';
+  if(n.iso > iso) return 'late';
+  if(n.hm < '19:00') return 'before';
+  if(n.hm < EVENT_CHECKIN) return 'checkin';
+  if(n.hm < EV_LATE) return 'closed';
+  return 'late';
+}
+// new entries are taken until 19:15 on the night
+function evEntriesOpen(iso){
+  const n = evUkNow();
+  return n.iso < iso || (n.iso === iso && n.hm < EV_ENTRIES);
+}
+function evClient(){
+  return new Promise(res=>{ let n=0; (function chk(){ if(window.tournzaSupabase || typeof supabase==='undefined' || n++>50) res(window.tournzaSupabase||null); else setTimeout(chk,100); })(); });
+}
+
+async function evMount(e){
+  evLeave();
+  EV.id = String(e.id); EV.msg = '';
+  const sb = EV.sb = await evClient();
+  if(!sb || EV.id !== String(e.id)) return;
+  try{ const { data } = await sb.auth.getSession(); EV.user = data && data.session && data.session.user || null; }catch(_){ EV.user = null; }
+  await evLoad();
+  if(EV.id !== String(e.id)) return;
+  try{
+    EV.chan = sb.channel('ev-' + EV.id)
+      .on('postgres_changes', { event:'*', schema:'public', table:'matches', filter:'tournament_id=eq.' + EV.id }, ()=>evLoad())
+      .on('postgres_changes', { event:'*', schema:'public', table:'tournaments', filter:'id=eq.' + EV.id }, ()=>evLoad())
+      .on('postgres_changes', { event:'*', schema:'public', table:'tournament_group_members', filter:'tournament_id=eq.' + EV.id }, ()=>evLoad())
+      .subscribe();
+  }catch(_){}
+  EV.timer = setInterval(evLoad, 15000);
+}
+function evLeave(){
+  if(EV.timer){ clearInterval(EV.timer); EV.timer = null; }
+  if(EV.chan && EV.sb){ try{ EV.sb.removeChannel(EV.chan); }catch(_){} }
+  EV.chan = null; EV.id = null; EV.data = null;
+}
+
+async function evLoad(){
+  const sb = EV.sb, id = EV.id;
+  if(!sb || !id || EV.loading) return;
+  EV.loading = true;
+  try{
+    const [t, en, gr, mem, fx] = await Promise.all([
+      sb.from('tournaments').select('id, phase, cancel_reason, entrant_count, group_count, tournament_date').eq('id', id).maybeSingle(),
+      sb.from('tournament_entries').select('player_id, payment_status, checked_in, players(name)').eq('tournament_id', id),
+      sb.from('tournament_groups').select('id, label, size, completed_at, tie_flag').eq('tournament_id', id).order('label'),
+      sb.from('tournament_group_members').select('group_id, player_id, final_rank, outcome, eliminated_at').eq('tournament_id', id),
+      sb.from('matches').select('id, stage, group_id, round, slot, player1_id, player2_id, status, winner_id, legs_p1, legs_p2, result_type, flag, source_p1, source_p2, best_of, ready_at').eq('tournament_id', id),
+    ]);
+    if(t.error) throw t.error;
+    const groups = gr.data || [];
+    const tables = {};
+    await Promise.all(groups.map(async g=>{
+      const r = await sb.rpc('tz_group_table', { p_group: g.id });
+      tables[g.id] = r.data || [];
+    }));
+    let mine = null, friendly = null;
+    if(EV.user){
+      const [m, f] = await Promise.all([
+        sb.rpc('my_tournament_match'),
+        sb.from('live_matches').select('id, code, status, player1_id, player2_id').eq('match_type','friendly').in('status',['waiting','ready','in_progress']),
+      ]);
+      mine = m.data || null;
+      friendly = (f.data||[]).find(x=>x.player1_id===EV.user.id || x.player2_id===EV.user.id) || null;
+    }
+    if(EV.id !== id) return;
+    const names = {};
+    (en.data||[]).forEach(x=>{ names[x.player_id] = (x.players && x.players.name) || 'Player'; });
+    EV.data = { t: t.data, entries: en.data||[], groups, members: mem.data||[], fixtures: fx.data||[], tables, names, mine, friendly };
+  }catch(err){
+    console.warn('Could not load the tournament night:', err);
+    EV.data = EV.data || null;
+  }finally{
+    EV.loading = false;
+    evRender();
+  }
+}
+
+function evName(id){ return id ? evEsc((EV.data && EV.data.names[id]) || 'Player') : ''; }
+
+function evRender(){
+  const night = $('#ev-night'), me = $('#ev-me');
+  if(!night || !me) return;
+  const d = EV.data;
+  if(!d || !d.t){ night.innerHTML = ''; me.innerHTML = ''; return; }
+  const t = d.t, phase = t.phase, win = phase === 'open' ? evWindow(String(t.tournament_date).slice(0,10)) : 'closed';
+  const shut = win === 'closed' || win === 'late';
+  const entriesOpen = phase === 'open' && evEntriesOpen(String(t.tournament_date).slice(0,10));
+  // entries close at 19:15 (the server refuses after that too)
+  const buy = $('#ev-buy');
+  if(buy && !entriesOpen){ buy.disabled = true; buy.textContent = 'Entries closed'; }
+  // the page's own "check-in closes … tonight" line, once that has passed
+  const cd = $('#event-detail .countdown');
+  if(cd && (phase !== 'open' || shut)) cd.textContent = phase === 'cancelled' ? '● Cancelled' : '● Check-in closed at ' + EVENT_CHECKIN;
+
+  // ---- the night at a glance ----
+  // which step is on now: entries (until 19:15) and check-in (19:00–19:20) overlap
+  const step = phase === 'open' ? (win === 'before' ? 0 : win === 'checkin' ? 1 : 2) : (phase === 'cancelled' ? -1 : 3);
+  const cells = [['Entries','until ' + EV_ENTRIES], ['Check-in','19:00–' + EVENT_CHECKIN], ['Draw', EV_DRAW], ['First matches', 'from ' + EV_DRAW]];
+  let html = `<div class="ev-clock" aria-label="Tonight">${cells.map((c,i)=>{
+      const now = i === step || (i === 0 && step === 1 && entriesOpen);
+      const cls = phase === 'cancelled' ? 'done' : (now ? 'now' : (i < step || (i === 0 && step >= 1) ? 'done' : ''));
+      return `<div class="${cls}"><div class="k">${c[0]}</div><div class="v">${c[1]}</div></div>`; }).join('')}</div>`;
+
+  if(phase === 'cancelled'){
+    html += `<div class="panel"><span class="pill" style="color:var(--red-bright);border-color:rgba(214,59,67,.5)">Cancelled</span>
+      <h3 style="font-size:19px;margin:12px 0 6px">${evEsc(t.cancel_reason || 'This tournament was cancelled')}</h3>
+      <p class="ev-note">Every <strong>£6 buy-in</strong> for this tournament will be refunded to the card it was paid with.</p></div>`;
+  }
+  if(phase === 'completed') html += evPodium(d);
+  if(['groups','knockout','completed'].includes(phase)){
+    const ko = d.fixtures.filter(f=>f.stage !== 'group');
+    if(ko.length) html += `<div class="panel"><h3 style="font-size:19px">Knockout</h3>${evBracket(ko)}</div>`;
+    if(d.groups.length) html += `<div class="panel"><h3 style="font-size:19px">Groups</h3><div class="ev-groups">${d.groups.map(g=>evGroup(g, d)).join('')}</div></div>`;
+  }
+  night.innerHTML = html;
+  me.innerHTML = evMe(d, phase, win);
+}
+
+function evGroup(g, d){
+  const rows = d.tables[g.id] || [];
+  const meId = EV.user && EV.user.id;
+  const fx = d.fixtures.filter(f=>f.group_id === g.id).sort((a,b)=>a.round-b.round || a.slot-b.slot);
+  return `<div class="ev-group" data-group="${evEsc(g.label)}">
+    <h4>Group ${evEsc(g.label)} ${g.completed_at ? '<span class="pill green">Final</span>' : ''}</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Player</th><th class="num">P</th><th class="num">W</th><th class="num">Pts</th><th class="num">+/−</th><th class="num hide-sm" title="Legs won against the throw">LAT</th><th class="num hide-sm">Avg</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr class="${r.position <= 2 && g.completed_at ? 'q' : ''} ${r.player_id === meId ? 'me' : ''}">
+        <td class="mono">${r.tied && !g.completed_at && g.tie_flag ? '=' : ''}${r.position}</td><td>${evName(r.player_id)}</td>
+        <td class="num">${r.played}</td><td class="num">${r.won}</td><td class="num"><strong>${r.points}</strong></td>
+        <td class="num">${r.leg_diff > 0 ? '+' : ''}${r.leg_diff}</td><td class="num hide-sm">${r.legs_against_throw}</td><td class="num hide-sm">${Number(r.average).toFixed(2)}</td></tr>`).join('')}
+      </tbody></table></div>
+    ${g.tie_flag ? `<p class="ev-flag">Awaiting bull-off decision — ${evEsc(g.tie_flag.replace(/^Tie needs a bull-off: /,''))}</p>` : ''}
+    <ul class="ev-fx">${fx.map(f=>`<li><span>${evName(f.player1_id)} v ${evName(f.player2_id)}</span><span class="sc">${evScore(f)}</span></li>`).join('')}</ul>
+  </div>`;
+}
+function evScore(f){
+  if(f.status === 'completed'){
+    if(f.result_type === 'walkover' && !f.winner_id) return 'No-show (both)';
+    return `${f.legs_p1 ?? 0}–${f.legs_p2 ?? 0}${f.result_type === 'walkover' ? ' w/o' : ''}`;
+  }
+  if(f.status === 'live') return '<span style="color:var(--red-bright)">Live</span>';
+  if(f.status === 'ready') return 'On now';
+  if(f.status === 'void') return 'Awaiting decision';
+  return '—';
+}
+function evSource(s){
+  if(!s) return 'TBC';
+  let m = /^([A-H])([12])$/.exec(s);
+  if(m) return (m[2] === '1' ? 'Winner' : 'Runner-up') + ' Group ' + m[1];
+  m = /^W (r16|qf|sf) (\d+)$/.exec(s);
+  if(m) return 'Winner ' + ({ r16:'L16', qf:'QF', sf:'SF' })[m[1]] + ' ' + m[2];
+  return evEsc(s);
+}
+function evBracket(ko){
+  const order = ['r16','qf','sf','final'].filter(s=>ko.some(f=>f.stage === s));
+  return `<div class="ev-bracket">${order.map(s=>`<div class="ev-round" data-stage="${s}"><h4>${EV_STAGE[s]} · best of ${ko.find(f=>f.stage===s).best_of}</h4>
+    ${ko.filter(f=>f.stage === s).sort((a,b)=>a.slot-b.slot).map(f=>{
+      const side = (pid, src, legs)=> pid
+        ? `<div><span class="${f.winner_id && f.winner_id === pid ? 'w' : ''}">${evName(pid)}</span><span class="sc">${f.status === 'completed' ? (legs ?? 0) : ''}</span></div>`
+        : `<div><span class="tbd">${evSource(src)}</span><span></span></div>`;
+      const st = f.flag && /^Held|^Tie|double_no_show|^Stalled/.test(f.flag) && f.status !== 'completed'
+        ? '<div class="st held">Held — awaiting decision</div>'
+        : f.status === 'live' ? '<div class="st live">Live</div>' : f.status === 'ready' ? '<div class="st">On now</div>'
+        : f.status === 'completed' && f.result_type === 'walkover' ? '<div class="st">Walkover</div>' : '';
+      return `<div class="ev-tie">${side(f.player1_id, f.source_p1, f.legs_p1)}${side(f.player2_id, f.source_p2, f.legs_p2)}${st}</div>`;
+    }).join('')}</div>`).join('')}</div>`;
+}
+function evPodium(d){
+  const by = k => d.members.filter(m=>m.outcome === k).map(m=>evName(m.player_id));
+  const w = by('winner'), r = by('runner_up'), sf = by('sf'), qf = by('qf');
+  if(!w.length) return '';
+  return `<div class="panel"><h3 style="font-size:19px">Final placings</h3><div class="ev-podium">
+    <div class="champ"><div class="k">Winner</div><div class="v">${w.join(', ')}</div></div>
+    <div><div class="k">Runner-up</div><div class="v">${r.join(', ') || '—'}</div></div>
+    <div><div class="k">Semi-finals</div><div class="v">${sf.join(', ') || '—'}</div></div>
+    ${qf.length ? `<div class="champ" style="grid-column:1/-1"><div class="k">Quarter-finals</div><div class="v" style="font-size:16px;color:var(--ivory)">${qf.join(', ')}</div></div>` : ''}
+  </div></div>`;
+}
+
+// ---- the signed-in player's own box (above the buy-in panel) ----
+function evMe(d, phase, win){
+  const u = EV.user;
+  if(!u) return '';
+  const entry = d.entries.find(x=>x.player_id === u.id);
+  const paid = entry && entry.payment_status === 'paid';
+  if(!paid) return '';
+  const mem = d.members.find(m=>m.player_id === u.id);
+  const msg = `<p class="ev-msg" role="status" id="ev-msg">${evEsc(EV.msg)}</p>`;
+  const box = (h, body) => `<div class="ev-me"><div class="panel"><div class="eyebrow">Your night</div><h3>${h}</h3>${body}</div></div>`;
+
+  if(phase === 'cancelled') return box('Tournament cancelled', `<p>Your <strong>£6 buy-in will be refunded</strong> to the card you paid with.</p>`);
+  if(phase === 'open'){
+    if(entry.checked_in && win === 'late') return box('The draw didn’t run', `<p>The draw didn’t run on time, so this tournament won’t go ahead. Your <strong>£6 buy-in will be refunded</strong> to the card you paid with, and Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+    if(entry.checked_in) return box('Checked in ✓', `<p>The draw is at ${EV_DRAW} and the first matches start straight after. Keep this page open — your match appears here. Friendlies are off until the draw.</p>`);
+    if(win === 'before') return box('You’re entered ✓', `<p>Check in here between <strong>19:00 and ${EVENT_CHECKIN}</strong> on the night. No check-in, no place — the buy-in isn’t refunded.</p>`);
+    if(win === 'closed' || win === 'late') return box('Check-in has closed', `<p>You didn’t check in, so you’re not in tonight’s draw. Friendlies are open.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+    const fr = d.friendly;
+    return box('Check in now', (fr ? `<div class="ev-warn">You’re still in a Friendly (code <span class="mono">${evEsc(fr.code)}</span>). Finish or leave it to check in.</div>
+        <button class="btn btn-ghost" data-ev-leave="${evEsc(fr.id)}" ${EV.busy?'disabled':''}>Leave Friendly</button><div style="height:10px"></div>` : '')
+      + `<p>Check-in closes at <strong>${EVENT_CHECKIN}</strong>. Only checked-in players are drawn.</p>
+        <button class="btn btn-primary" data-ev-checkin="${evEsc(EV.id)}" ${EV.busy || fr ?'disabled':''}>Check in</button>${msg}`);
+  }
+  if(!mem) return box('Not in tonight’s draw', `<p>You didn’t check in before ${EVENT_CHECKIN}. Friendlies are open.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+  if(mem.outcome === 'winner') return box('Champion', `<p>You won tonight’s tournament. Well played.</p>`);
+  if(mem.outcome === 'runner_up') return box('Runner-up', `<p>Beaten in the final. Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+  if(mem.eliminated_at || mem.outcome) return box('You’re out', `<p>Knocked out (${EV_OUT[mem.outcome] || 'tonight'}). Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+  const m = d.mine;
+  if(m && String(m.tournament_id) === EV.id){
+    const by = m.ready_at ? new Date(new Date(m.ready_at).getTime() + 180000).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : null;
+    return box(`Your match: v ${evEsc(m.opponent || 'opponent')}`,
+      `<p>${EV_STAGE_ONE[m.stage] || 'Match'} · best of ${m.best_of}.${m.status === 'ready' && by ? ` Open your match room by <strong>${by}</strong> — after 3 minutes a no-show loses the match.` : ''}</p>
+       <a class="btn btn-primary" href="play.html?match=${encodeURIComponent(m.code)}" data-testid="play-your-match">Play your match</a>`);
+  }
+  if(phase === 'completed') return box('Tournament finished', `<p>Thanks for playing tonight.</p>`);
+  return box('Waiting for your next match', `<p>It opens here as soon as your opponent is free.</p>`);
+}
+
+// ---- actions ----
+document.addEventListener('click', async ev=>{
+  const ci = ev.target.closest('[data-ev-checkin]'), lv = ev.target.closest('[data-ev-leave]');
+  if(!ci && !lv) return;
+  ev.preventDefault();
+  if(EV.busy || !EV.sb) return;
+  EV.busy = true; EV.msg = ''; evRender();
+  try{
+    const r = ci ? await EV.sb.rpc('check_in', { p_tournament: Number(ci.dataset.evCheckin) })
+                 : await EV.sb.rpc('leave_friendly_match', { p_match: lv.dataset.evLeave });
+    if(r.error) EV.msg = r.error.message || 'That didn’t work — try again.';
+    else if(ci) notify('Checked in ✓ The draw is at ' + EV_DRAW + '.');
+    else notify('You’ve left the Friendly. You can check in now.');
+  }catch(err){ EV.msg = 'Couldn’t reach Tournza — check your connection and try again.'; }
+  EV.busy = false;
+  await evLoad();
+});
+
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves
 loadTournamentsFromSupabase();
@@ -2359,6 +2693,10 @@ go((location.hash||'#home').slice(1)||'home');
     // Did we just return from Stripe tournament buy-in checkout? The session
     // we created ourselves (create-tournament-checkout) sends the tournament
     // id straight back in the success URL, so no sessionStorage juggling needed.
+    if(params.get('tournament')==='cancelled'){
+      cleanTournamentParam();
+      notify('Payment cancelled — you haven’t been charged.');
+    }
     const tournamentId = params.get('event');
     if(params.get('tournament')==='success' && tournamentId){
       cleanTournamentParam();
@@ -2368,8 +2706,8 @@ go((location.hash||'#home').slice(1)||'home');
       let entered = await checkTournamentEntry(user, tournamentId);
       for(let i=0; i<6 && !entered; i++){ await sleep(1500); entered = await checkTournamentEntry(user, tournamentId); }
       notify(entered
-        ? 'You’re entered ✓'
-        : 'Payment received — your entry will show shortly. Refresh in a moment if it doesn’t.');
+        ? 'You’re entered ✓ Check in between 19:00 and ' + EVENT_CHECKIN + ' on the night.'
+        : 'We’re still confirming your payment. If you don’t get a place, your £6 buy-in will be refunded.');
       go('event:' + tournamentId);
       return;
     }
