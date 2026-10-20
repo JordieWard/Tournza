@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- the site is designed dark: tell browsers so, so a phone in dark mode never re-colours it -->
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07101f">
 <title>Tournza — UK regional virtual darts</title>
 <meta name="description" content="Verified players. Professional events. Real rankings. Find UK regional darts events and register in seconds.">
 <meta property="og:title" content="Tournza — UK regional virtual darts">
@@ -579,9 +582,6 @@
   .pf-stats .b .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted-2);margin-top:10px}
   .pf-stats .b.key{border-color:var(--pf-cyan-line);background:radial-gradient(120% 90% at 0% 0%,rgba(0,224,255,.18),transparent 60%),var(--pf-card)}
   .pf-stats .b.key .v{color:var(--pf-cyan);text-shadow:0 0 22px rgba(0,224,255,.35)}
-  .pf-stats .b.pb::before{content:"PB";position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-    color:var(--pf-mag);border:1px solid var(--pf-mag-line);border-radius:999px;padding:2px 7px}
-  .pf-stats .b.pb .v{color:#fff}
   .pf-stats .b.na .v{color:var(--muted)}
   .pf-stats .b.na::before{display:none}
   .pf-grid{display:grid;grid-template-columns:1.65fr .85fr;gap:20px;margin-top:22px}
@@ -686,6 +686,123 @@
     .pf-hist td.num{font-size:17px}
   }
 
+  :root{color-scheme:dark}
+
+  /* ---------- Stage 7: tournament page + LIVE ---------- */
+  .tp{max-width:880px;margin:0 auto}
+  .tp-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .tp-nav .back{margin:0}
+  .tp-nav .tp-link{font-family:var(--mono);font-size:12.5px;color:var(--muted-2);cursor:pointer}
+  .tp-nav .tp-link:hover{color:var(--ivory)}
+  .tp-head{margin-bottom:18px}
+  .tp-head h2{font-size:clamp(26px,5vw,40px);margin:10px 0 4px;line-height:1.05}
+  .tp-pills{display:flex;gap:8px;flex-wrap:wrap}
+  .tp-sub{font-family:var(--mono);font-size:12.5px;color:var(--muted-2);margin:0;letter-spacing:.04em}
+  .tp-me .ev-me{margin-bottom:18px}
+  .tp-me .ev-me .btn{width:100%}
+  .tp .ev-night .panel{margin-bottom:18px}
+  .tp-on ul{list-style:none;margin:0 0 12px;padding:0}
+  .tp-on li{display:grid;grid-template-columns:1fr auto;grid-template-areas:"who act" "meta act";gap:2px 12px;align-items:center;
+    padding:12px 2px;border-top:1px solid var(--line-soft)}
+  .tp-on li:first-child{border-top:0}
+  .tp-on li.me{background:rgba(46,119,255,.10);border-radius:10px;padding:12px 10px}
+  .tp-on .who{grid-area:who;display:flex;flex-wrap:wrap;gap:6px;font-weight:700;font-size:15px;min-width:0}
+  .tp-on .who .v{color:var(--muted);font-weight:400}
+  .tp-on .meta{grid-area:meta;font-family:var(--mono);font-size:11.5px;color:var(--muted-2)}
+  .tp-on .btn,.tp-yours{grid-area:act}
+  .tp-yours{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-2)}
+  .lv{color:var(--red-bright)}
+  .lv::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red-bright);margin-right:5px;vertical-align:1px;animation:tpPulse 1.6s infinite}
+  @keyframes tpPulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .tp-n{display:inline-block;min-width:22px;padding:1px 7px;margin-left:6px;border-radius:999px;background:rgba(214,59,67,.15);color:var(--red-bright);font-family:var(--mono);font-size:12px;vertical-align:3px;text-align:center}
+  .ev-watch{color:var(--red-bright);text-decoration:none;border-bottom:1px dotted currentColor}
+  .ev-watch:hover{color:#fff}
+  .ev-golive{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin-bottom:18px;padding:14px 16px;border-radius:var(--r);
+    border:1px solid rgba(214,59,67,.5);background:rgba(214,59,67,.08);color:var(--ivory-dim);text-decoration:none;font-size:14px;cursor:pointer}
+  .ev-golive strong{color:var(--ivory)}
+  .ev-golive .dot,.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--red-bright);animation:tpPulse 1.6s infinite}
+  .ev-golive .go{font-family:var(--mono);font-size:12.5px;color:var(--red-bright);white-space:nowrap}
+  /* LIVE: the loudest page on the site — same ink and blue, turned up with cyan, magenta and the live red */
+  #route-live,.tl-bg{--tl-cyan:#00e0ff;--tl-mag:#e83cff;--tl-red:#ff4d5a}
+  .tl-bg{display:none;position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:var(--ink)}
+  body.tl-on .tl-bg{display:block}
+  body.tl-on::before,body.tl-on::after{opacity:.35}
+  .tl-bg span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.7;animation:tlDrift 18s ease-in-out infinite alternate}
+  .tl-bg .a{width:60vmax;height:60vmax;left:-18vmax;top:-22vmax;background:radial-gradient(circle,var(--blue) 0%,transparent 65%)}
+  .tl-bg .b{width:48vmax;height:48vmax;right:-14vmax;top:-10vmax;background:radial-gradient(circle,var(--tl-mag) 0%,transparent 62%);opacity:.5;animation-duration:22s}
+  .tl-bg .c{width:52vmax;height:52vmax;left:20vmax;bottom:-30vmax;background:radial-gradient(circle,var(--tl-cyan) 0%,transparent 60%);opacity:.42;animation-duration:26s}
+  .tl-bg .d{width:30vmax;height:30vmax;right:6vmax;bottom:4vmax;background:radial-gradient(circle,var(--tl-red) 0%,transparent 62%);opacity:.4;animation-duration:15s}
+  .tl-bg::after{content:"";position:absolute;inset:0;background:
+      repeating-linear-gradient(115deg,transparent 0 46px,rgba(255,255,255,.025) 46px 47px),
+      radial-gradient(120% 80% at 50% 120%,rgba(7,16,31,.85),transparent 60%)}
+  @keyframes tlDrift{to{transform:translate3d(6vmax,4vmax,0) scale(1.12)}}
+  .tl{padding-top:34px;text-align:center}
+  .tl-word{display:flex;justify-content:center;margin:0;font-family:var(--display);font-weight:900;
+    font-size:clamp(96px,21vw,248px);line-height:.8;letter-spacing:-.045em}
+  .tl-txt{display:inline-block;background:linear-gradient(100deg,#fff 0%,var(--ivory) 22%,var(--tl-cyan) 48%,var(--blue-2) 68%,var(--tl-mag) 88%,var(--tl-red) 100%);
+    background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 8px 40px rgba(0,224,255,.25));animation:tlSheen 7s ease-in-out infinite alternate;padding-right:.04em}
+  @keyframes tlSheen{from{background-position:0% 0}to{background-position:100% 0}}
+  .tl-wrap{position:relative;display:inline-block}   /* the word is centred; the beacon hangs off its left */
+  .tl-beacon{position:absolute;right:calc(100% + clamp(10px,2.2vw,28px));top:50%;margin-top:calc(clamp(22px,4.2vw,52px) / -2);width:clamp(22px,4.2vw,52px);height:clamp(22px,4.2vw,52px);border-radius:50%;background:var(--tl-red);
+    box-shadow:0 0 0 0 rgba(255,77,90,.6),0 0 36px rgba(255,77,90,.8);animation:tlBeacon 1.6s ease-out infinite}
+  @keyframes tlBeacon{0%{box-shadow:0 0 0 0 rgba(255,77,90,.55),0 0 36px rgba(255,77,90,.8)}100%{box-shadow:0 0 0 clamp(14px,2.6vw,30px) rgba(255,77,90,0),0 0 36px rgba(255,77,90,.8)}}
+  .tl-bar{height:4px;width:min(100%,720px);margin:clamp(16px,2.4vw,26px) auto 16px;border-radius:4px;
+    background:linear-gradient(90deg,var(--tl-red),var(--tl-mag) 30%,var(--blue-2) 60%,var(--tl-cyan))}
+  .tl-count{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);margin:0 0 22px;min-height:1em}
+  .tl-count b{color:#fff;font-weight:500}
+  .tl-count i{font-style:normal;color:var(--tl-mag);padding:0 4px}
+  .tl-filter{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:0 0 30px}
+  .tl-filter:empty{display:none}
+  .tl-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ivory-dim);cursor:pointer;
+    padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(11,24,48,.65);backdrop-filter:blur(6px);transition:border-color .15s,color .15s,background .15s}
+  .tl-chip:hover{color:#fff;border-color:var(--tl-cyan)}
+  .tl-chip span{font-size:10.5px;min-width:18px;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff}
+  .tl-chip.on{color:var(--ink);background:linear-gradient(100deg,var(--tl-cyan),var(--blue-2));border-color:transparent;font-weight:500}
+  .tl-chip.on span{background:rgba(7,16,31,.25);color:var(--ink)}
+  .tl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;text-align:left}
+  .tl-card{position:relative;display:flex;flex-direction:column;min-height:236px;border:1px solid transparent;border-radius:calc(var(--r) + 4px);padding:20px;
+    background:linear-gradient(160deg,rgba(15,27,52,.92),rgba(9,16,34,.94)) padding-box,
+               linear-gradient(120deg,var(--tl-acc),rgba(120,150,210,.18) 45%,var(--tl-acc2)) border-box;
+    box-shadow:0 20px 50px rgba(2,8,24,.5),0 0 44px -20px var(--tl-acc);--tl-acc:var(--tl-cyan);--tl-acc2:var(--tl-mag);
+    transition:transform .18s ease,box-shadow .18s ease}
+  .tl-card:hover,.tl-card:focus-within{transform:translateY(-4px);box-shadow:0 26px 60px rgba(2,8,24,.6),0 0 60px -14px var(--tl-acc)}
+  .tl-card:nth-child(4n+2){--tl-acc:var(--tl-mag);--tl-acc2:var(--blue-2)}
+  .tl-card:nth-child(4n+3){--tl-acc:var(--blue-2);--tl-acc2:var(--tl-red)}
+  .tl-card:nth-child(4n+4){--tl-acc:var(--tl-red);--tl-acc2:var(--tl-cyan)}
+  .tl-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .tl-day{font-family:var(--mono);font-size:11.5px;color:var(--muted-2)}
+  .tl-region{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tl-acc);margin:18px 0 4px}
+  .tl-card h3{font-size:21px;line-height:1.15;margin:0 0 16px;letter-spacing:-.01em}
+  .tl-now{display:flex;align-items:center;gap:10px;margin-top:auto}
+  .tl-now b{font-family:var(--display);font-weight:900;font-size:44px;line-height:1;color:#fff;text-shadow:0 0 24px var(--tl-acc)}
+  .tl-now span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);line-height:1.35}
+  .tl-open{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);font-family:var(--display);font-weight:700;font-size:14.5px;color:#fff;text-decoration:none}
+  .tl-open span{color:var(--tl-acc);transition:margin .15s}
+  .tl-card:hover .tl-open span{margin-left:4px}
+  .tl-open::after{content:"";position:absolute;inset:0;border-radius:inherit}     /* the whole card opens the tournament */
+  .tl-open:focus-visible{outline:none}
+  .tl-card:focus-within{outline:2px solid var(--tl-acc);outline-offset:3px}
+  @media (max-width:980px){ .tl-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .tl-empty{text-align:center;padding:40px 20px}
+  .tl-empty .tl-dot{margin:0 auto 12px}
+  .tl-dot.off{background:var(--muted);animation:none}
+  .tl-empty h3{font-size:22px;margin:0 0 8px}
+  .tl-empty .ev-note{margin:0 auto 16px;max-width:44ch}
+  nav.main a.nav-live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red-bright);margin-right:7px;vertical-align:1px}
+  .acct-ev{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px;transition:background .15s}
+  .acct-ev:hover{background:rgba(46,119,255,.08)}
+  .acct-ev .go{color:var(--blue-2);margin-left:6px}
+  @media (max-width:720px){
+    .tl{padding-top:18px}
+    .tl-word{font-size:30vw}
+    .tl-grid{grid-template-columns:1fr;gap:14px}
+    .tl-card{min-height:0;padding:18px 16px}
+    .tl-filter{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;margin:0 -16px 22px;padding:0 16px 4px;scrollbar-width:none}
+    .tl-chip{flex:none}
+    .tp-on .who{font-size:14px}
+  }
+
   /* ---------- responsive ---------- */
   @media(max-width:920px){
     .hero-grid{grid-template-columns:1fr;gap:36px}
@@ -722,6 +839,7 @@
       <div class="logo" data-link="home" tabindex="0" role="button" aria-label="Tournza home">Tournza</div>
       <nav class="main" id="nav">
         <a data-link="events">Events</a>
+        <a data-link="live" class="nav-live">Live</a>
         <a data-link="rankings">Rankings</a>
         <a data-link="players">Players</a>
         <a data-link="friendlies" class="nav-fr">Friendlies</a>
@@ -942,6 +1060,31 @@
       <div class="fr-h3"><h3>Friendly history</h3><span class="mono" style="font-size:11.5px;color:var(--muted)" id="fr-history-note"></span></div>
       <div id="fr-history"></div>
     </div>
+  </section>
+</div>
+
+<!-- ================= TOURNAMENT (Stage 7) ================= -->
+<!-- The page a player plays from and waits on once the draw is made: their
+     match, what's on now (watch), the knockout draw and the groups. Public. -->
+<div class="route" id="route-tournament">
+  <section class="block tp">
+    <div class="tp-nav"><span class="back" data-link="live">← Live</span><a class="tp-link" id="tp-details" data-link="events">Event details →</a></div>
+    <div id="tp-head" class="tp-head"></div>
+    <div id="tp-me" class="tp-me"></div>
+    <div id="tp-night" class="ev-night"></div>
+  </section>
+</div>
+
+<!-- ================= LIVE (Stage 7) ================= -->
+<!-- the LIVE page's full-screen colour (outside the route so it covers the whole window) -->
+<div class="tl-bg" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
+<div class="route" id="route-live">
+  <section class="block tl">
+    <h1 class="tl-word"><span class="tl-wrap"><span class="tl-beacon" aria-hidden="true"></span><span class="tl-txt">LIVE</span></span></h1>
+    <div class="tl-bar" aria-hidden="true"></div>
+    <p class="tl-count" id="tl-count" aria-live="polite"></p>
+    <div class="tl-filter" id="tl-filter" role="group" aria-label="Filter by region"></div>
+    <div id="tl-list"><div class="panel"><p class="ev-note">Loading…</p></div></div>
   </section>
 </div>
 
@@ -1242,7 +1385,7 @@
         <div class="foot-col"><span class="h">Regions</span>
           <a data-link="events">London</a><a data-link="events">North West</a><a data-link="events">West Midlands</a><a data-link="events">Scotland</a><a data-link="events">Wales</a><a data-link="events">All regions</a></div>
         <div class="foot-col"><span class="h">Compete</span>
-          <a data-link="events">Events</a><a data-link="rankings">Rankings</a><a data-link="players">Players</a><a data-link="friendlies">Friendlies</a><a data-link="membership">Membership</a><a data-link="rules">Fair play</a></div>
+          <a data-link="events">Events</a><a data-link="live">Live</a><a data-link="rankings">Rankings</a><a data-link="players">Players</a><a data-link="friendlies">Friendlies</a><a data-link="membership">Membership</a><a data-link="rules">Fair play</a></div>
         <div class="foot-col"><span class="h">Tournza</span>
           <a href="login.html#signup" id="foot-join">Join</a><a data-link="join">Contact</a><a data-link="privacy">Privacy</a><a data-link="terms">Terms</a></div>
       </div>
@@ -1794,11 +1937,11 @@ function renderPlayerProfile(id){
     ['3-dart average', S(p.avg, 2), 'key'],
     ['First 9 average', S(p.first9, 2), 'key'],
     ['Checkout %', S(p.checkout, 1, '%')],
-    ['Highest checkout', p.hi!=null ? String(p.hi) : null, 'pb'],
+    ['Highest checkout', p.hi!=null ? String(p.hi) : null],
     ['100+', count(p.c100)],
     ['140+', count(p.c140)],
     ['180s', count(p.e180)],
-    ['Best leg', p.bestLeg!=null ? `${p.bestLeg}<small>darts</small>` : null, 'pb'],
+    ['Best leg', p.bestLeg!=null ? `${p.bestLeg}<small>darts</small>` : null],
   ];
   const recent = hist.slice(-10);
   el.innerHTML=`
@@ -1902,7 +2045,7 @@ function buildTicker(){
 }
 
 /* ---------------- router ---------------- */
-const ROUTES=['home','events','event','rankings','players','player','friendlies','membership','join','account','privacy','terms','rules'];
+const ROUTES=['home','events','event','tournament','live','rankings','players','player','friendlies','membership','join','account','privacy','terms','rules'];
 // True once we've left the homepage and created a browser-history "anchor"
 // for it — see go() below. Reset to false once we're back on it, so leaving
 // again later still sets up a fresh anchor for the next Back press.
@@ -1916,9 +2059,12 @@ function go(target){
   // nav active state
   $$('nav.main a').forEach(a=>a.classList.toggle('active', a.dataset.link===name
     || (name==='event'&&a.dataset.link==='events')
+    || (name==='tournament'&&a.dataset.link==='live')
     || (name==='player'&&a.dataset.link==='players')
     || (name==='join'&&a.dataset.link==='membership' && false)));
-  if(name==='event') renderEventDetail(arg); else evLeave();
+  if(name==='event') renderEventDetail(arg); else if(name==='tournament') tpMount(arg); else evLeave();
+  if(name==='live') tlMount(); else tlLeave();
+  document.body.classList.toggle('tl-on', name==='live');   // LIVE's full-screen colour
   if(name==='player') renderPlayerProfile(arg);
   if(name==='account' && window.renderAccountDashboard) window.renderAccountDashboard();
   document.body.classList.toggle('fr-on', name==='friendlies');   // Friendlies' own pink theme
@@ -2575,7 +2721,11 @@ window.addEventListener('pageshow', ev=>{ if(ev.persisted && FR.live && FR.user)
    signed-in player's own match / Friendly. Every action is a server call
    that does its own checking (check_in, leave_friendly_match); the page
    never decides anything. Refreshes live, with a 15-second backstop. */
-const EV = { id:null, sb:null, user:null, timer:null, chan:null, data:null, busy:false, msg:'' };
+const EV = { id:null, sb:null, user:null, timer:null, chan:null, data:null, busy:false, msg:'', mode:'event', sent:{} };
+// Stage 7: the same live data drives two pages —
+//   'event'      #event:<id>       the event page (details, entry, check-in)
+//   'tournament' #tournament:<id>  the tournament page: groups, draw, your match,
+//                                  matches on now (watch), your poster once you're out
 const EV_STAGE = { r16:'Last 16', qf:'Quarter-finals', sf:'Semi-finals', final:'Final' };
 const EV_STAGE_ONE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
 const EV_OUT = { winner:'Winner', runner_up:'Runner-up', sf:'Semi-finals', qf:'Quarter-finals', r16:'Last 16', group:'Group stage' };
@@ -2614,9 +2764,13 @@ function evClient(){
   return new Promise(res=>{ let n=0; (function chk(){ if(window.tournzaSupabase || typeof supabase==='undefined' || n++>50) res(window.tournzaSupabase||null); else setTimeout(chk,100); })(); });
 }
 
-async function evMount(e){
+function evMount(e){ return evStart(e.id, 'event'); }
+function tpMount(id){ return evStart(id, 'tournament'); }
+async function evStart(id, mode){
+  const e = { id };
   evLeave();
-  EV.id = String(e.id); EV.msg = '';
+  EV.id = String(e.id); EV.msg = ''; EV.mode = mode;
+  if(mode === 'tournament'){ const h = $('#tp-head'); if(h) h.innerHTML = ''; ['#tp-me','#tp-night'].forEach(s=>{ const x=$(s); if(x) x.innerHTML=''; }); }
   const sb = EV.sb = await evClient();
   if(!sb || EV.id !== String(e.id)) return;
   try{ const { data } = await sb.auth.getSession(); EV.user = data && data.session && data.session.user || null; }catch(_){ EV.user = null; }
@@ -2643,11 +2797,11 @@ async function evLoad(){
   EV.loading = true;
   try{
     const [t, en, gr, mem, fx] = await Promise.all([
-      sb.from('tournaments').select('id, phase, cancel_reason, entrant_count, group_count, tournament_date').eq('id', id).maybeSingle(),
+      sb.from('tournaments').select('id, name, region, phase, cancel_reason, entrant_count, group_count, tournament_date').eq('id', id).maybeSingle(),
       sb.from('tournament_entries').select('player_id, payment_status, checked_in, players(name)').eq('tournament_id', id),
       sb.from('tournament_groups').select('id, label, size, completed_at, tie_flag').eq('tournament_id', id).order('label'),
       sb.from('tournament_group_members').select('group_id, player_id, final_rank, outcome, eliminated_at').eq('tournament_id', id),
-      sb.from('matches').select('id, stage, group_id, round, slot, player1_id, player2_id, status, winner_id, legs_p1, legs_p2, result_type, flag, source_p1, source_p2, best_of, ready_at').eq('tournament_id', id),
+      sb.from('matches').select('id, stage, group_id, round, slot, player1_id, player2_id, status, winner_id, legs_p1, legs_p2, result_type, flag, source_p1, source_p2, best_of, ready_at, live_match_id').eq('tournament_id', id),
     ]);
     if(t.error) throw t.error;
     const groups = gr.data || [];
@@ -2681,25 +2835,33 @@ async function evLoad(){
 function evName(id){ return id ? evEsc((EV.data && EV.data.names[id]) || 'Player') : ''; }
 
 function evRender(){
-  const night = $('#ev-night'), me = $('#ev-me');
+  const tp = EV.mode === 'tournament';
+  const night = $(tp ? '#tp-night' : '#ev-night'), me = $(tp ? '#tp-me' : '#ev-me');
   if(!night || !me) return;
   const d = EV.data;
+  if(tp && (!d || !d.t)){ if(d && !d.t) night.innerHTML = `<div class="panel"><p class="ev-note">That tournament isn’t available.</p></div>`; me.innerHTML = ''; return; }
   if(!d || !d.t){ night.innerHTML = ''; me.innerHTML = ''; return; }
   const t = d.t, phase = t.phase, win = phase === 'open' ? evWindow(String(t.tournament_date).slice(0,10)) : 'closed';
+  const inPlay = phase === 'groups' || phase === 'knockout';
+  const myMem = EV.user && d.members.find(m=>m.player_id === EV.user.id);
+  // in the draw and it's under way: the tournament page is where you play and wait (once per visit, so
+  // "Event details" from there doesn't bounce straight back)
+  if(!tp && inPlay && myMem && !EV.sent[EV.id]){ EV.sent[EV.id] = true; go('tournament:' + EV.id); return; }
+  if(tp) tpHead(d);
   const shut = win === 'closed' || win === 'late';
   const entriesOpen = phase === 'open' && evEntriesOpen(String(t.tournament_date).slice(0,10));
   // entries close at 19:15 (the server refuses after that too)
-  const buy = $('#ev-buy');
+  const buy = tp ? null : $('#ev-buy');
   if(buy && !entriesOpen){ buy.disabled = true; buy.textContent = 'Entries closed'; }
   // the page's own "check-in closes … tonight" line, once that has passed
-  const cd = $('#event-detail .countdown');
+  const cd = tp ? null : $('#event-detail .countdown');
   if(cd && (phase !== 'open' || shut)) cd.textContent = phase === 'cancelled' ? '● Cancelled' : '● Check-in closed at ' + EVENT_CHECKIN;
 
   // ---- the night at a glance ----
   // which step is on now: entries (until 19:15) and check-in (19:00–19:20) overlap
   const step = phase === 'open' ? (win === 'before' ? 0 : win === 'checkin' ? 1 : 2) : (phase === 'cancelled' ? -1 : 3);
   const cells = [['Entries','until ' + EV_ENTRIES], ['Check-in','19:00–' + EVENT_CHECKIN], ['Draw', EV_DRAW], ['First matches', 'from ' + EV_DRAW]];
-  let html = `<div class="ev-clock" aria-label="Tonight">${cells.map((c,i)=>{
+  let html = tp && phase !== 'open' ? '' : `<div class="ev-clock" aria-label="Tonight">${cells.map((c,i)=>{
       const now = i === step || (i === 0 && step === 1 && entriesOpen);
       const cls = phase === 'cancelled' ? 'done' : (now ? 'now' : (i < step || (i === 0 && step >= 1) ? 'done' : ''));
       return `<div class="${cls}"><div class="k">${c[0]}</div><div class="v">${c[1]}</div></div>`; }).join('')}</div>`;
@@ -2709,14 +2871,47 @@ function evRender(){
       <h3 style="font-size:19px;margin:12px 0 6px">${evEsc(t.cancel_reason || 'This tournament was cancelled')}</h3>
       <p class="ev-note">Every <strong>£6 buy-in</strong> for this tournament will be refunded to the card it was paid with.</p></div>`;
   }
+  if(!tp && inPlay) html += `<a class="ev-golive" data-link="tournament:${evEsc(EV.id)}" href="#tournament:${evEsc(EV.id)}"><span class="dot"></span><span><strong>The tournament is under way</strong><br>Groups, the draw and live scores</span><span class="go">Open →</span></a>`;
   if(phase === 'completed') html += evPodium(d);
+  if(tp && inPlay) html += evOnNow(d);
   if(['groups','knockout','completed'].includes(phase)){
     const ko = d.fixtures.filter(f=>f.stage !== 'group');
     if(ko.length) html += `<div class="panel"><h3 style="font-size:19px">Knockout</h3>${evBracket(ko)}</div>`;
     if(d.groups.length) html += `<div class="panel"><h3 style="font-size:19px">Groups</h3><div class="ev-groups">${d.groups.map(g=>evGroup(g, d)).join('')}</div></div>`;
   }
+  if(tp && phase === 'open') html += `<div class="panel"><p class="ev-note">The draw is at <strong>${EV_DRAW}</strong>. Groups and the first matches appear here as soon as it’s made.</p></div>`;
   night.innerHTML = html;
   me.innerHTML = evMe(d, phase, win);
+}
+
+// ---- tournament page: header, matches on now ----
+function evWatchUrl(f){ return 'watch.html?match=' + encodeURIComponent(f.live_match_id) + '&back=' + encodeURIComponent('#tournament:' + EV.id); }
+function tpHead(d){
+  const h = $('#tp-head'); if(!h) return;
+  const t = d.t, iso = String(t.tournament_date).slice(0,10);
+  const dl = $('#tp-details');                       // the event page exists while the event is still listed (today onward)
+  if(dl){ const listed = typeof EVENTS !== 'undefined' && EVENTS.some(x=>String(x.id) === EV.id); dl.hidden = !listed; dl.dataset.link = 'event:' + EV.id; }
+  const day = (parseLocalDate(iso) || new Date(iso)).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  const pill = { open:'<span class="pill">Not started</span>', groups:'<span class="pill live">Live · Groups</span>', knockout:'<span class="pill live">Live · Knockout</span>',
+                 completed:'<span class="pill green">Finished</span>', cancelled:'<span class="pill" style="color:var(--red-bright)">Cancelled</span>' }[t.phase] || '';
+  h.innerHTML = `<div class="tp-pills">${pill}${t.region ? `<span class="pill">${evEsc(t.region)}</span>` : ''}</div>
+    <h2>${evEsc(t.name || 'Tournament')}</h2>
+    <p class="tp-sub">${evEsc(day)} · ${t.entrant_count ? t.entrant_count + ' players' : ''}${t.group_count ? ' · ' + t.group_count + ' group' + (t.group_count === 1 ? '' : 's') : ''}</p>`;
+}
+function evOnNow(d){
+  const on = d.fixtures.filter(f=>(f.status === 'ready' || f.status === 'live') && f.live_match_id)
+    .sort((a,b)=>(a.stage === 'group' ? 0 : 1) - (b.stage === 'group' ? 0 : 1) || a.round - b.round || a.slot - b.slot);
+  const gl = id => { const g = d.groups.find(x=>x.id === id); return g ? 'Group ' + evEsc(g.label) : 'Group'; };
+  const me = EV.user && EV.user.id;
+  const rows = on.map(f=>{
+    const mine = me && (f.player1_id === me || f.player2_id === me);
+    return `<li class="${mine ? 'me' : ''}"><div class="who"><span>${evName(f.player1_id)}</span><span class="v">v</span><span>${evName(f.player2_id)}</span></div>
+      <div class="meta">${f.stage === 'group' ? gl(f.group_id) : EV_STAGE_ONE[f.stage]} · best of ${f.best_of} · ${f.status === 'live' ? '<span class="lv">Live</span>' : 'Starting'}</div>
+      ${mine ? '<span class="tp-yours">Your match</span>' : `<a class="btn btn-ghost btn-sm" href="${evWatchUrl(f)}" data-testid="watch">Watch</a>`}</li>`;
+  }).join('');
+  return `<div class="panel tp-on"><h3 style="font-size:19px">On now ${on.length ? `<span class="tp-n">${on.length}</span>` : ''}</h3>
+    ${on.length ? `<ul>${rows}</ul><p class="ev-note">Watch any match for live scores (scores only — no cameras).</p>`
+      : `<p class="ev-note">${d.t.phase === 'groups' && !d.fixtures.some(f=>f.stage === 'group' && f.status !== 'completed') ? 'Group games finished — the knockout is about to start.' : 'No matches on right this second — the next ones start as soon as players are free.'}</p>`}</div>`;
 }
 
 function evGroup(g, d){
@@ -2741,6 +2936,7 @@ function evScore(f){
     if(f.result_type === 'walkover' && !f.winner_id) return 'No-show (both)';
     return `${f.legs_p1 ?? 0}–${f.legs_p2 ?? 0}${f.result_type === 'walkover' ? ' w/o' : ''}`;
   }
+  if((f.status === 'live' || f.status === 'ready') && f.live_match_id && EV.id) return `<a class="ev-watch" href="${evWatchUrl(f)}">${f.status === 'live' ? 'Live' : 'On now'} · Watch</a>`;
   if(f.status === 'live') return '<span style="color:var(--red-bright)">Live</span>';
   if(f.status === 'ready') return 'On now';
   if(f.status === 'void') return 'Awaiting decision';
@@ -2763,6 +2959,7 @@ function evBracket(ko){
         : `<div><span class="tbd">${evSource(src)}</span><span></span></div>`;
       const st = f.flag && /^Held|^Tie|double_no_show|^Stalled/.test(f.flag) && f.status !== 'completed'
         ? '<div class="st held">Held — awaiting decision</div>'
+        : (f.status === 'live' || f.status === 'ready') && f.live_match_id ? `<div class="st ${f.status === 'live' ? 'live' : ''}"><a class="ev-watch" href="${evWatchUrl(f)}">${f.status === 'live' ? 'Live' : 'On now'} · Watch</a></div>`
         : f.status === 'live' ? '<div class="st live">Live</div>' : f.status === 'ready' ? '<div class="st">On now</div>'
         : f.status === 'completed' && f.result_type === 'walkover' ? '<div class="st">Walkover</div>' : '';
       return `<div class="ev-tie">${side(f.player1_id, f.source_p1, f.legs_p1)}${side(f.player2_id, f.source_p2, f.legs_p2)}${st}</div>`;
@@ -2794,7 +2991,7 @@ function evMe(d, phase, win){
   if(phase === 'cancelled') return box('Tournament cancelled', `<p>Your <strong>£6 buy-in will be refunded</strong> to the card you paid with.</p>`);
   if(phase === 'open'){
     if(entry.checked_in && win === 'late') return box('The draw didn’t run', `<p>The draw didn’t run on time, so this tournament won’t go ahead. Your <strong>£6 buy-in will be refunded</strong> to the card you paid with, and Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
-    if(entry.checked_in) return box('Checked in ✓', `<p>The draw is at ${EV_DRAW} and the first matches start straight after. Keep this page open — your match appears here. Friendlies are off until the draw.</p>`);
+    if(entry.checked_in) return box('Checked in ✓', `<p>The draw is at ${EV_DRAW} and the first matches start straight after. Keep this page open — when the draw is made it takes you to the tournament page, where your match appears. Friendlies are off until the draw.</p>`);
     if(win === 'before') return box('You’re entered ✓', `<p>Check in here between <strong>19:00 and ${EVENT_CHECKIN}</strong> on the night. No check-in, no place — the buy-in isn’t refunded.</p>`);
     if(win === 'closed' || win === 'late') return box('Check-in has closed', `<p>You didn’t check in, so you’re not in tonight’s draw. Friendlies are open.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
     const fr = d.friendly;
@@ -2804,9 +3001,12 @@ function evMe(d, phase, win){
         <button class="btn btn-primary" data-ev-checkin="${evEsc(EV.id)}" ${EV.busy || fr ?'disabled':''}>Check in</button>${msg}`);
   }
   if(!mem) return box('Not in tonight’s draw', `<p>You didn’t check in before ${EVENT_CHECKIN}. Friendlies are open.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
-  if(mem.outcome === 'winner') return box('Champion', `<p>You won tonight’s tournament. Well played.</p>`);
-  if(mem.outcome === 'runner_up') return box('Runner-up', `<p>Beaten in the final. Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
-  if(mem.eliminated_at || mem.outcome) return box('You’re out', `<p>Knocked out (${EV_OUT[mem.outcome] || 'tonight'}). Friendlies are open again.</p><a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>`);
+  const poster = `<button class="btn btn-primary tp-poster" data-tp-poster="${evEsc(EV.id)}" ${EV.busy ? 'disabled' : ''}>Download your tournament poster</button><div style="height:10px"></div>`;
+  const tpLink = EV.mode === 'tournament' ? '' : `<a class="btn btn-ghost" data-link="tournament:${evEsc(EV.id)}" href="#tournament:${evEsc(EV.id)}">Tournament page</a><div style="height:10px"></div>`;
+  const posterHere = EV.mode === 'tournament' ? poster : tpLink;
+  if(mem.outcome === 'winner') return box('Champion', `<p>You won tonight’s tournament. Well played.</p>${posterHere}${msg}`);
+  if(mem.outcome === 'runner_up') return box('Runner-up', `<p>Beaten in the final. Friendlies are open again.</p>${posterHere}<a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>${msg}`);
+  if(mem.eliminated_at || mem.outcome) return box('You’re out', `<p>Knocked out (${EV_OUT[mem.outcome] || 'tonight'}). Friendlies are open again.</p>${posterHere}<a class="btn btn-ghost" data-link="friendlies">Go to Friendlies</a>${msg}`);
   const m = d.mine;
   if(m && String(m.tournament_id) === EV.id){
     const by = m.ready_at ? new Date(new Date(m.ready_at).getTime() + 180000).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : null;
@@ -2814,8 +3014,12 @@ function evMe(d, phase, win){
       `<p>${EV_STAGE_ONE[m.stage] || 'Match'} · best of ${m.best_of}.${m.status === 'ready' && by ? ` Open your match room by <strong>${by}</strong> — after 3 minutes a no-show loses the match.` : ''}</p>
        <a class="btn btn-primary" href="play.html?match=${encodeURIComponent(m.code)}" data-testid="play-your-match">Play your match</a>`);
   }
-  if(phase === 'completed') return box('Tournament finished', `<p>Thanks for playing tonight.</p>`);
-  return box('Waiting for your next match', `<p>It opens here as soon as your opponent is free.</p>`);
+  if(phase === 'completed') return box('Tournament finished', `<p>Thanks for playing tonight.</p>${EV.mode === 'tournament' ? poster : tpLink}${msg}`);
+  const myGroup = d.groups.find(g=>g.id === mem.group_id);
+  const goTp = EV.mode === 'tournament' ? '' : tpLink;
+  if(phase === 'groups' && myGroup && myGroup.completed_at)
+    return box('Through to the knockout', `<p>Your group is finished. The knockout starts once <strong>every</strong> group game has finished — your next match appears here.</p>${goTp}`);
+  return box('Waiting for your next match', `<p>It opens here as soon as your opponent is free.</p>${goTp}`);
 }
 
 // ---- actions ----
@@ -2834,6 +3038,219 @@ document.addEventListener('click', async ev=>{
   }catch(err){ EV.msg = 'Couldn’t reach Tournza — check your connection and try again.'; }
   EV.busy = false;
   await evLoad();
+});
+
+/* ---------------- Stage 7: LIVE page + tournament poster ----------------
+   #live: every tournament being played right now (public), from the server's
+   tz_live_now() — open a tournament, or watch any match (scores only).
+   The tournament poster: the signed-in player's own night (tz_my_night),
+   drawn as an A4 PDF in the match poster's style. Nothing here writes data. */
+const TL = { timer:null, busy:false, region:'', rows:null };
+const TP_STAGE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
+
+async function tlMount(){
+  tlLeave();
+  await tlLoad();
+  TL.timer = setInterval(tlLoad, 15000);
+}
+function tlLeave(){ if(TL.timer){ clearInterval(TL.timer); TL.timer = null; } }
+async function tlLoad(){
+  const el = $('#tl-list'); if(!el || TL.busy) return;
+  TL.busy = true;
+  try{
+    const sb = await evClient();
+    if(!sb) throw new Error('offline');
+    const { data, error } = await sb.rpc('tz_live_now');
+    if(error) throw error;
+    tlRender(data || []);
+  }catch(err){
+    console.warn('Could not load LIVE:', err);
+    if(!el.dataset.ok) el.innerHTML = `<div class="panel"><p class="ev-note">Couldn’t load what’s live — check your connection. It retries every few seconds.</p></div>`;
+  }finally{ TL.busy = false; }
+}
+function tlRender(rows){
+  const el = $('#tl-list'); if(!el) return;
+  el.dataset.ok = '1';
+  TL.rows = rows;
+  const by = new Map();
+  rows.forEach(r=>{ const k = String(r.tournament_id); if(!by.has(k)) by.set(k, { t:r, n:0 }); if(r.match_id) by.get(k).n++; });
+  const all = [...by.values()];
+  const cnt = $('#tl-count'), nm = rows.filter(r=>r.match_id).length;
+  if(cnt) cnt.innerHTML = all.length ? `<b>${all.length}</b> tournament${all.length === 1 ? '' : 's'} in play <i>·</i> <b>${nm}</b> match${nm === 1 ? '' : 'es'} on the oche` : '';
+  // region filter: only regions with something live, plus All
+  const regions = [...new Set(all.map(x=>x.t.region).filter(Boolean))].sort();
+  if(TL.region && !regions.includes(TL.region)) TL.region = '';
+  const bar = $('#tl-filter');
+  if(bar) bar.innerHTML = regions.length > 1 ? ['', ...regions].map(r=>`<button type="button" class="tl-chip ${r === (TL.region || '') ? 'on' : ''}" data-tl-region="${evEsc(r)}" aria-pressed="${r === (TL.region || '')}">${r ? evEsc(r) : 'All regions'}${r ? `<span>${all.filter(x=>x.t.region === r).length}</span>` : ''}</button>`).join('') : '';
+  if(!all.length){
+    el.innerHTML = `<div class="panel tl-empty"><div class="tl-dot off"></div><h3>Nothing live right now</h3>
+      <p class="ev-note">Tournament nights start at <strong>${EVENT_KICKOFF}</strong>. As soon as a draw is made, the tournament shows up here.</p>
+      <a class="btn btn-ghost" data-link="events">See upcoming events</a></div>`;
+    return;
+  }
+  const shown = all.filter(x=>!TL.region || x.t.region === TL.region);
+  el.innerHTML = `<div class="tl-grid">${shown.map(({ t, n })=>{
+    const iso = String(t.tournament_date).slice(0,10);
+    const day = (parseLocalDate(iso) || new Date(iso)).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+    const id = evEsc(t.tournament_id);
+    return `<div class="tl-card" data-tournament-live="${id}">
+      <div class="tl-card-top"><span class="pill live">Live · ${t.phase === 'knockout' ? 'Knockout' : 'Groups'}</span><span class="tl-day">${evEsc(day)}</span></div>
+      <div class="tl-region">${evEsc(t.region || '')}</div>
+      <h3>${evEsc(t.tournament_name)}</h3>
+      <div class="tl-now"><b>${n}</b><span>match${n === 1 ? '' : 'es'}<br>on now</span></div>
+      <a class="tl-open" data-link="tournament:${id}" href="#tournament:${id}">Open tournament <span aria-hidden="true">→</span></a>
+    </div>`;
+  }).join('')}</div>`;
+}
+document.addEventListener('click', e=>{
+  const c = e.target.closest('[data-tl-region]'); if(!c) return;
+  TL.region = c.dataset.tlRegion; if(TL.rows) tlRender(TL.rows);
+});
+
+// ---------------- the tournament poster ----------------
+function tpLoadJsPdf(){
+  if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  return new Promise((res, rej)=>{
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = ()=> window.jspdf && window.jspdf.jsPDF ? res(window.jspdf.jsPDF) : rej(new Error('jsPDF missing'));
+    s.onerror = ()=> rej(new Error('Could not load the PDF maker'));
+    document.head.appendChild(s);
+  });
+}
+function tpLogo(){
+  const el = document.querySelector('header .logo');
+  const m = el && /url\("?(data:image\/png;base64,[^")]+)"?\)/.exec(getComputedStyle(el).backgroundImage || '');
+  return m ? m[1] : null;
+}
+const TP_FINISH = { winner:'CHAMPION', runner_up:'RUNNER-UP', sf:'SEMI-FINALIST', qf:'QUARTER-FINALIST', r16:'LAST 16', group:'GROUP STAGE' };
+const TPC = { ink:'#04060d', ink2:'#090e1c', card:'#0e1526', card2:'#131c33', ivory:'#f4f7ff', dim:'#93a2c9', muted:'#5c6c93',
+              cyan:'#12d6ff', cyan2:'#4de3ff', mag:'#ff2f6e', mag2:'#ff5c8a', lime:'#39ff9e', amber:'#ffb020', line:'#1d2945' };
+
+function tpDraw(JsPDF, n){
+  const doc = new JsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W = 210, H = 297;
+  const fill = c => doc.setFillColor(c), ink = c => doc.setTextColor(c), stroke = c => doc.setDrawColor(c);
+  const alpha = (a, fn) => { doc.saveGraphicsState(); doc.setGState(new doc.GState({ opacity:a, 'stroke-opacity':a })); fn(); doc.restoreGraphicsState(); };
+  const num = (v, dp) => v == null || v === '' || isNaN(Number(v)) ? '—' : Number(v).toFixed(dp);
+  const s = n.stats || {}, t = n.tournament || {};
+  // background: ink, lower band, two dartboard watermarks, dot grid, cyan/magenta bars (as the match poster)
+  fill(TPC.ink); doc.rect(0, 0, W, H, 'F');
+  alpha(0.55, ()=>{ fill(TPC.ink2); doc.rect(0, H * 0.58, W, H * 0.42, 'F'); });
+  const board = (x, y, r, c) => alpha(0.08, ()=>{ stroke(c); doc.setLineWidth(0.35);
+    [r * .28, r * .52, r * .76, r].forEach(q=>doc.circle(x, y, q, 'S'));
+    for(let i = 0; i < 20; i++){ const a = i / 20 * Math.PI * 2; doc.line(x, y, x + Math.cos(a) * r, y + Math.sin(a) * r); } });
+  board(W * 1.02, H * 0.08, 74, TPC.cyan); board(-W * 0.02, H * 0.94, 80, TPC.mag);
+  alpha(0.05, ()=>{ fill(TPC.ivory); for(let x = 9; x < W; x += 9) for(let y = 9; y < H; y += 9) doc.circle(x, y, 0.22, 'F'); });
+  const bar = 2.6;
+  fill(TPC.cyan); doc.rect(0, 0, W / 2, bar, 'F'); doc.rect(0, H - bar, W / 2, bar, 'F');
+  fill(TPC.mag); doc.rect(W / 2, 0, W / 2, bar, 'F'); doc.rect(W / 2, H - bar, W / 2, bar, 'F');
+
+  // header: logo, event, region · date
+  const logo = tpLogo(), lw = 46;
+  if(logo){ try{ doc.addImage(logo, 'PNG', (W - lw) / 2, 13, lw, lw * 110 / 473); }catch(_){} }
+  ink(TPC.cyan2); doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+  doc.text(String(t.name || 'Tournament').toUpperCase(), W / 2, 30.5, { align:'center' });
+  const iso = String(t.date || '').slice(0, 10);
+  const day = iso ? new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+  ink(TPC.dim); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+  doc.text([t.region, day, n.entrants ? n.entrants + ' PLAYERS' : null].filter(Boolean).join('  ·  ').toUpperCase(), W / 2, 36, { align:'center' });
+  alpha(0.4, ()=>{ stroke(TPC.muted); doc.setLineWidth(0.25); doc.line(W / 2 - 22, 39.5, W / 2 + 22, 39.5); });
+
+  // the player and how far they got
+  ink(TPC.ivory); doc.setFont('helvetica', 'bold');
+  let fs = 34; doc.setFontSize(fs);
+  const name = String(n.name || 'Player').toUpperCase();
+  while(fs > 18 && doc.getTextWidth(name) > W - 36){ fs -= 1; doc.setFontSize(fs); }
+  doc.text(name, W / 2, 58, { align:'center' });
+  const fin = TP_FINISH[n.outcome] || 'TOURNAMENT', champ = n.outcome === 'winner';
+  doc.setFontSize(11); const fw = doc.getTextWidth(fin) + 16;
+  fill(champ ? TPC.amber : TPC.mag); doc.roundedRect((W - fw) / 2, 63, fw, 9, 4.5, 4.5, 'F');
+  ink(TPC.ink); doc.text(fin, W / 2, 69.3, { align:'center' });
+  if(n.ranking_points != null){
+    ink(TPC.cyan2); doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+    doc.text('+' + n.ranking_points + ' RANKING POINT' + (Number(n.ranking_points) === 1 ? '' : 'S'), W / 2, 79, { align:'center' });
+  }
+
+  // hero: event average
+  const ay = 86;
+  alpha(0.9, ()=>{ fill(TPC.card); doc.roundedRect(18, ay, W - 36, 38, 4, 4, 'F'); });
+  alpha(0.6, ()=>{ stroke(TPC.cyan); doc.setLineWidth(0.4); doc.roundedRect(18, ay, W - 36, 38, 4, 4, 'S'); });
+  ink(TPC.cyan); doc.setFont('helvetica', 'bold'); doc.setFontSize(46);
+  doc.text(num(s.avg, 2), W / 2, ay + 24, { align:'center' });
+  ink(TPC.dim); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+  doc.text('3-DART AVERAGE ACROSS THE EVENT', W / 2, ay + 32, { align:'center' });
+
+  // stats grid 3 × 3
+  const cells = [
+    ['MATCHES', s.played != null ? `${s.won ?? 0}-${s.lost ?? 0}` : '—', 'won-lost'],
+    ['LEGS', `${s.legs_for ?? 0}-${s.legs_against ?? 0}`, 'won-lost'],
+    ['FIRST 9 AVG', num(s.first9, 2)],
+    ['CHECKOUT %', s.checkout_pct == null ? '—' : num(s.checkout_pct, 1) + '%'],
+    ['HIGHEST CHECKOUT', s.hi_checkout == null ? '—' : String(s.hi_checkout)],
+    ['BEST LEG', s.best_leg == null ? '—' : s.best_leg + ' darts'],
+    ['180s', String(s.c180 ?? 0)], ['140+', String(s.c140 ?? 0)], ['100+', String(s.c100 ?? 0)],
+  ];
+  const gx = 18, gy = ay + 44, gw = (W - 36 - 8) / 3, gh = 22;
+  cells.forEach((c, i)=>{
+    const x = gx + (i % 3) * (gw + 4), y = gy + Math.floor(i / 3) * (gh + 4);
+    alpha(0.92, ()=>{ fill(TPC.card2); doc.roundedRect(x, y, gw, gh, 3, 3, 'F'); });
+    const hot = (c[0] === '180s' && Number(c[1]) > 0) || (c[0] === 'HIGHEST CHECKOUT' && Number(c[1]) >= 100);
+    ink(hot ? TPC.mag2 : TPC.ivory); doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
+    doc.text(c[1], x + gw / 2, y + 11.5, { align:'center' });
+    ink(TPC.muted); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    doc.text(c[0] + (c[2] ? '  (' + c[2].toUpperCase() + ')' : ''), x + gw / 2, y + 17.5, { align:'center' });
+  });
+
+  // the road: every match of the night
+  let ry = gy + 3 * (gh + 4) + 8;
+  ink(TPC.cyan2); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+  doc.text('THE ROAD', 18, ry);
+  alpha(0.35, ()=>{ stroke(TPC.muted); doc.setLineWidth(0.25); doc.line(42, ry - 1.2, W - 18, ry - 1.2); });
+  ry += 4;
+  const ms = (n.matches || []).slice(-10), rh = Math.min(9, (H - 26 - ry) / Math.max(ms.length, 1));
+  ms.forEach((m, i)=>{
+    const y = ry + i * rh;
+    if(i % 2 === 0) alpha(0.5, ()=>{ fill(TPC.card); doc.rect(18, y, W - 36, rh, 'F'); });
+    const mid = y + rh / 2 + 1.4;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); ink(TPC.dim);
+    doc.text((m.stage === 'group' ? 'GROUP ' + (m.group || '') : (TP_STAGE[m.stage] || '').toUpperCase()), 22, mid);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); ink(TPC.ivory);
+    doc.text('v ' + String(m.opponent || 'Bye'), 62, mid);
+    const walk = m.result_type === 'walkover';
+    doc.setFont('helvetica', 'bold'); ink(TPC.ivory);
+    doc.text(walk ? 'W/O' : `${m.legs_for ?? 0}-${m.legs_against ?? 0}`, 150, mid, { align:'right' });
+    fill(m.won ? TPC.lime : TPC.mag); doc.roundedRect(154, y + rh / 2 - 2.6, 9, 5.2, 1.5, 1.5, 'F');
+    ink(TPC.ink); doc.setFontSize(7.5); doc.text(m.won ? 'W' : 'L', 158.5, mid - 0.2, { align:'center' });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); ink(TPC.dim);
+    doc.text(m.avg == null ? '' : num(m.avg, 2) + ' avg', W - 22, mid, { align:'right' });
+  });
+
+  // footer
+  ink(TPC.muted); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+  doc.text('TOURNZA.CO.UK  ·  REGIONAL ONLINE DARTS  ·  EVERY NIGHT', W / 2, H - 10, { align:'center' });
+  return doc;
+}
+async function tpPoster(id){
+  const sb = EV.sb || await evClient();
+  const { data, error } = await sb.rpc('tz_my_night', { p_tournament: Number(id) });
+  if(error) throw error;
+  if(!data) throw new Error('Your poster is ready once you’ve played in this tournament.');
+  const JsPDF = await tpLoadJsPdf();
+  const doc = tpDraw(JsPDF, data);
+  const safe = x => String(x || '').trim().replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'Tournza';
+  doc.save(`Tournza_${safe(data.tournament && data.tournament.name)}_${safe(data.name)}.pdf`);
+}
+document.addEventListener('click', async ev=>{
+  const b = ev.target.closest('[data-tp-poster]');
+  if(!b) return;
+  ev.preventDefault();
+  if(EV.busy) return;
+  EV.busy = true; EV.msg = ''; const label = b.textContent; b.disabled = true; b.textContent = 'Making your poster…';
+  try{ await tpPoster(b.dataset.tpPoster); notify('Poster downloaded ✓'); }
+  catch(err){ console.warn('poster:', err); EV.msg = (err && err.message && !/fetch|network/i.test(err.message)) ? err.message : 'Couldn’t make the poster — try again.'; }
+  EV.busy = false; b.disabled = false; b.textContent = label;
+  evRender();
 });
 
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
@@ -2995,7 +3412,7 @@ go((location.hash||'#home').slice(1)||'home');
           .select('full_name, membership_status, created_at, age_verified, cam_verified, stripe_customer_id, current_period_end, cancel_at_period_end, region')
           .eq('id', user.id).maybeSingle(),
         sb.from('tournament_entries')
-          .select('id, tournaments(id, name, tournament_date)')
+          .select('id, tournaments(id, name, tournament_date, phase)')
           .eq('player_id', user.id)
       ]);
       const { data: player } = await sb.from('players').select('id').eq('id', user.id).maybeSingle();
@@ -3119,7 +3536,11 @@ go((location.hash||'#home').slice(1)||'home');
           const iso = String(e.tournaments.tournament_date).slice(0,10);
           const when = iso===todayIso ? ('Tonight '+EVENT_KICKOFF)
             : (parseLocalDate(iso)?.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+EVENT_KICKOFF);
-          return `<div class="stat-line"><span>${e.tournaments.name}</span><span class="badge-ok mono">${when}</span></div>`;
+          const t = e.tournaments, drawn = ['groups','knockout','completed'].includes(t.phase);
+          const to = (drawn ? 'tournament:' : 'event:') + t.id;
+          const badge = t.phase === 'groups' || t.phase === 'knockout' ? '<span class="pill live" style="padding:3px 9px">Live</span>'
+            : t.phase === 'completed' ? '<span class="badge-ok mono">Finished</span>' : t.phase === 'cancelled' ? '<span class="badge-wait mono">Cancelled</span>' : `<span class="badge-ok mono">${when}</span>`;
+          return `<a class="stat-line acct-ev" data-link="${to}" href="#${to}" data-testid="acct-event"><span>${evEsc(t.name)} <span class="go" aria-hidden="true">→</span></span>${badge}</a>`;
         }).join('') + '<div class="stat-line" style="color:var(--muted)"><span class="mono">£6 buy-in per event</span><span></span></div>';
       }
     }
