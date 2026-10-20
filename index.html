@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- the site is designed dark: tell browsers so, so a phone in dark mode never re-colours it -->
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#07101f">
 <title>Tournza — UK regional virtual darts</title>
 <meta name="description" content="Verified players. Professional events. Real rankings. Find UK regional darts events and register in seconds.">
@@ -687,6 +687,7 @@
   }
 
   :root{color-scheme:dark}
+  @media (prefers-color-scheme:dark){:root{color-scheme:dark}}   /* our dark theme IS the site: tells Samsung Internet not to apply its own */
 
   /* ---------- Stage 7: tournament page + LIVE ---------- */
   .tp{max-width:880px;margin:0 auto}
