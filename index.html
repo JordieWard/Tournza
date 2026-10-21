@@ -720,6 +720,20 @@
   }
   .pf-matches tr.win td{background:rgba(25,211,243,.06);border-color:rgba(25,211,243,.22)}
   .pf-matches tr.win td:first-child{border-left-color:var(--pf-cyan)}
+  /* your own posters (2026-10) */
+  .pf-poster{appearance:none;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;border:1px solid rgba(25,211,243,.45);
+    background:rgba(25,211,243,.10);color:#BFF6FF;font:700 12px/1 var(--body);cursor:pointer;white-space:nowrap;min-height:32px}
+  .pf-poster::before{content:"";width:11px;height:11px;background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v12m0 0l-5-5m5 5l5-5M4 20h16' stroke='black' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v12m0 0l-5-5m5 5l5-5M4 20h16' stroke='black' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+  .pf-poster:hover{border-color:#19D3F3;background:rgba(25,211,243,.18);color:#fff}
+  .pf-poster:disabled{opacity:.6;cursor:wait}
+  .pf-poster:focus-visible{outline:2px solid #19D3F3;outline-offset:2px}
+  .pf-recent li .pf-poster{margin-left:8px}
+  .pf-poster-note{margin:12px 0 0}
+  @media (max-width:720px){ .pf-poster{min-height:40px;padding:8px 12px} }
+  .pf-recent li:has(.pf-poster){grid-template-columns:minmax(0,1fr) auto auto auto}
+  .pf-recent li .pf-poster{margin-left:0}
 
   :root{color-scheme:dark}
   @media (prefers-color-scheme:dark){:root{color-scheme:dark}}   /* our dark theme IS the site: tells Samsung Internet not to apply its own */
@@ -1349,8 +1363,8 @@
   /* which pages share this system (home, Friendlies, Players and profiles keep their approved look) */
   /* ---------- lit page band: electric-blue light and angular beams. NO dartboard art here —
      the artwork belongs to the homepage and Friendlies only. ---------- */
-  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{position:relative;isolation:isolate}
-  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{
+  .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{position:relative;isolation:isolate}
+  .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{
     content:"";position:absolute;z-index:-1;pointer-events:none;top:0;left:calc(50% - 50vw);width:100vw;height:520px;
     background:
       radial-gradient(700px 340px at 78% -10%,rgba(46,112,255,.55),transparent 70%),
@@ -1365,10 +1379,10 @@
     -webkit-mask:linear-gradient(180deg,#000 50%,transparent);mask:linear-gradient(180deg,#000 50%,transparent);
   }
   /* ---------- headings: Archivo 900, white, uppercase page titles (as the references) ---------- */
-  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) :is(h1,h2){
+  .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) :is(h1,h2){
     background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff;-webkit-text-fill-color:#fff;
   }
-  .route:is(#route-events,#route-rankings,#route-account) .section-head h2,
+  .route:is(#route-events,#route-rankings,#route-players,#route-account) .section-head h2,
   .route#route-membership .mem-head h2{
     font-size:var(--h-page);font-weight:900;letter-spacing:-.005em;line-height:.98;text-transform:uppercase;text-shadow:0 0 34px rgba(54,120,255,.5)}
   .route:is(#route-join,#route-privacy,#route-terms,#route-rules) h2[style*="margin-top"]:first-of-type{
@@ -1377,14 +1391,14 @@
   .route#route-tournament .tp-head h2{font-size:var(--h-event);font-weight:900;letter-spacing:-.015em;line-height:1.05;text-shadow:0 0 30px rgba(54,120,255,.4)}
   .route:is(#route-membership,#route-join,#route-privacy,#route-terms,#route-rules) h2[style*="margin-top"]:not(:first-of-type),
   .route#route-membership .mem-head ~ div h2{font-size:var(--h-sub);text-transform:none}
-  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:38px}
-  .route:is(#route-events,#route-rankings,#route-account) .section-head{margin-bottom:24px}
-  .route:is(#route-events,#route-rankings,#route-account) .section-head .lede{font-size:15.5px;margin-top:10px;max-width:56ch}
+  .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:38px}
+  .route:is(#route-events,#route-rankings,#route-players,#route-account) .section-head{margin-bottom:24px}
+  .route:is(#route-events,#route-rankings,#route-players,#route-account) .section-head .lede{font-size:15.5px;margin-top:10px;max-width:56ch}
   .route .eyebrow{font-weight:500;letter-spacing:.24em}
   /* LIVE keeps its word-mark, just a little smaller */
   #route-live .tl-word{font-size:clamp(34px,5.4vw,64px)}
   /* ---------- cards: layered navy, defined blue border, top highlight ---------- */
-  .route:not(#route-home):not(#route-friendlies):not(#route-player):not(#route-players) :is(.panel,.ev-card,.mem-card,.tbl-wrap){
+  .route:not(#route-home):not(#route-friendlies):not(#route-player) :is(.panel,.ev-card,.mem-card,.tbl-wrap,.player-card){
     background:var(--card-surface);border:1px solid var(--card-line);border-radius:var(--r-card);box-shadow:var(--card-shadow)}
   .route#route-events .ev-card:hover{border-color:var(--cyan-line);box-shadow:var(--card-shadow),0 0 34px -16px rgba(25,211,243,.7)}
   .route:not(#route-home):not(#route-friendlies) .panel h3{letter-spacing:-.005em}
@@ -1489,18 +1503,9 @@
   .evd-fx .tbd{color:var(--muted)}
   .evd-fx .sc{font-family:var(--mono);color:#fff;white-space:nowrap}
   @media (max-width:720px){
-    .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{height:420px}
+    .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{height:420px}
   }
-  /* phones: a sticky join bar (only while the join box itself is off screen) */
-  .evd-mbar{display:none}
   @media (max-width:720px){
-    .evd-mbar:not([hidden]){display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:40;align-items:center;gap:12px;
-      padding:10px 10px 10px 16px;border-radius:14px;border:1px solid var(--card-line);background:rgba(10,20,39,.94);backdrop-filter:blur(12px);
-      box-shadow:0 16px 40px -12px rgba(0,0,0,.9),0 0 30px -14px rgba(54,120,255,.8)}
-    .evd-mbar .p{display:flex;flex-direction:column;line-height:1.1}
-    .evd-mbar .p strong{font:900 20px/1 var(--display);color:#fff}
-    .evd-mbar .p span{font:500 10.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-    .evd-mbar .btn{margin-left:auto;min-height:44px;padding:0 18px}
     .route#route-event h2.evd-title{font-size:clamp(26px,7.4vw,32px)}
     .evd-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -24px;padding:0 24px}
     .evd-pills::-webkit-scrollbar{display:none}
@@ -1514,7 +1519,7 @@
     .evd-pane .panel{padding:16px}
     .evd-fx li{grid-template-columns:1fr auto;row-gap:2px}
     .evd-fx .st{grid-column:1/-1}
-    .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:22px}
+    .route:is(#route-events,#route-event,#route-rankings,#route-players,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:22px}
     .evd-split{white-space:normal}
   }
   /* ===== Pass 8: deliberate emphasis — deeper base, figures that stand out, live that pulses ===== */
@@ -1542,6 +1547,19 @@
   #route-player .pf-hero::after{background:linear-gradient(90deg,#3E86FF,#19D3F3 60%,rgba(25,211,243,0))}
   #route-player .pf-tabs [aria-selected="true"]{background:var(--btn-blue);box-shadow:var(--glow-blue)}
   @media (max-width:720px){ #route-player .pf-hero h2{font-size:clamp(30px,9vw,40px)} }
+  /* ===== Pass 9: Friendlies title in the same heading style as the other pages (keeps its pink) ===== */
+  .route#route-friendlies .section-head h2{font-size:var(--h-page);font-weight:900;letter-spacing:-.005em;line-height:.98;text-transform:uppercase}
+  /* player directory cards: the same card language as the rest of the site */
+  .route#route-players .player-card{transition:transform .15s,border-color .15s,box-shadow .15s}
+  .route#route-players .player-card:hover{transform:translateY(-2px);border-color:var(--cyan-line);box-shadow:var(--card-shadow),0 0 34px -16px rgba(25,211,243,.7)}
+  .route#route-players .player-card .ava{border-radius:12px;background:var(--btn-blue);box-shadow:0 8px 22px -8px rgba(40,110,255,.9),inset 0 1px 0 rgba(255,255,255,.25)}
+  .route#route-players .pc-stats{border:1px solid var(--line-soft)}
+  .route#route-players .pc-stats .b{background:rgba(7,13,26,.65)}
+  .route#route-players .pc-stats .b:first-child .v{color:var(--cyan);text-shadow:0 0 16px rgba(25,211,243,.35)}
+  .route#route-players .pc-stats .b:not(:first-child) .v{color:#fff}
+  .route#route-players input{border-radius:var(--r-ctl);border:1px solid var(--card-line);background:rgba(14,27,52,.9);min-height:42px}
+  .route#route-players input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(25,211,243,.2)}
+  @media (prefers-reduced-motion:reduce){ .route#route-players .player-card:hover{transform:none} }
 
 </style>
 </head>
@@ -2228,7 +2246,7 @@ async function loadPlayersFromSupabase(){
     // slice(-8) form strip below reads left-to-right as "oldest → newest".
     const { data: results, error: rErr } = await sb
       .from('results')
-      .select('player_id, position, outcome, ranking_points, tournaments(name, tournament_date, region)')
+      .select('player_id, tournament_id, position, outcome, ranking_points, tournaments(name, tournament_date, region)')
       .not('outcome', 'is', null)
       .order('created_at', { ascending: true });
     if(rErr) throw rErr;
@@ -2263,7 +2281,7 @@ async function loadPlayersFromSupabase(){
       p.points += Number(r.ranking_points) || 0;
       p.events += 1;
       if(r.outcome==='winner') p.wins += 1;
-      p.recent.push({ title: t.name || 'Tournament', date, outcome: r.outcome, position: r.position ?? null, pts: Number(r.ranking_points) || 0 });
+      p.recent.push({ title: t.name || 'Tournament', date, outcome: r.outcome, position: r.position ?? null, pts: Number(r.ranking_points) || 0, tid: r.tournament_id ?? null });
     });
     // form: W = reached the final (winner or runner-up), L = out before it
     PLAYERS.forEach(p=>{ p.form = p.recent.slice(-8).map(r=>(r.outcome==='winner'||r.outcome==='runner_up')?'W':'L'); });
@@ -2572,33 +2590,10 @@ function renderEventDetail(id){
         <li>Draw at ${EV_DRAW}. Fewer than 4 checked in, or no draw by ${EV_LATE}: the night is cancelled and every buy-in refunded</li>
       </ul>
       <p class="form-note" style="margin-top:14px">Full <a data-link="rules" href="#rules" style="color:var(--blue-2)">fair-play rules</a> apply to every event.</p>
-    </div>`)}
-    ${alreadyIn ? '' : `<div class="evd-mbar" hidden><div class="p"><strong>£${e.entry.toFixed(2)}</strong><span>${e.reg}/${e.cap} entered</span></div>
-      <button type="button" class="btn btn-primary" data-evd-join>Enter tournament</button></div>`}`;
+    </div>`)}`;
   evdShowTab(EVD_TAB.tab);
-  evdWatchJoin();
   evMount(e);
 }
-// phones: the sticky join bar shows while the real join box is off screen and entry is open;
-// it simply presses the real #ev-buy button (same checkout, same checks)
-let EVD_IO = null;
-function evdMbarSync(){
-  const bar = document.querySelector('#event-detail .evd-mbar'); if(!bar) return;
-  const buy = document.getElementById('ev-buy');
-  bar.hidden = !buy || buy.disabled || !!bar.dataset.inView;
-}
-function evdWatchJoin(){
-  if(EVD_IO){ EVD_IO.disconnect(); EVD_IO = null; }
-  const bar = document.querySelector('#event-detail .evd-mbar'), box = document.querySelector('#event-detail .evd-join');
-  if(!bar || !box || !('IntersectionObserver' in window)) return;
-  EVD_IO = new IntersectionObserver(es=>{ es.forEach(x=>{ if(x.isIntersecting) bar.dataset.inView = '1'; else delete bar.dataset.inView; }); evdMbarSync(); });
-  EVD_IO.observe(box);
-}
-document.addEventListener('click', ev=>{
-  if(!ev.target.closest('[data-evd-join]')) return;
-  const buy = document.getElementById('ev-buy');
-  if(buy && !buy.disabled) buy.click(); else { evdShowTab('overview'); document.querySelector('#event-detail .evd-join')?.scrollIntoView({ behavior:'smooth', block:'center' }); }
-});
 
 function renderRankings(){
   const body=$('#rank-body'), title=$('#rank-title');
@@ -2786,15 +2781,18 @@ function renderPlayerProfile(id){
   const tab = PF.id === String(id) ? PF.tab : 'overview';
   PF.id = String(id); PF.tab = tab; PF.p = p;
   const spark = pfSpark(recent);
+  // your own profile: download your posters (made on the spot from your saved results)
+  const own = !!(typeof authState !== 'undefined' && authState.user && String(authState.user.id) === String(p.id));
+  const tPoster = r => own && r.tid ? `<button type="button" class="pf-poster" data-pf-tposter="${pfEsc(r.tid)}" aria-label="Download your poster for ${pfEsc(r.title)}">Poster</button>` : '';
   const histTable = rows => `<table class="pf-hist">
-        <thead><tr><th>Event</th><th>Finish</th><th class="pos-col">Position</th><th class="num">Pts</th></tr></thead>
+        <thead><tr><th>Event</th><th>Finish</th><th class="pos-col">Position</th><th class="num">Pts</th>${own ? '<th class="num">Poster</th>' : ''}</tr></thead>
         <tbody>${rows.slice().reverse().map(r=>{
           const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
           return `<tr class="${cls}">
             <td class="ev"><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></td>
             <td><span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span></td>
             <td class="pos-col"><span class="pf-pos">${pfPlace(r)}</span></td>
-            <td class="num pf-pts-cell ${cls}">+${r.pts}</td></tr>`; }).join('')}</tbody>
+            <td class="num pf-pts-cell ${cls}">+${r.pts}</td>${own ? `<td class="num">${tPoster(r)}</td>` : ''}</tr>`; }).join('')}</tbody>
       </table>`;
   const panes = {
     overview: `
@@ -2827,7 +2825,7 @@ function renderPlayerProfile(id){
         ${hist.length ? `<ul>${hist.slice(-5).reverse().map(r=>{
           const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
           return `<li class="${cls}"><div><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></div>
-            <span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span><b class="pf-pts-cell ${cls}">+${r.pts}</b></li>`; }).join('')}</ul>
+            <span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span><b class="pf-pts-cell ${cls}">+${r.pts}</b>${tPoster(r)}</li>`; }).join('')}</ul>
           <button type="button" class="pf-more" data-pf-tab="tournaments">All tournaments →</button>`
           : stateMsg('No completed tournaments yet.')}
       </aside>
@@ -2920,7 +2918,7 @@ async function pfLoadMatches(p){
     if(!sb) throw new Error('offline');
     const id = String(p.id);
     const { data, error } = await sb.from('matches')
-      .select('id, tournament_id, stage, group_id, round, slot, player1_id, player2_id, winner_id, legs_p1, legs_p2, result_type, status')
+      .select('id, tournament_id, stage, group_id, round, slot, player1_id, player2_id, winner_id, legs_p1, legs_p2, result_type, status, live_match_id')
       .or(`player1_id.eq.${id},player2_id.eq.${id}`).eq('status', 'completed');
     if(error) throw error;
     const rows = (data || []).filter(m => m.winner_id || m.result_type === 'played');
@@ -2932,11 +2930,12 @@ async function pfLoadMatches(p){
     }
     if(PF.id !== id || PF.tab !== 'matches' || !box()) return;
     if(!rows.length){ box().innerHTML = stateMsg('No tournament matches yet.'); return; }
+    const own = !!(typeof authState !== 'undefined' && authState.user && String(authState.user.id) === id);
     const nm = pid => { const x = (typeof PLAYERS !== 'undefined' ? PLAYERS : []).find(q=>String(q.id)===String(pid)); return x ? x.name : 'Player'; };
     const order = { group:0, r16:1, qf:2, sf:3, final:4 };
     rows.sort((a,b)=> String((tmap[b.tournament_id]||{}).tournament_date||'').localeCompare(String((tmap[a.tournament_id]||{}).tournament_date||'')) || (order[b.stage]-order[a.stage]) || (b.round-a.round));
     box().innerHTML = `<table class="pf-hist pf-matches">
-      <thead><tr><th>Event</th><th>Stage</th><th>Opponent</th><th class="num">Score</th><th class="num">Result</th></tr></thead>
+      <thead><tr><th>Event</th><th>Stage</th><th>Opponent</th><th class="num">Score</th><th class="num">Result</th>${own ? '<th class="num">Poster</th>' : ''}</tr></thead>
       <tbody>${rows.map(m=>{
         const me1 = String(m.player1_id) === id, opp = me1 ? m.player2_id : m.player1_id;
         const won = String(m.winner_id) === id, w = m.result_type === 'walkover';
@@ -2946,7 +2945,8 @@ async function pfLoadMatches(p){
           <td>${PF_STAGE[m.stage] || ''}</td>
           <td>${opp ? `<a data-link="player:${pfEsc(opp)}" href="#player:${pfEsc(opp)}">${pfEsc(nm(opp))}</a>` : '—'}</td>
           <td class="num">${w ? 'w/o' : `${me1 ? (m.legs_p1 ?? 0) : (m.legs_p2 ?? 0)}–${me1 ? (m.legs_p2 ?? 0) : (m.legs_p1 ?? 0)}`}</td>
-          <td class="num"><span class="pf-wl ${won?'w':'l'}">${m.winner_id ? (won ? 'W' : 'L') : '—'}</span></td></tr>`; }).join('')}</tbody></table>`;
+          <td class="num"><span class="pf-wl ${won?'w':'l'}">${m.winner_id ? (won ? 'W' : 'L') : '—'}</span></td>${own ? `<td class="num">${m.result_type === 'played' && m.live_match_id ? `<button type="button" class="pf-poster" data-pf-mposter="${pfEsc(m.id)}" aria-label="Download the match poster">Poster</button>` : '<span class="pf-sub">—</span>'}</td>` : ''}</tr>`; }).join('')}</tbody></table>
+      ${own ? '<p class="pf-sub pf-poster-note">Posters are yours to download any time — made from your saved results.</p>' : ''}`;
   }catch(err){
     console.warn('Could not load matches:', err);
     if(box()) box().innerHTML = stateMsg('Couldn’t load matches — check your connection and try again.');
@@ -3852,7 +3852,6 @@ function evdFill(d, phase, inPlay){
   set('#evd-results', (phase === 'completed' ? evPodium(d) : '')
     + (done.length ? `<div class="panel"><h3>Results <span class="evd-count">${done.length} played</span></h3><ul class="evd-fx">${done.map(f=>evdFixRow(f, d)).join('')}</ul></div>` : ''));
   if(typeof evdShowTab === 'function') evdShowTab(EVD_TAB.tab);   // falls back to Overview if the open tab went away
-  if(typeof evdMbarSync === 'function') evdMbarSync();          // phone join bar follows the real buy-in button
 }
 
 // ---- tournament page: header, matches on now ----
@@ -4226,6 +4225,131 @@ document.addEventListener('click', async ev=>{
   evRender();
 });
 
+/* ---------------- Your posters, from your own profile (2026-10) ----------------
+   On YOUR OWN profile only:
+   • Match history → "Poster" on each tournament match you played: the same A4 match poster
+     the match room gives you at the final dart, redrawn from the result stored when the match
+     finished (live_matches.summary — the engine's own stats, checked by finish-match). The
+     stored row is only readable by the two players (database rule), so nobody else can make it.
+   • Recent tournaments / Tournaments → "Poster": the tournament poster (tz_my_night, your
+     own night only), exactly as on the tournament page.
+   Nothing is stored or written; each poster is made on the spot from the saved results. */
+const MP = { ink:'#04060d', ink2:'#090e1c', surface:'#0e1526', surface2:'#131c33', ivory:'#f4f7ff', ivoryDim:'#93a2c9',
+             muted:'#5c6c93', cyan:'#12d6ff', cyan2:'#4de3ff', magenta:'#ff2f6e', magenta2:'#ff5c8a' };
+const MP_SIDE = { A:{ hex:MP.cyan, dim:MP.cyan2 }, B:{ hex:MP.magenta, dim:MP.magenta2 } };
+const MP_STAGE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
+const mpRgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mpSafe = x => String(x || '').trim().replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'Player';
+
+// the match room's poster, same layout, same numbers (A = player 1, B = player 2)
+function mpDraw(JsPDF, d){
+  const s = new JsPDF({ orientation:'portrait', unit:'mm', format:'a4' }), a = 210, l = 297;
+  const fill = c => s.setFillColor(...mpRgb(c)), ink = c => s.setTextColor(...mpRgb(c)), draw = c => s.setDrawColor(...mpRgb(c));
+  const op = (o, fn) => { s.saveGraphicsState(); s.setGState(new s.GState({ opacity:o, 'stroke-opacity':o })); fn(); s.restoreGraphicsState(); };
+  const board = (x, y, r, c) => op(0.07, ()=>{ draw(c); s.setLineWidth(0.35);
+    for(const k of [r*0.28, r*0.52, r*0.76, r]) s.circle(x, y, k, 'S');
+    for(let i=0;i<20;i++){ const t = i/20*Math.PI*2; s.line(x, y, x+Math.cos(t)*r, y+Math.sin(t)*r); } });
+  const W = d.winner, logo = d.logo;
+  fill(MP.ink); s.rect(0, 0, a, l, 'F');
+  op(0.55, ()=>{ fill(MP.ink2); s.rect(0, l*0.62, a, l*0.38, 'F'); });
+  board(a*1.02, l*0.06, 70, MP.cyan); board(a*-0.02, l*0.95, 78, MP.magenta);
+  op(0.05, ()=>{ fill(MP.ivory); for(let i=9;i<a;i+=9) for(let j=9;j<l;j+=9) s.circle(i, j, 0.22, 'F'); });
+  const u = 2.6;
+  fill(MP.cyan); s.rect(0, 0, a/2, u, 'F'); fill(MP.magenta); s.rect(a/2, 0, a/2, u, 'F');
+  fill(MP.cyan); s.rect(0, l-u, a/2, u, 'F'); fill(MP.magenta); s.rect(a/2, l-u, a/2, u, 'F');
+  if(logo){ try{ s.addImage(logo, 'PNG', (a-46)/2, 14, 46, 46*(110/473)); }catch(_){} }
+  ink(MP.cyan2); s.setFont('helvetica','bold'); s.setFontSize(10.5); s.text(d.title, a/2, 30.5, { align:'center' });
+  ink(MP.muted); s.setFont('helvetica','normal'); s.setFontSize(8.5); s.text(d.sub, a/2, 36, { align:'center' });
+  op(0.4, ()=>{ draw(MP.muted); s.setLineWidth(0.25); s.line(a/2-22, 39.5, a/2+22, 39.5); });
+  const x = 54;
+  s.setFont('helvetica','bold'); s.setFontSize(23);
+  ink(W === 'A' ? MP.cyan2 : MP.muted); s.text(d.names.A.toUpperCase(), 22, x, { align:'left' });
+  ink(W === 'B' ? MP.magenta2 : MP.muted); s.text(d.names.B.toUpperCase(), a-22, x, { align:'right' });
+  ink(MP.muted); s.setFont('helvetica','italic'); s.setFontSize(11); s.text('vs', a/2, x-1.5, { align:'center' });
+  const bw = 22, bh = 6.4, bx = W === 'A' ? 22 : a-22-bw;
+  fill(MP_SIDE[W].hex); s.roundedRect(bx, x+4.5, bw, bh, 3.2, 3.2, 'F');
+  ink(MP.ink); s.setFont('helvetica','bold'); s.setFontSize(8); s.text('WINNER', bx+bw/2, x+4.5+bh/2+1.4, { align:'center' });
+  const F = 108, S = MP_SIDE[W].hex;
+  for(const [r, o] of [[50,.035],[43,.045],[36,.06],[29,.08],[22,.11]]) op(o, ()=>{ fill(S); s.circle(a/2, F-6, r, 'F'); });
+  ink(MP.ivory); s.setFont('helvetica','bold'); s.setFontSize(92); s.text(`${d.legs.A}–${d.legs.B}`, a/2, F, { align:'center' });
+  ink(S); s.setFontSize(13); s.text(`${d.names[W].toUpperCase()} WINS`, a/2, F+14, { align:'center' });
+  const n2 = v => v == null || isNaN(Number(v)) ? '–' : Number(v).toFixed(2);
+  const rows = (st, legs) => [
+    ['LEGS WON', String(legs)], ['AVERAGE', n2(st.avg3)], ['FIRST 9', n2(st.first9Avg)],
+    ['CHECKOUT %', st.checkoutPct == null ? '–' : Math.round(st.checkoutPct) + '%'],
+    ['CO RATE', `${st.checkoutHits ?? 0}/${st.checkoutAttempts ?? 0}`], ['HIGHEST FINISH', String(st.highestCheckout || '–')],
+    ['THROWS', String(st.visits ?? '–')], ['BEST LEG', st.bestLegDarts ? `${st.bestLegDarts} darts` : '–'],
+    ['60+', String(st.count60 ?? 0)], ['80+', String(st.count80 ?? 0)], ['100+', String(st.count100 ?? 0)],
+    ['140+', String(st.count140 ?? 0)], ['180s', String(st.count180 ?? 0)]];
+  const re = 134, H = 83, D = 118, V = 12, J = (a - H*2 - V)/2, P = J + H + V;
+  const card = (cx, side) => {
+    const win = side === W, c = MP_SIDE[side];
+    fill(win ? MP.surface2 : MP.surface); s.roundedRect(cx, re, H, D, 3.5, 3.5, 'F');
+    op(win ? 0.9 : 0.35, ()=>{ draw(win ? c.hex : MP.muted); s.setLineWidth(win ? 0.6 : 0.3); s.roundedRect(cx, re, H, D, 3.5, 3.5, 'S'); });
+    ink(win ? c.dim : MP.ivoryDim); s.setFont('helvetica','bold'); s.setFontSize(13.5); s.text(d.names[side].toUpperCase(), cx+H/2, re+10, { align:'center' });
+    const cols = 3, rowsN = 5, top = re+18, ch = (D-24)/rowsN, cw = H/cols;
+    rows(d.stats[side] || {}, d.legs[side]).forEach(([k, v], i)=>{
+      const cxx = cx + cw*(i % cols) + cw/2, ry = top + ch*Math.floor(i / cols);
+      ink(MP.ivory); s.setFont('helvetica','bold'); s.setFontSize(12.5); s.text(String(v), cxx, ry+5, { align:'center' });
+      ink(MP.muted); s.setFont('helvetica','normal'); s.setFontSize(5.4); s.text(k, cxx, ry+9.4, { align:'center' });
+    });
+  };
+  card(J, 'A'); card(P, 'B');
+  op(0.3, ()=>{ draw(MP.muted); s.setLineWidth(0.25); s.line(22, 268, a-22, 268); });
+  const lw = 20, lh = lw*(110/473);
+  if(logo){ try{ s.addImage(logo, 'PNG', 22, 273, lw, lh); }catch(_){} }
+  ink(MP.muted); s.setFont('helvetica','normal'); s.setFontSize(7.5);
+  s.text('tournza.co.uk', 22+lw+4, 273+lh/2+1.4, { align:'left' });
+  const gen = new Date().toLocaleString(undefined, { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  s.text(`Generated ${gen}`, a-22, 273+lh/2+1.4, { align:'right' });
+  if(logo) op(0.055, ()=>{ try{ s.addImage(logo, 'PNG', a/2-66, l/2-31, 150, 34.883720930232556, undefined, undefined, -18); }catch(_){} });
+  return s;
+}
+
+async function pfMatchPoster(fixtureId){
+  const sb = window.tournzaSupabase || await evClient();
+  const f = await sb.from('matches').select('id, tournament_id, stage, group_id, live_match_id, result_type').eq('id', fixtureId).maybeSingle();
+  if(f.error) throw f.error;
+  if(!f.data || !f.data.live_match_id || f.data.result_type !== 'played') throw new Error('There’s no poster for this match — it wasn’t played out.');
+  const [lm, t, g] = await Promise.all([
+    sb.from('live_matches').select('id, player1_name, player2_name, best_of, legs_p1, legs_p2, winner_id, player1_id, player2_id, summary, status, completed_at').eq('id', f.data.live_match_id).maybeSingle(),
+    sb.from('tournaments').select('name, tournament_date').eq('id', f.data.tournament_id).maybeSingle(),
+    f.data.group_id ? sb.from('tournament_groups').select('label').eq('id', f.data.group_id).maybeSingle() : Promise.resolve({ data:null }),
+  ]);
+  const m = lm.data;
+  if(lm.error || !m || m.status !== 'completed' || !m.summary || !m.summary.p1) throw new Error('This match’s poster isn’t available.');
+  const winner = m.winner_id && String(m.winner_id) === String(m.player2_id) ? 'B' : 'A';
+  const iso = t.data && t.data.tournament_date ? String(t.data.tournament_date).slice(0,10) : (m.completed_at || '').slice(0,10);
+  const day = iso ? new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+  const stage = (MP_STAGE[f.data.stage] || 'Match') + (f.data.stage === 'group' && g.data && g.data.label ? ' ' + g.data.label : '');
+  const d = {
+    names:{ A: m.player1_name || 'Player 1', B: m.player2_name || 'Player 2' },
+    legs:{ A: m.legs_p1 ?? 0, B: m.legs_p2 ?? 0 }, winner,
+    stats:{ A: m.summary.p1, B: m.summary.p2 },
+    title: t.data && t.data.name ? String(t.data.name).toUpperCase() : 'M A T C H   R E S U L T',
+    sub: `${stage}  ·  BEST OF ${m.best_of}  ·  ${day}`.toUpperCase(),
+    logo: typeof tpLogo === 'function' ? tpLogo() : null,
+  };
+  const JsPDF = await tpLoadJsPdf();
+  mpDraw(JsPDF, d).save(`Tournza_${mpSafe(d.names.A)}_vs_${mpSafe(d.names.B)}_Match_Result.pdf`);
+}
+
+// one handler for both kinds of button
+document.addEventListener('click', async ev=>{
+  const b = ev.target.closest('[data-pf-mposter],[data-pf-tposter]'); if(!b) return;
+  ev.preventDefault();
+  if(b.disabled) return;
+  const label = b.textContent; b.disabled = true; b.textContent = 'Making…';
+  try{
+    if(b.dataset.pfMposter) await pfMatchPoster(b.dataset.pfMposter);
+    else await tpPoster(b.dataset.pfTposter);
+    notify('Poster downloaded ✓');
+  }catch(err){
+    console.warn('poster:', err);
+    notify((err && err.message && !/fetch|network|load/i.test(err.message)) ? err.message : 'Couldn’t make the poster — try again.', 'warn');
+  }finally{ b.disabled = false; b.textContent = label; }
+});
+
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves
 loadTournamentsFromSupabase();
@@ -4331,6 +4455,7 @@ go((location.hash||'#home').slice(1)||'home');
     if(footJoin) footJoin.hidden = true;
     if(navLogin) navLogin.hidden = true;
     userMenu.hidden = false;
+    if(typeof PF !== 'undefined' && PF.id && document.querySelector('#route-player.active')) renderPlayerProfile(PF.id);
     const memFree = $('#mem-free-btn');
     if(memFree){ memFree.textContent = 'You have an account ✓'; memFree.setAttribute('href', '#account'); memFree.dataset.link = 'account'; }
 
