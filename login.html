@@ -52,7 +52,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
   /* ---- Tournza palette (swap these for your exact brand hexes) ---- */
@@ -233,6 +233,86 @@
   @media (prefers-reduced-motion:reduce){
     .board-glow{animation:none}
   }
+  /* ===== Tournza visual refresh (2026-10): same palette as the main site; colours only ===== */
+  :root{
+    --oche:#070D1A; --surface:#101D35; --raised:#0B1528; --line:rgba(54,120,255,.30);
+    --chalk:#EAF0FF; --smoke:#A3B1D6; --primary:#3678FF; --primary-2:#2662E8; --primary-hi:#5B93FF;
+  }
+  body{background:
+      radial-gradient(900px 600px at 85% -10%, rgba(54,120,255,.26), transparent 60%),
+      radial-gradient(600px 420px at 0% 0%, rgba(25,211,243,.08), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(54,120,255,.14), transparent 60%),
+      var(--oche)}
+  .board-glow{opacity:.16}
+  .card{background:linear-gradient(165deg,#13244A 0%,#0F1C36 45%,#0B1528 100%);
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.8),0 0 60px -24px rgba(25,211,243,.45),inset 0 1px 0 rgba(255,255,255,.05)}
+  .tagline{color:var(--smoke)}
+  .tab.active,.btn{background:linear-gradient(180deg,#3678FF,#2662E8)}
+  .btn:not(.ghost){box-shadow:0 10px 30px -10px rgba(54,120,255,.75)}
+  .btn.ghost{background:rgba(16,29,53,.55);border-color:rgba(120,160,235,.30)}
+  .btn.ghost:hover{border-color:#19D3F3;background:rgba(25,211,243,.10)}
+  .field input:focus{border-color:#19D3F3;box-shadow:0 0 0 3px rgba(25,211,243,.22)}
+  .field input::placeholder{color:#7584A8}
+  .foot{color:#8A9BC4}
+  .welcome{background:linear-gradient(100deg,#fff 0%,#fff 38%,#19D3F3 72%,#3678FF 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .badge{color:#19D3F3;background:rgba(25,211,243,.12);border-color:rgba(25,211,243,.42)}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid #19D3F3;outline-offset:2px}
+  /* ===== Pass 5 (2026-10): "Create your account" and "Log in" side by side; tabs on phones ===== */
+  .card{transition:max-width .2s}
+  .card:has(#auth[data-view="login"]),.card:has(#auth[data-view="signup"]){max-width:920px}
+  .card:has(#auth[data-view="login"]) .brand,.card:has(#auth[data-view="signup"]) .brand{margin-bottom:0}
+  .card:has(#dashboard.active),.card:has(#boot.active){max-width:420px}   /* logged-in view: as before */
+  #auth .tagline{text-align:center}
+  .col-head h2{font-family:"Oswald",sans-serif;font-weight:600;font-size:26px;line-height:1.1;letter-spacing:.01em;color:#fff}
+  .col-head p{color:var(--smoke);font-size:13.5px;line-height:1.5;margin:8px 0 18px}
+  .field select{width:100%;font-family:inherit;font-size:14.5px;color:var(--chalk);background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+  .field select:focus{outline:none;border-color:#19D3F3;box-shadow:0 0 0 3px rgba(25,211,243,.22)}
+  .tick{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--smoke);cursor:pointer;margin-top:2px}
+  .tick input{width:18px;height:18px;flex:none;margin-top:1px;accent-color:#3678FF;cursor:pointer}
+  .tick a{color:#19D3F3;text-decoration:underline;text-underline-offset:2px}
+  .auth-col{min-width:0}
+  /* wider screens: both panels at once (forgot / reset / confirm take over as a single panel) */
+  @media (min-width:760px){
+    #auth .tabs{display:none !important}
+    #auth:is([data-view="login"],[data-view="signup"]) .auth-cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+    #auth:is([data-view="login"],[data-view="signup"]) .auth-col{padding:6px 34px 4px}
+    #auth:is([data-view="login"],[data-view="signup"]) .col-signup{padding-left:4px;border-right:1px solid var(--line)}
+    #auth:is([data-view="login"],[data-view="signup"]) .col-login{padding-right:4px}
+    #auth:is([data-view="login"],[data-view="signup"]) #signupForm,
+    #auth[data-view="signup"] #loginForm{display:flex}
+    #auth:not([data-view="login"]):not([data-view="signup"]) .col-signup{display:none}
+    #auth:not([data-view="login"]):not([data-view="signup"]) .col-head{display:none}
+    .col-login .col-head{position:relative}
+    .col-signup .col-head h2{background:linear-gradient(100deg,#fff 0%,#fff 45%,#19D3F3 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  }
+  /* phones: one panel at a time, chosen with the tabs */
+  @media (max-width:759.98px){
+    #auth[data-view="signup"] .col-login{display:none}
+    #auth:not([data-view="signup"]) .col-signup{display:none}
+    .col-head{display:none}
+    .field input,.field select{font-size:16px}   /* no zoom-in on iPhone */
+    .btn,.tab{min-height:44px}
+  }
+  /* ===== Pass 7: the same type and controls as the rest of Tournza ===== */
+  body{font-family:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+  .welcome,.avatar,.badge,.col-head h2{font-family:"Archivo",sans-serif}
+  .col-head h2{font-weight:900;font-size:24px;letter-spacing:-.005em;text-transform:uppercase;text-shadow:0 0 30px rgba(54,120,255,.45)}
+  .col-signup .col-head h2{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff}
+  .welcome{font-weight:900}
+  .field label,.tagline,.foot{font-family:"DM Mono",ui-monospace,monospace;letter-spacing:.08em}
+  .field label{text-transform:uppercase;font-size:11px;font-weight:500;color:#8A9BC4}
+  .tab,.btn{font-family:"Hanken Grotesk",sans-serif;font-weight:700}
+  .btn:not(.ghost),.tab.active{background:linear-gradient(180deg,#3E86FF 0%,#1F62F7 100%);box-shadow:0 10px 28px -10px rgba(40,110,255,.95),inset 0 1px 0 rgba(255,255,255,.22)}
+  .card{border-color:rgba(70,132,255,.34);border-radius:14px;
+    background:linear-gradient(180deg,rgba(24,44,84,.96) 0%,rgba(13,25,48,.97) 55%,rgba(10,20,39,.98) 100%);
+    box-shadow:inset 0 1px 0 rgba(150,190,255,.10),0 30px 70px -30px rgba(0,0,0,.95),0 0 80px -30px rgba(54,120,255,.55)}
+  .field input,.field select{border-color:rgba(70,132,255,.30);background:rgba(10,20,39,.85)}
+  body{background:
+      radial-gradient(760px 420px at 82% -6%,rgba(54,120,255,.48),transparent 70%),
+      radial-gradient(420px 260px at 98% 26%,rgba(25,211,243,.14),transparent 70%),
+      radial-gradient(600px 420px at -6% 110%,rgba(54,120,255,.18),transparent 65%),
+      #070D1A}
+  .board-glow{display:none}   /* dartboard art is for the homepage and Friendlies only */
 </style>
 </head>
 <body>
@@ -244,7 +324,7 @@
     </div>
 
     <!-- ============ AUTH VIEW ============ -->
-    <section id="auth">
+    <section id="auth" data-view="login">
       <p class="tagline">Your darts tournament platform. Throw first.</p>
 
       <div class="tabs" role="tablist">
@@ -255,6 +335,38 @@
       <div class="msg error" id="errBox" role="alert" aria-live="assertive"></div>
       <div class="msg ok"    id="okBox"  role="status" aria-live="polite"></div>
 
+      <div class="auth-cols">
+        <div class="auth-col col-signup">
+          <div class="col-head"><h2>Create your account</h2><p>Free to join. Browse events, rankings and watch live — become a member to enter tournaments.</p></div>
+      <!-- Sign up -->
+      <form id="signupForm" novalidate>
+        <div class="field">
+          <label for="suName">Full name</label>
+          <input id="suName" type="text" autocomplete="name" placeholder="Phil Taylor" required />
+        </div>
+        <div class="field">
+          <label for="suEmail">Email</label>
+          <input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label for="suRegion">Your region</label>
+          <select id="suRegion" required>
+            <option value="">Choose your region</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="suPassword">Password</label>
+          <input id="suPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required />
+        </div>
+        <label class="tick" for="suTerms">
+          <input id="suTerms" type="checkbox" required />
+          <span>I’m 18 or over and agree to the <a href="/#terms" target="_blank" rel="noopener">Terms</a> and <a href="/#privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+        <button class="btn" type="submit" id="signupBtn">Create account</button>
+      </form>
+        </div>
+        <div class="auth-col col-login">
+          <div class="col-head"><h2>Log in</h2><p>Welcome back. Pick up where you left off.</p></div>
       <!-- Login -->
       <form id="loginForm" class="active" novalidate>
         <div class="field">
@@ -298,28 +410,8 @@
         <button class="btn" type="submit" id="resetBtn">Set new password</button>
       </form>
 
-      <!-- Sign up -->
-      <form id="signupForm" novalidate>
-        <div class="field">
-          <label for="suName">Full name</label>
-          <input id="suName" type="text" autocomplete="name" placeholder="Phil Taylor" required />
         </div>
-        <div class="field">
-          <label for="suEmail">Email</label>
-          <input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
-        </div>
-        <div class="field">
-          <label for="suRegion">Your region</label>
-          <select id="suRegion" required>
-            <option value="">Choose your region</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="suPassword">Password</label>
-          <input id="suPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required />
-        </div>
-        <button class="btn" type="submit" id="signupBtn">Create account</button>
-      </form>
+      </div>
     </section>
 
     <!-- ============ DASHBOARD VIEW ============ -->
@@ -412,6 +504,7 @@
     // forgot/reset/confirm hide it (nothing to switch between in those).
     function showView(name) {
       clearMsg();
+      authView.dataset.view = name;   // which column(s) the page shows (side by side on wider screens)
       const tabs = document.querySelector(".tabs");
       tabs.style.display = (name === "login" || name === "signup") ? "" : "none";
       tabLogin.classList.toggle("active", name === "login");
@@ -496,6 +589,10 @@
 
       if (!full_name || !email || !region || password.length < 6) {
         showErr("Enter your name, email, region, and a password of at least 6 characters.");
+        return;
+      }
+      if (!$("suTerms").checked) {
+        showErr("Please confirm you’re 18 or over and agree to the Terms and Privacy Policy.");
         return;
       }
 

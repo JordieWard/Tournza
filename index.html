@@ -686,6 +686,41 @@
     .pf-hist td.num{font-size:17px}
   }
 
+  /* ---------- profile pass 3 (2026-10): tabs, overview with recent tournaments, matches, spark line ---------- */
+  .pf-spark{display:block;width:120px;height:34px;margin:8px 0 0 auto;color:var(--pf-cyan);filter:drop-shadow(0 0 6px rgba(25,211,243,.6))}
+  .pf-tabs{display:flex;gap:6px;margin:22px 0 4px;padding:5px;border:1px solid var(--pf-edge);border-radius:14px;background:rgba(7,13,26,.6);width:max-content;max-width:100%;overflow-x:auto}
+  .pf-tabs [role=tab]{appearance:none;border:0;background:none;color:var(--muted-2);font-family:var(--display);font-weight:700;font-size:14px;padding:9px 18px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .pf-tabs [role=tab]:hover{color:#fff}
+  .pf-tabs [role=tab][aria-selected=true]{color:#fff;background:linear-gradient(180deg,#3678FF,#2662E8);box-shadow:0 8px 22px -10px rgba(54,120,255,.9)}
+  .pf-tabs [role=tab]:focus-visible{outline:2px solid var(--pf-cyan);outline-offset:2px}
+  .pf-ov{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+  .pf-ov .pf-section{margin-top:20px}
+  .pf-recent{margin-top:20px}
+  .pf-recent ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .pf-recent li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;background:rgba(7,16,35,.55);border:1px solid rgba(120,160,230,.10)}
+  .pf-recent li strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pf-recent li span{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-recent li b{font-family:var(--display);font-weight:900;font-size:16px}
+  .pf-recent li.win{border-color:rgba(245,54,120,.35);background:rgba(245,54,120,.08)}
+  .pf-recent li.pod{border-color:rgba(25,211,243,.25);background:rgba(25,211,243,.05)}
+  .pf-more{appearance:none;border:0;background:none;color:var(--pf-cyan);font-family:var(--display);font-weight:700;font-size:13.5px;margin-top:14px;cursor:pointer;padding:0}
+  .pf-more:hover{text-decoration:underline}
+  .pf-sub{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .pf-matches a{color:#fff;text-decoration:underline;text-decoration-color:rgba(25,211,243,.5);text-underline-offset:3px}
+  .pf-wl{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;font-size:13px}
+  .pf-wl.w{background:rgba(25,211,243,.16);color:var(--pf-cyan);border:1px solid rgba(25,211,243,.45)}
+  .pf-wl.l{background:rgba(245,54,120,.10);color:#FF6A9B;border:1px solid rgba(245,54,120,.35)}
+  .pf-matches td.num{font-size:16px}
+  @media (max-width:1100px){ .pf-ov{grid-template-columns:1fr} }
+  @media (max-width:720px){
+    .pf-spark{margin:0 0 0 auto;width:90px}
+    .pf-tabs{width:100%}
+    .pf-tabs [role=tab]{flex:1;padding:9px 8px}
+    .pf-matches th:nth-child(2),.pf-matches td:nth-child(2){display:none}
+  }
+  .pf-matches tr.win td{background:rgba(25,211,243,.06);border-color:rgba(25,211,243,.22)}
+  .pf-matches tr.win td:first-child{border-left-color:var(--pf-cyan)}
+
   :root{color-scheme:dark}
   @media (prefers-color-scheme:dark){:root{color-scheme:dark}}   /* our dark theme IS the site: tells Samsung Internet not to apply its own */
 
@@ -779,8 +814,6 @@
   .tl-now b{font-family:var(--display);font-weight:900;font-size:44px;line-height:1;color:#fff;text-shadow:0 0 24px var(--tl-acc)}
   .tl-now span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);line-height:1.35}
   .tl-open{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);font-family:var(--display);font-weight:700;font-size:14.5px;color:#fff;text-decoration:none}
-  .tl-open span{color:var(--tl-acc);transition:margin .15s}
-  .tl-card:hover .tl-open span{margin-left:4px}
   .tl-open::after{content:"";position:absolute;inset:0;border-radius:inherit}     /* the whole card opens the tournament */
   .tl-open:focus-visible{outline:none}
   .tl-card:focus-within{outline:2px solid var(--tl-acc);outline-offset:3px}
@@ -827,6 +860,689 @@
     *{animation:none!important;scroll-behavior:auto!important}
     .ticker-track{animation:none}
   }
+
+  /* =====================================================================
+     Tournza visual refresh (2026-10) — ONE layer, loaded last, index.html only.
+     Midnight navy, deep-navy panels, electric-blue actions, cyan for the
+     competitive side and stats, pink for live indicators and Friendlies.
+     Only colours, backgrounds, borders, glow and type weight change here:
+     no layout, no content, no behaviour. The match room (play.html) and
+     watch.html have their own stylesheets and never load this.
+     ===================================================================== */
+  :root{
+    --ink:#070D1A;            /* midnight navy — page            */
+    --ink-2:#0B1528;          /* between ink and deep navy        */
+    --surface:#101D35;        /* deep navy — cards and panels     */
+    --surface-2:#172A4C;
+    --line:rgba(54,120,255,.26);
+    --line-soft:rgba(120,160,235,.14);
+    --ivory:#EAF0FF;          /* cool white                       */
+    --ivory-dim:#C3CFEE;
+    --muted:#8A9BC4;          /* 7.0:1 on navy                    */
+    --muted-2:#A3B1D6;
+    --blue:#3678FF;           /* electric blue — actions          */
+    --blue-2:#5B93FF;
+    --cyan:#19D3F3;           /* electric cyan — competitive, stats */
+    --cyan-soft:rgba(25,211,243,.12);
+    --cyan-line:rgba(25,211,243,.42);
+    --pink:#F53678;           /* neon pink — live, Friendlies     */
+    --pink-2:#FF6A9B;
+    --pink-soft:rgba(245,54,120,.12);
+    --pink-line:rgba(245,54,120,.45);
+    --btn-blue:linear-gradient(180deg,#3678FF,#2662E8);      /* white text ≥ 4.5:1 */
+    --btn-pink:linear-gradient(180deg,#F0346F,#CF1F5E);
+    --glow-blue:0 10px 30px -10px rgba(54,120,255,.75);
+    --glow-cyan:0 0 26px rgba(25,211,243,.35);
+    --glow-pink:0 10px 30px -10px rgba(245,54,120,.8);
+    --card-bg:linear-gradient(165deg,#13244A 0%,#0F1C36 45%,#0B1528 100%);
+    /* the existing theme hooks, pointed at the new palette */
+    --logo-blue:#3678FF;
+    --logo-blue-2:#19D3F3;
+    --logo-line:rgba(54,120,255,.45);
+    --fr:#F53678;
+    --fr-2:#FF6A9B;
+    --fr-soft:rgba(245,54,120,.12);
+    --fr-line:rgba(245,54,120,.45);
+    --red-bright:#FF6B7A;
+  }
+
+  /* ---------- atmosphere ---------- */
+  body{background:var(--ink);color:var(--ivory)}
+  body:not(.fr-on)::before{
+    background:
+      radial-gradient(1000px 640px at 82% -10%, rgba(54,120,255,.26), transparent 60%),
+      radial-gradient(760px 520px at 8% 4%, rgba(25,211,243,.08), transparent 60%),
+      radial-gradient(900px 640px at 10% 110%, rgba(54,120,255,.14), transparent 58%),
+      radial-gradient(600px 420px at 100% 85%, rgba(245,54,120,.07), transparent 60%);
+  }
+  body.fr-on::before{
+    background:
+      radial-gradient(1000px 640px at 82% -10%, rgba(245,54,120,.22), transparent 60%),
+      radial-gradient(800px 600px at 8% 108%, rgba(245,54,120,.10), transparent 55%),
+      radial-gradient(700px 500px at 0% 0%, rgba(54,120,255,.08), transparent 60%);
+  }
+
+  /* ---------- header / nav ---------- */
+  header{background:rgba(7,13,26,.84)}
+  .ticker{background:#0A1426}
+  .dot.live{background:var(--pink);animation-name:tzPinkPulse}
+  .tag-live{color:var(--pink-2)}
+  @keyframes tzPinkPulse{70%{box-shadow:0 0 0 7px rgba(245,54,120,0)}100%{box-shadow:0 0 0 0 rgba(245,54,120,0)}}
+  nav.main a:hover{color:#fff}
+  nav.main a.active{background:var(--btn-blue);box-shadow:var(--glow-blue)}
+  nav.main a.nav-fr.active{background:var(--btn-pink);box-shadow:var(--glow-pink)}
+  nav.main a.nav-live::before{background:var(--pink)}
+  .burger{border-color:var(--line)}
+  @media(max-width:720px){ nav.main.open{background:rgba(7,13,26,.97)} }
+
+  /* ---------- type ---------- */
+  .eyebrow{color:var(--cyan)}
+  .eyebrow::before{background:var(--cyan)}
+  .lede{color:var(--muted-2)}
+
+  /* ---------- buttons ---------- */
+  .btn-primary{background:var(--btn-blue);color:#fff;box-shadow:var(--glow-blue)}
+  .btn-primary:hover{background:linear-gradient(180deg,#4A86FF,#2E6BF0);box-shadow:0 12px 34px -10px rgba(54,120,255,.95)}
+  .btn-ghost{border-color:rgba(120,160,235,.30);background:rgba(16,29,53,.55)}
+  .btn-ghost:hover{border-color:var(--cyan);background:var(--cyan-soft)}
+  .btn:focus-visible,a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+  /* ---------- cards, panels, pills ---------- */
+  .card{background:var(--card-bg);border-color:var(--line-soft);box-shadow:0 18px 44px -26px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
+  .card.clk:hover{border-color:var(--cyan-line);box-shadow:0 22px 50px -24px rgba(0,0,0,.9),0 0 34px -16px rgba(25,211,243,.55)}
+  .panel{background:var(--card-bg);border-color:var(--line-soft);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+  .pill{border-color:rgba(120,160,235,.28);color:var(--muted-2)}
+  .pill.live{color:var(--pink-2);border-color:var(--pink-line);background:var(--pink-soft)}
+  .pill.fmt{color:var(--cyan);border-color:var(--cyan-line);background:var(--cyan-soft)}
+  .price{color:#fff}
+  .progress{background:#0B1528}
+  .progress > i{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+  .countdown{color:var(--pink-2)}
+
+  /* ---------- forms ---------- */
+  select,input,textarea{background:#0B1528;border-color:rgba(120,160,235,.26)}
+  select:focus,input:focus,textarea:focus{outline-color:var(--cyan);border-color:var(--cyan)}
+  .check input{accent-color:var(--blue)}
+
+  /* ---------- tables (rankings, groups, history) ---------- */
+  .tbl-wrap{border-color:var(--line);background:rgba(11,21,40,.7)}
+  thead th{background:#0E1B33;color:var(--cyan);border-bottom-color:var(--line)}
+  tbody td{border-bottom-color:var(--line-soft)}
+  tbody tr.clk:hover{background:rgba(25,211,243,.06)}
+  td.rank.top{color:var(--cyan);text-shadow:var(--glow-cyan)}
+  .pts{color:#fff;font-weight:500}
+  .ava{background:linear-gradient(135deg,var(--blue-2),#2559D6)}
+
+  /* ---------- grids of stats (home stat band, player cards, profile, kv) ---------- */
+  .statband,.steps,.hero-facts,.kv,.pc-stats,.bigstats{background:var(--line-soft);border-color:var(--line-soft)}
+  .statband .s,.step,.kv .cell,.bigstats .b{background:linear-gradient(180deg,#101D35,#0B1528)}
+  .fact,.pc-stats .b{background:#0B1528}
+  .statband .big{color:var(--cyan);text-shadow:var(--glow-cyan)}
+  .bigstats .b .v,.pc-stats .b .v{color:var(--cyan)}
+  .step .n{color:var(--cyan)}
+  .fact .k,.kv .cell .k{color:var(--cyan);opacity:.85}
+
+  /* ---------- hero artwork (homepage + Friendlies): Jordan's darts art, graded to the palette ----------
+     A full-width layer behind the hero, under dark overlays so the text and
+     buttons always read; it fades into the page at the bottom. Purely
+     decorative: aria-hidden, no pointer events, never wider than the window. */
+  html{overflow-x:clip}
+  .tz-art{position:absolute;top:0;left:calc(50% - 50vw);width:100vw;z-index:-1;pointer-events:none;overflow:hidden}
+  /* the picture keeps its own proportions (never zoomed past its resolution); --art-x slides the board
+     so about half of it shows at the right-hand edge */
+  .tz-art-img{position:absolute;top:50%;right:0;height:100%;aspect-ratio:1672/941;transform:translate(var(--art-x,15%),-50%);
+    background:center/100% 100% no-repeat}
+  .tz-art::before,.tz-art::after{content:"";position:absolute;inset:0;z-index:1}
+  .tz-art::after{z-index:2}
+  /* the site-wide diagonal stripes would sit on top of the artwork: off on the two art pages */
+  body:has(#route-home.active)::after,body:has(#route-friendlies.active)::after{opacity:0}
+  .tz-art::after{background:radial-gradient(120% 90% at 85% 40%,transparent 40%,rgba(7,13,26,.55) 100%)}       /* vignette */
+
+  /* ---------- homepage (pass 3): compact landing page — headline, glance cards, art on the right ---------- */
+  #route-home .home-hero{position:relative;isolation:isolate;padding:84px 0 40px;min-height:640px;display:flex;flex-direction:column;justify-content:center}
+  #route-home .tz-art{top:-54px;height:calc(100% + 120px)}
+  #route-home .tz-art-img{background-image:url(assets/home-hero.webp);--art-x:6%}
+  #route-home .tz-art::before{background:
+      linear-gradient(90deg,rgba(7,13,26,.97) 0%,rgba(7,13,26,.9) 30%,rgba(7,13,26,.5) 50%,rgba(7,13,26,.08) 68%,rgba(7,13,26,0) 100%),
+      linear-gradient(180deg,rgba(7,13,26,.5) 0%,rgba(7,13,26,0) 16%,rgba(7,13,26,0) 72%,var(--ink) 100%)}
+  #route-home .home-copy{max-width:700px}
+  #route-home .home-hero h1.home-h1{margin:18px 0 0;font-size:clamp(44px,5.6vw,82px);line-height:.94;letter-spacing:-.025em;text-transform:uppercase;
+    background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff;filter:drop-shadow(0 10px 40px rgba(7,13,26,.9))}
+  #route-home .home-hero h1.home-h1 span{display:block}
+  #route-home .home-hero h1.home-h1 .hl{background:linear-gradient(100deg,#7FEAFF 0%,var(--cyan) 40%,#3678FF 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 26px rgba(25,211,243,.45))}
+  #route-home .home-hero .lede{margin-top:22px;color:var(--ivory-dim);max-width:46ch}
+  #route-home .home-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:46px;max-width:760px}
+  #route-home .hs{position:relative;padding:18px 18px 16px;border-radius:16px;border:1px solid rgba(120,190,255,.22);
+    background:linear-gradient(165deg,rgba(19,36,74,.72),rgba(9,17,34,.82));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    box-shadow:0 20px 44px -26px rgba(0,0,0,.95),inset 0 1px 0 rgba(160,220,255,.14)}
+  #route-home .hs .v{font-family:var(--display);font-weight:900;font-size:clamp(28px,3vw,38px);line-height:1;color:var(--cyan);text-shadow:0 0 22px rgba(25,211,243,.4)}
+  #route-home .hs .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);margin-top:9px;line-height:1.35}
+  #route-home .hs:last-child .v{color:#fff;text-shadow:none}
+  #route-home section.block.home-tonight{padding-top:30px;position:relative;z-index:1}
+  #route-home section.block.home-how{position:relative;z-index:1}
+  .home-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .home-ev{position:relative;display:flex;flex-direction:column;gap:6px;padding:18px 20px;border-radius:16px;color:inherit;text-decoration:none;
+    border:1px solid transparent;background:radial-gradient(120% 70% at 50% -10%,rgba(54,120,255,.16),transparent 62%) padding-box,linear-gradient(165deg,#13244A,#0B1528) padding-box,
+      linear-gradient(130deg,rgba(25,211,243,.55),rgba(54,120,255,.18) 45%,rgba(120,160,235,.12)) border-box;
+    box-shadow:0 24px 50px -30px rgba(0,0,0,.95),inset 0 1px 0 rgba(160,220,255,.10);transition:transform .18s,box-shadow .18s}
+  .home-ev:hover{transform:translateY(-3px);box-shadow:0 28px 56px -28px rgba(0,0,0,.95),0 0 40px -16px rgba(25,211,243,.6)}
+  .home-ev .top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
+  .home-ev .rg{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  .home-ev strong{font-family:var(--display);font-size:19px;line-height:1.2}
+  .home-ev .meta{font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+  .home-ev .cap{display:block;height:4px;border-radius:4px;background:#0B1528;overflow:hidden;margin-top:6px}
+  .home-ev .cap i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+  .home-ev .go{font-family:var(--display);font-weight:700;font-size:14px;margin-top:8px;color:#fff}
+  .home-ev .go span{color:var(--cyan)}
+  #route-home section.block.home-how{padding-top:24px}
+
+  @media(max-width:920px){
+    #route-home .home-hero{min-height:0;padding:48px 0 30px}
+    #route-home .tz-art{top:-40px;height:560px}
+    #route-home .tz-art-img{background-image:url(assets/home-hero-m.webp);aspect-ratio:540/720;top:0;transform:translateX(30%)}
+    #route-home .tz-art::before{background:
+      linear-gradient(90deg,rgba(7,13,26,.95) 0%,rgba(7,13,26,.84) 50%,rgba(7,13,26,.45) 100%),
+      linear-gradient(180deg,rgba(7,13,26,.45) 0%,rgba(7,13,26,0) 25%,rgba(7,13,26,.2) 60%,var(--ink) 100%)}
+    #route-home .home-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:32px}
+    .home-list{grid-template-columns:1fr}
+  }
+
+  /* ---------- events + event details ---------- */
+  .ev-card{border-top:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,
+    linear-gradient(120deg,rgba(25,211,243,.55),rgba(54,120,255,.25) 40%,rgba(120,160,235,.12)) border-box;border:1px solid transparent}
+  .ev-card:hover{box-shadow:0 0 40px -16px rgba(25,211,243,.6)}
+  .ev-card .ev-meta{color:var(--muted-2)}
+  .prize-row .pos{color:var(--cyan)}
+  .rules li::before{border-color:var(--cyan)}
+  .ev-clock{border-color:var(--line)}
+  .ev-clock > div{background:#0B1528}
+  .ev-clock .now{background:linear-gradient(180deg,rgba(25,211,243,.16),rgba(25,211,243,.04))}
+  .ev-clock .now .k{color:var(--cyan)}
+  .ev-me .panel{border-color:var(--cyan-line);box-shadow:0 0 40px -18px rgba(25,211,243,.6)}
+  .ev-tie > div{background:#0B1528}
+  .ev-tie .w{color:var(--cyan)}
+  .ev-podium .champ .v{color:var(--cyan);text-shadow:var(--glow-cyan)}
+  .ev-group tr.me td{background:rgba(25,211,243,.08)}
+  .ev-group tr.q td:first-child{box-shadow:inset 3px 0 0 var(--cyan)}
+
+  /* ---------- LIVE page: palette + "LIVE MATCHES" heading ---------- */
+  #route-live,.tl-bg{--tl-cyan:#19D3F3;--tl-mag:#F53678;--tl-red:#F53678}
+  .tl-word{font-size:clamp(56px,10.5vw,138px);line-height:.92;letter-spacing:-.03em}
+  .tl-wrap{display:inline-flex;flex-wrap:wrap;justify-content:center;column-gap:.22em}
+  .tl-txt{background:linear-gradient(100deg,#7FEAFF 0%,var(--tl-cyan) 45%,#3678FF 100%);background-size:200% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 34px rgba(25,211,243,.35))}
+  .tl-txt2{color:#fff;text-shadow:0 6px 34px rgba(54,120,255,.35)}
+  .tl-beacon{width:clamp(18px,2.6vw,36px);height:clamp(18px,2.6vw,36px);margin-top:calc(clamp(18px,2.6vw,36px) / -2)}
+  .tl-sub{margin:14px auto 0;font-size:clamp(15px,1.5vw,18px);color:var(--ivory-dim)}
+  .tl-open{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px;padding:11px 14px;border-radius:12px;
+    border:1px solid var(--line);background:rgba(7,13,26,.55);font-size:14px}
+  .tl-open .play{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--tl-acc);color:var(--ink);font-size:9px}
+  .tl-card:hover .tl-open{border-color:var(--tl-acc)}
+  .tl-chev{position:absolute;right:18px;top:50%;font-size:22px;color:var(--tl-acc);opacity:.8;transform:translateY(-50%)}
+  @media(max-width:720px){
+    .tl-word{font-size:clamp(52px,16vw,88px)}
+    .tl-wrap{align-items:center}
+    .tl-beacon{position:relative;right:auto;top:auto;margin:0 .18em 0 0;align-self:center}   /* on a phone the dot sits beside LIVE, not off-screen */
+  }
+
+  /* ---------- tournament page ---------- */
+  .tp-on li.me{background:rgba(25,211,243,.08)}
+  .tp-yours{color:var(--cyan)}
+  .ev-watch{color:var(--pink-2)}
+  .ev-golive{border-color:var(--pink-line);background:var(--pink-soft)}
+  .ev-golive .dot,.tl-dot{background:var(--pink)}
+  .ev-golive .go{color:var(--pink-2)}
+  .lv{color:var(--pink-2)}
+  .lv::before{background:var(--pink)}
+  .tp-n{background:var(--pink-soft);color:var(--pink-2)}
+
+  /* ---------- Friendlies: the pink sub-brand ---------- */
+  #route-friendlies section.block{position:relative;isolation:isolate}
+  #route-friendlies .tz-art{top:-64px;height:860px}
+  #route-friendlies .tz-art-img{background-image:url(assets/friendlies-hero.webp);--art-x:13%}
+  #route-friendlies .tz-art::before{background:
+      linear-gradient(90deg,rgba(9,5,14,.97) 0%,rgba(9,5,14,.88) 28%,rgba(12,6,18,.42) 52%,rgba(12,6,18,.05) 72%,transparent 100%),
+      linear-gradient(180deg,rgba(9,5,14,.5) 0%,transparent 16%,transparent 58%,var(--ink) 100%)}
+  #route-friendlies .tz-art::after{background:radial-gradient(120% 90% at 85% 35%,transparent 40%,rgba(9,5,14,.6) 100%)}
+  #route-friendlies .section-head h2{background:linear-gradient(100deg,#fff 0%,#fff 46%,var(--fr-2) 64%,var(--fr) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 8px 40px rgba(245,54,120,.35))}
+  #route-friendlies .lede{color:#D9C7DD}
+  #route-friendlies .panel{border:1px solid rgba(255,106,155,.38);border-radius:18px;
+    background:radial-gradient(120% 70% at 50% -10%,rgba(245,54,120,.20),transparent 60%),
+               linear-gradient(165deg,rgba(32,14,40,.82),rgba(14,12,32,.86) 55%,rgba(11,16,36,.92));
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 0 0 1px rgba(245,54,120,.10),0 0 70px -24px rgba(245,54,120,.75),0 30px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,180,210,.18)}
+  #route-friendlies .fr-grid .panel:first-child{border-color:rgba(255,106,155,.65);
+    box-shadow:0 0 0 1px rgba(245,54,120,.25),0 0 90px -20px rgba(245,54,120,.9),0 30px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,190,215,.3)}
+  #route-friendlies .btn-primary{background:var(--btn-pink);box-shadow:0 12px 34px -10px rgba(245,54,120,.95),inset 0 1px 0 rgba(255,255,255,.25)}
+  #route-friendlies .btn-primary:hover{background:linear-gradient(180deg,#FF4B85,#DC2967)}
+  #route-friendlies .fr-join .btn{background:var(--btn-blue);border-color:transparent;color:#fff;box-shadow:var(--glow-blue)}
+  #route-friendlies .fr-join input{border-color:rgba(54,120,255,.45);background:rgba(7,13,26,.75)}
+  .fr-bo button{background:rgba(7,13,26,.6);border-color:rgba(160,170,235,.26);color:var(--ivory)}
+  .fr-bo button:hover{border-color:var(--fr-2)}
+  .fr-bo button[aria-pressed="true"]{background:var(--btn-pink);border-color:transparent;box-shadow:0 8px 24px -8px rgba(245,54,120,.9),inset 0 1px 0 rgba(255,255,255,.25)}
+  .fr-pill{color:var(--fr-2);border-color:var(--fr-line);background:rgba(245,54,120,.14)}
+  #fr-online-pill{background:rgba(24,8,22,.85);box-shadow:0 0 24px -6px rgba(245,54,120,.7)}
+  .ava.fr{background:linear-gradient(135deg,var(--fr-2),var(--fr))}
+  .fr-stats{border-color:rgba(245,54,120,.4)}
+  .fr-stats .b{background:linear-gradient(180deg,#171128,#0B1328)}
+  @media(max-width:920px){
+    #route-friendlies .tz-art{top:-44px;height:600px}
+    #route-friendlies .tz-art-img{background-image:url(assets/friendlies-hero-m.webp);aspect-ratio:540/720;top:0;transform:translateX(34%)}
+    #route-friendlies .tz-art::before{background:
+      linear-gradient(90deg,rgba(9,5,14,.94) 0%,rgba(9,5,14,.8) 50%,rgba(9,5,14,.4) 100%),
+      linear-gradient(180deg,rgba(9,5,14,.45) 0%,transparent 25%,rgba(9,5,14,.2) 60%,var(--ink) 100%)}
+  }
+
+  /* Friendlies pass 3: icons + the code box, as in the reference (decorative only) */
+  #route-friendlies .section-head{flex-direction:column;align-items:flex-start;gap:18px}   /* online count sits under the intro, as in the reference */
+  #route-friendlies .fr-join{position:relative}
+  #route-friendlies .fr-join input{text-align:left;padding-left:44px;
+    background:rgba(7,13,26,.75) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B93FF' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M5 9h14M5 15h14M10 4 8 20M16 4l-2 16'/%3E%3C/svg%3E") 15px 50%/18px no-repeat}
+  #route-friendlies .fr-join input::placeholder{font-family:var(--body);font-weight:500;font-size:15px;letter-spacing:0;text-transform:none;color:#7F93C4}
+  #route-friendlies .fr-grid .panel:first-child > .fr-pill::before,#fr-create::before{content:"";width:16px;height:16px;flex:none;background:currentColor;
+    -webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+  #route-friendlies .fr-grid .panel:first-child > .fr-pill::before{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='6' width='20' height='12' rx='6'/%3E%3Cpath d='M7 12h4M9 10v4'/%3E%3Ccircle cx='15.5' cy='11' r='1'/%3E%3Ccircle cx='17.5' cy='13' r='1'/%3E%3C/svg%3E")}
+  #fr-create::before{width:18px;height:18px;--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7'/%3E%3C/svg%3E")}
+
+  /* ---------- player profile + rankings ---------- */
+  #route-player{--pf-cyan:#19D3F3;--pf-cyan-2:#7FEAFF;--pf-cyan-soft:rgba(25,211,243,.12);--pf-cyan-line:rgba(25,211,243,.42);
+    --pf-blue:#3678FF;--pf-mag:#F53678;--pf-mag-soft:rgba(245,54,120,.13);--pf-mag-line:rgba(245,54,120,.48)}
+  #route-rankings tbody tr:nth-child(-n+3) td.rank{color:var(--cyan)}
+
+  /* ---------- membership, account, legal, footer ---------- */
+  .plan{background:var(--card-bg);border-color:var(--cyan-line);box-shadow:0 0 60px -24px rgba(25,211,243,.55)}
+  .plan::after{background:radial-gradient(circle,rgba(25,211,243,.22),transparent 70%)}
+  .plan .amt{color:#fff}
+  .faq summary::after{color:var(--cyan)}
+  .badge-ok{color:var(--cyan)}
+  .legal .admin{background:var(--cyan-soft);border-color:var(--cyan-line)}
+  .acct-ev .go{color:var(--cyan)}
+  footer{background:#060B16;border-top-color:var(--line)}
+  .user-menu-dropdown{background:#0E1B33;border-color:var(--line)}
+  .user-menu-dropdown a:hover,.user-menu-dropdown button:hover{background:var(--cyan-soft)}
+  .toast-pop{background:#0E1B33;border-color:var(--line)}
+
+  /* ---------- pass 2: depth — lit top edges, inner light, soft shadow (all pages) ---------- */
+  .card,.panel{background:radial-gradient(120% 60% at 50% -12%,rgba(54,120,255,.14),transparent 62%),var(--card-bg);
+    box-shadow:0 26px 60px -32px rgba(0,0,0,.95),inset 0 1px 0 rgba(160,200,255,.10),inset 0 0 0 1px rgba(255,255,255,.015)}
+  .card.clk:hover{box-shadow:0 30px 70px -30px rgba(0,0,0,.95),0 0 44px -18px rgba(25,211,243,.55),inset 0 1px 0 rgba(160,220,255,.18)}
+  .tbl-wrap{box-shadow:0 26px 60px -34px rgba(0,0,0,.95),inset 0 1px 0 rgba(160,200,255,.08)}
+  thead th{background:linear-gradient(180deg,#132447,#0D1A33)}
+  .statband .s,.step{background:radial-gradient(100% 70% at 50% -10%,rgba(54,120,255,.12),transparent 65%),linear-gradient(180deg,#101D35,#0B1528)}
+
+  /* ---------- pass 2: LIVE — the heading lit like a sign, a light streak behind it ---------- */
+  #route-live .tl{position:relative}
+  #route-live .tl-word{position:relative}
+  /* a faint, blurred glimpse of the darts artwork behind LIVE — atmosphere, not a picture */
+  .tl-bg .e{position:absolute;inset:-4% -6% auto auto;width:min(1300px,95vw);aspect-ratio:1672/941;border-radius:0;filter:blur(3px) saturate(1.1);opacity:.22;
+    background:url(assets/home-hero.webp) right top/100% 100% no-repeat;animation:none;
+    -webkit-mask:radial-gradient(70% 70% at 80% 40%,#000 30%,transparent 75%);mask:radial-gradient(70% 70% at 80% 40%,#000 30%,transparent 75%)}
+  #route-live .tl-word::after{content:"";position:absolute;left:50%;top:50%;width:min(900px,90vw);height:70%;transform:translate(-50%,-50%);z-index:-2;
+    background:radial-gradient(closest-side,rgba(25,211,243,.22),rgba(54,120,255,.10) 55%,transparent)}
+  .tl-txt{filter:drop-shadow(0 0 18px rgba(25,211,243,.55)) drop-shadow(0 0 60px rgba(25,211,243,.35))}
+  .tl-txt2{text-shadow:0 0 22px rgba(120,170,255,.45),0 0 70px rgba(54,120,255,.35)}
+  .tl-beacon{box-shadow:0 0 0 0 rgba(245,54,120,.6),0 0 30px rgba(245,54,120,.95),0 0 70px rgba(245,54,120,.6)}
+  .tl-card{background:radial-gradient(120% 60% at 50% -10%,color-mix(in srgb,var(--tl-acc) 22%,transparent),transparent 62%) padding-box,
+               linear-gradient(165deg,rgba(19,36,74,.92),rgba(11,21,40,.95)) padding-box,
+               linear-gradient(140deg,var(--tl-acc),rgba(120,150,210,.16) 45%,var(--tl-acc2)) border-box;
+    box-shadow:0 26px 60px -30px rgba(0,0,0,.95),0 0 46px -22px var(--tl-acc),inset 0 1px 0 rgba(255,255,255,.08)}
+  .tl-card h3{font-size:22px}
+  .tl-now b{background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--tl-acc) 60%,#fff));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;
+    filter:drop-shadow(0 0 16px color-mix(in srgb,var(--tl-acc) 70%,transparent))}
+  .tl-chip.on{box-shadow:0 0 24px -6px rgba(25,211,243,.8)}
+
+  /* ---------- pass 2: player profile header lighting ---------- */
+  #route-player .pf-hero{box-shadow:0 30px 70px -34px rgba(0,0,0,.95),0 0 70px -30px rgba(25,211,243,.6),inset 0 1px 0 rgba(160,220,255,.16)}
+
+  /* ---------- profile: national + regional rank ---------- */
+  .pf-ranks{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 2px}
+  .pf-rank{display:inline-flex;align-items:baseline;gap:8px;padding:7px 14px 7px 12px;border-radius:12px;
+    border:1px solid rgba(25,211,243,.45);background:linear-gradient(180deg,rgba(25,211,243,.14),rgba(25,211,243,.04));box-shadow:0 0 24px -10px rgba(25,211,243,.7)}
+  .pf-rank b{font-family:var(--display);font-weight:900;font-size:22px;line-height:1;color:#fff}
+  .pf-rank i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+  .pf-rank.reg{border-color:rgba(91,147,255,.45);background:linear-gradient(180deg,rgba(54,120,255,.16),rgba(54,120,255,.04));box-shadow:0 0 24px -10px rgba(54,120,255,.7)}
+  .pf-rank.reg i{color:#9DBBFF}
+
+  /* ---------- rankings table: region column on wide screens, under the name on phones ---------- */
+  .rk-reg{display:none}
+
+  /* =====================================================================
+     Phones (2026-10 mobile pass): every page as polished as desktop.
+     Layout only adapts below 720px; nothing is hidden that isn't shown
+     another way on the same screen.
+     ===================================================================== */
+  @media(max-width:720px){
+    /* comfortable tap targets; 16px form text so iPhones don't zoom in on focus */
+    .burger{width:44px;height:44px;border-radius:12px}
+    nav.main.open a{padding:14px 14px;font-size:16px}
+    select,input,textarea{font-size:16px}
+    .btn{min-height:44px}
+    .btn-sm{min-height:40px}
+    section.block{padding:36px 0}
+    .section-head{margin-bottom:22px}
+
+    /* rankings: one column, compact table */
+    .rk-grid{grid-template-columns:1fr !important;gap:18px}
+    .rk-table .rk-region,.rk-table .rk-events{display:none}
+    .rk-table .rk-reg{display:block;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);margin-top:3px}
+    .rk-table thead th,.rk-table tbody td{padding:13px 12px}
+    .rk-table td.rank{width:44px;font-size:20px}
+    .rk-table .rk-name strong{display:block;font-size:15.5px}
+
+    /* profile header: tighter, ranks readable */
+    #route-player .pf-hero h2{font-size:clamp(30px,9vw,40px)}
+    .pf-rank{padding:6px 11px}
+    .pf-rank b{font-size:19px}
+    .pf-rank i{font-size:10px}
+
+    /* profile tables become stacked rows (event on top; opponent / score / result below) */
+    .pf-hist.pf-matches,.pf-matches tbody{display:block}
+    .pf-matches thead{display:none}
+    .pf-matches tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px 14px;padding:12px 14px;margin:0 0 8px;
+      border-radius:12px;background:rgba(7,16,35,.55);border:1px solid rgba(120,160,230,.12);border-left:3px solid rgba(120,160,230,.25)}
+    .pf-matches tbody tr.win{background:rgba(25,211,243,.06);border-color:rgba(25,211,243,.22);border-left-color:var(--cyan)}
+    .pf-matches tbody td{display:block;background:none !important;border:0 !important;padding:0 !important;border-radius:0 !important}
+    .pf-matches td.ev{grid-column:1 / -1}
+    .pf-matches td.ev strong{display:inline;font-size:15px}
+    .pf-matches td.ev span{margin-left:8px}
+    .pf-matches td:nth-child(2){display:none}
+
+    /* homepage steps: two per row reads better than a long single column */
+    #route-home .steps{grid-template-columns:1fr 1fr}
+    #route-home .step{padding:18px 16px}
+    #route-home .step h4{font-size:17px;margin:10px 0 6px}
+    #route-home .step p{font-size:13.5px}
+
+    /* Friendlies stats: two per row so numbers aren't squeezed */
+    .fr-stats{grid-template-columns:repeat(2,1fr)}
+
+    /* footer: two columns, larger links */
+    .foot-links{display:grid;grid-template-columns:1fr 1fr;gap:22px 28px;width:100%}
+    .foot-col a{font-size:15px;padding:3px 0}
+  }
+  @media(max-width:420px){
+    #route-home .home-hero h1.home-h1{font-size:12.2vw}        /* each headline line stays on one line */
+  }
+  @media(max-width:380px){
+    #route-player .pf-hero{grid-template-columns:1fr}
+    #route-player .pf-hero .ava.lg{width:56px;height:56px;font-size:20px;border-radius:14px}
+    #route-friendlies .fr-join{flex-wrap:wrap}
+    #route-friendlies .fr-join input{flex:1 1 100%}
+    #route-friendlies .fr-join .btn{flex:1 1 100%}
+    #route-home .steps{grid-template-columns:1fr}
+    #route-home .home-stats{gap:10px}
+    #route-home .hs{padding:14px 14px 12px}
+  }
+  /* ===== Pass 5 (2026-10): event lobby, membership, account settings — index.html only ===== */
+  /* ---------- membership: free vs membership ---------- */
+  #route-membership .mem-head{text-align:center;max-width:640px;margin:0 auto}
+  #route-membership .mem-head h2{margin-top:10px}
+  #route-membership .mem-head .lede{margin:14px auto 0}
+  .mem-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;margin:40px auto 0;align-items:stretch}
+  .mem-card{position:relative;display:flex;flex-direction:column;padding:30px 28px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,29,53,.85),rgba(11,21,40,.9))}
+  .mem-card .pill{align-self:flex-start}
+  .mem-card .amt{font-family:var(--display);font-weight:900;font-size:60px;line-height:1;margin:16px 0 8px;color:#fff}
+  .mem-card .amt span{font-size:18px;color:var(--muted);font-weight:500}
+  .mem-note{color:var(--muted-2);margin:0;font-size:14.5px}
+  .mem-card .incl{flex:1;margin-top:22px}
+  .mem-btn{width:100%;margin-top:26px;justify-content:center;text-align:center}
+  .mem-pro{border-color:var(--cyan-line);box-shadow:0 0 0 1px rgba(25,211,243,.25),0 0 70px -24px rgba(25,211,243,.7)}
+  .mem-flag{position:absolute;top:30px;right:24px;padding:6px 12px;border-radius:999px;background:var(--btn-blue);color:#fff;font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;box-shadow:var(--glow-blue);z-index:1}
+  .mem-foot{text-align:center;color:var(--muted-2);font-size:14px;margin:22px auto 0;max-width:640px}
+  @media (max-width:720px){
+    .mem-cards{grid-template-columns:1fr;gap:28px;margin-top:30px}
+    .mem-pro{order:-1}
+    .mem-card{padding:26px 20px}
+    .mem-card .amt{font-size:52px}
+    .mem-flag{position:static;align-self:flex-start;margin-bottom:12px}
+  }
+  /* ---------- account settings ---------- */
+  .acct{display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start;margin-top:8px}
+  .acct-nav{display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--line);border-radius:16px;background:rgba(11,21,40,.75);position:sticky;top:110px}
+  .acct-nav button{appearance:none;border:0;background:transparent;color:var(--muted-2);display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;font:600 14.5px/1.2 inherit;text-align:left;cursor:pointer;min-height:44px;white-space:nowrap}
+  .acct-nav svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .acct-nav button:hover{color:var(--ivory);background:rgba(54,120,255,.08)}
+  .acct-nav button.on{color:#fff;background:linear-gradient(90deg,rgba(54,120,255,.32),rgba(25,211,243,.10));box-shadow:inset 3px 0 0 var(--cyan)}
+  .acct-nav button.on svg{color:var(--cyan)}
+  .acct-nav button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .acct-pane{min-width:0}
+  .acct-pane h3{font-size:21px;margin:0 0 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .acct-field{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;padding:14px 0;border-top:1px solid var(--line-soft)}
+  .acct-field:first-of-type{border-top:0}
+  .acct-field .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .acct-field .v{font-weight:600;color:var(--ivory);min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+  .acct-field select{max-width:320px;width:100%}
+  .acct-help{color:var(--muted);font-size:12.5px;font-weight:400;margin:0}
+  .acct-soon{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
+  .acct-btn{margin-top:18px;width:auto;min-width:200px}
+  #acct-pw-form{display:flex;flex-direction:column;gap:14px;max-width:420px}
+  #acct-pw-form input{width:100%}
+  .acct-msg{min-height:1.2em;margin:0;font-size:13.5px}
+  .acct-msg.ok{color:#5BE3A6}
+  .acct-msg.bad{color:#FF8FA9}
+  @media (max-width:720px){
+    .acct{grid-template-columns:1fr;gap:14px}
+    .acct-nav{flex-direction:row;flex-wrap:wrap;position:static;padding:6px}
+    .acct-nav::-webkit-scrollbar{display:none}
+    .acct-nav button{padding:10px 12px;font-size:14px;flex:1 1 auto;justify-content:center}
+    .acct-nav button.on{box-shadow:inset 0 -3px 0 var(--cyan)}
+    .acct-field{grid-template-columns:1fr;gap:6px}
+    .acct-btn{width:100%}
+  }
+  /* ===== Pass 6 (2026-10): one Tournza design system — compact headings, tighter pages,
+     and the tab-based event page. index.html only, loaded last. Homepage, Friendlies,
+     Players and player profiles keep their own (approved) treatment. ===== */
+  :root{
+    --r-card:12px;
+    --r-ctl:10px;                                   /* buttons, inputs, tabs (references: rounded rectangles) */
+    --h-page:clamp(30px,3.5vw,46px);                /* page title: Archivo 900, uppercase (references) */
+    --h-event:clamp(28px,3.1vw,40px);               /* event name: Archivo 900, as written */
+    --h-sub:clamp(22px,2.4vw,28px);
+    --btn-blue:linear-gradient(180deg,#3E86FF 0%,#1F62F7 100%);   /* brighter, more defined blue (white text 4.9:1) */
+    --glow-blue:0 10px 28px -10px rgba(40,110,255,.95),inset 0 1px 0 rgba(255,255,255,.22);
+    --card-surface:linear-gradient(180deg,rgba(24,44,84,.94) 0%,rgba(13,25,48,.96) 55%,rgba(10,20,39,.97) 100%);
+    --card-line:rgba(70,132,255,.34);
+    --card-shadow:inset 0 1px 0 rgba(150,190,255,.10),0 20px 44px -28px rgba(0,0,0,.95);
+  }
+  /* which pages share this system (home, Friendlies, Players and profiles keep their approved look) */
+  /* ---------- lit page band: electric-blue light and angular beams. NO dartboard art here —
+     the artwork belongs to the homepage and Friendlies only. ---------- */
+  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{position:relative;isolation:isolate}
+  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{
+    content:"";position:absolute;z-index:-1;pointer-events:none;top:0;left:calc(50% - 50vw);width:100vw;height:520px;
+    background:
+      radial-gradient(700px 340px at 78% -10%,rgba(46,112,255,.55),transparent 70%),
+      radial-gradient(360px 220px at 97% 18%,rgba(25,211,243,.20),transparent 70%),
+      radial-gradient(560px 280px at 4% -12%,rgba(46,112,255,.18),transparent 70%),
+      linear-gradient(115deg,transparent 0 52%,rgba(90,150,255,.75) 52% 52.1%,transparent 52.1% 100%),
+      linear-gradient(115deg,transparent 0 54%,rgba(31,98,247,.30) 54% 63%,rgba(31,98,247,.12) 63% 71%,transparent 71% 100%),
+      linear-gradient(115deg,transparent 0 76%,rgba(46,112,255,.16) 76% 86%,transparent 86% 100%),
+      linear-gradient(115deg,transparent 0 88%,rgba(25,211,243,.55) 88% 88.08%,transparent 88.08% 100%),
+      linear-gradient(-65deg,transparent 0 70%,rgba(46,112,255,.10) 70% 78%,transparent 78% 100%),
+      linear-gradient(180deg,rgba(14,30,64,.65),rgba(5,9,18,0));
+    -webkit-mask:linear-gradient(180deg,#000 50%,transparent);mask:linear-gradient(180deg,#000 50%,transparent);
+  }
+  /* ---------- headings: Archivo 900, white, uppercase page titles (as the references) ---------- */
+  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) :is(h1,h2){
+    background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff;-webkit-text-fill-color:#fff;
+  }
+  .route:is(#route-events,#route-rankings,#route-account) .section-head h2,
+  .route#route-membership .mem-head h2{
+    font-size:var(--h-page);font-weight:900;letter-spacing:-.005em;line-height:.98;text-transform:uppercase;text-shadow:0 0 34px rgba(54,120,255,.5)}
+  .route:is(#route-join,#route-privacy,#route-terms,#route-rules) h2[style*="margin-top"]:first-of-type{
+    font-size:var(--h-page);font-weight:900;letter-spacing:-.02em;line-height:1.02;text-shadow:0 0 30px rgba(54,120,255,.4)}
+  .route#route-event h2.evd-title,
+  .route#route-tournament .tp-head h2{font-size:var(--h-event);font-weight:900;letter-spacing:-.015em;line-height:1.05;text-shadow:0 0 30px rgba(54,120,255,.4)}
+  .route:is(#route-membership,#route-join,#route-privacy,#route-terms,#route-rules) h2[style*="margin-top"]:not(:first-of-type),
+  .route#route-membership .mem-head ~ div h2{font-size:var(--h-sub);text-transform:none}
+  .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:38px}
+  .route:is(#route-events,#route-rankings,#route-account) .section-head{margin-bottom:24px}
+  .route:is(#route-events,#route-rankings,#route-account) .section-head .lede{font-size:15.5px;margin-top:10px;max-width:56ch}
+  .route .eyebrow{font-weight:500;letter-spacing:.24em}
+  /* LIVE keeps its word-mark, just a little smaller */
+  #route-live .tl-word{font-size:clamp(34px,5.4vw,64px)}
+  /* ---------- cards: layered navy, defined blue border, top highlight ---------- */
+  .route:not(#route-home):not(#route-friendlies):not(#route-player):not(#route-players) :is(.panel,.ev-card,.mem-card,.tbl-wrap){
+    background:var(--card-surface);border:1px solid var(--card-line);border-radius:var(--r-card);box-shadow:var(--card-shadow)}
+  .route#route-events .ev-card:hover{border-color:var(--cyan-line);box-shadow:var(--card-shadow),0 0 34px -16px rgba(25,211,243,.7)}
+  .route:not(#route-home):not(#route-friendlies) .panel h3{letter-spacing:-.005em}
+  /* ---------- controls: buttons, selects, pills (shared everywhere except the approved pages' own) ---------- */
+  .route:not(#route-home):not(#route-friendlies) .btn,header .btn{border-radius:var(--r-ctl)}
+  .btn-primary{background:var(--btn-blue);box-shadow:var(--glow-blue)}
+  .btn-primary:hover{background:linear-gradient(180deg,#579AFF,#2B6DFA)}
+  .btn-ghost{background:rgba(14,27,52,.8);border-color:rgba(100,150,255,.38)}
+  nav.main a{border-radius:9px}
+  nav.main a.active:not(.nav-fr){background:var(--btn-blue);box-shadow:var(--glow-blue)}
+  .route:not(#route-home):not(#route-friendlies) select{border-radius:var(--r-ctl);border:1px solid var(--card-line);
+    background-color:rgba(14,27,52,.9);color:var(--ivory);min-height:42px}
+  .route:not(#route-home):not(#route-friendlies) select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(25,211,243,.2)}
+  .route:not(#route-home):not(#route-friendlies) .pill{border-radius:8px;padding:5px 10px;background:rgba(14,27,52,.75)}
+  .route:not(#route-home):not(#route-friendlies) .pill.fmt{background:var(--cyan-soft)}
+  /* ---------- rankings: numbered badges, top three in gold / silver / bronze ---------- */
+  #route-rankings th{font-weight:500}
+  #route-rankings td.rank .rk-n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font:900 14px/1 var(--display);
+    color:#fff;background:rgba(54,120,255,.18);border:1px solid var(--card-line);text-shadow:none}
+  #route-rankings tbody tr:nth-child(1) td.rank .rk-n{background:linear-gradient(180deg,#FFD66B,#D49A1E);border-color:transparent;color:#2A1A00}
+  #route-rankings tbody tr:nth-child(2) td.rank .rk-n{background:linear-gradient(180deg,#E8EEF8,#9EABC2);border-color:transparent;color:#18202E}
+  #route-rankings tbody tr:nth-child(3) td.rank .rk-n{background:linear-gradient(180deg,#F0A36A,#B4602A);border-color:transparent;color:#2A1200}
+  #route-rankings tbody tr:hover td{background:rgba(54,120,255,.08)}
+
+  /* ---------- event page ---------- */
+  #event-detail .evd-head{margin:0}
+  .evd-back{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;margin:0 0 18px;border:1px solid var(--card-line);border-radius:var(--r-ctl);
+    font:500 12.5px/1 var(--mono);color:var(--muted-2);background:rgba(11,21,40,.6);text-decoration:none;min-height:34px}
+  .evd-back:hover{color:#fff;border-color:var(--cyan-line)}
+  .route#route-event h2.evd-title{margin:0 0 12px;max-width:none}
+  .evd-pills{display:flex;gap:8px;flex-wrap:wrap}
+  .evd-pills .pill{font-size:11.5px;padding:6px 11px}
+  #evd-phase.live{color:#FF8FB1;border-color:var(--pink-line);background:var(--pink-soft)}
+  #evd-phase.green{color:#5BE3A6;border-color:rgba(91,227,166,.45)}
+  .evd-banner:not(:empty){margin:16px 0 0}
+  .evd-banner .ev-golive{margin:0}
+  #event-detail .ev-golive{background:linear-gradient(100deg,rgba(25,211,243,.20),rgba(54,120,255,.20));border-color:var(--cyan-line);box-shadow:0 0 30px -14px rgba(25,211,243,.8)}
+  #event-detail .ev-golive .dot{background:var(--cyan)}
+  #event-detail .ev-golive .go{color:#fff;background:var(--btn-blue);padding:8px 14px;border-radius:999px;box-shadow:var(--glow-blue)}
+  .evd-tabs{display:flex;gap:4px;margin:20px 0 18px;padding:5px;border:1px solid var(--card-line);border-radius:12px;background:rgba(10,20,39,.85);box-shadow:var(--card-shadow);
+    overflow-x:auto;scrollbar-width:none;scroll-margin-top:90px}
+  .evd-tabs::-webkit-scrollbar{display:none}
+  .evd-tab{appearance:none;border:0;background:transparent;color:var(--muted-2);font:700 14px/1 var(--body);padding:11px 18px;border-radius:9px;
+    cursor:pointer;white-space:nowrap;min-height:42px;flex:0 0 auto;min-width:118px}
+  .evd-tab[hidden]{display:none}
+  .evd-tab .c{display:inline-block;min-width:20px;padding:2px 6px;margin-left:4px;border-radius:999px;background:var(--cyan-soft);color:var(--cyan);font-size:11.5px}
+  .evd-tab:hover{color:#fff}
+  .evd-tab.on{background:var(--btn-blue);color:#fff;box-shadow:var(--glow-blue)}
+  .evd-tab.on .c{background:rgba(255,255,255,.2);color:#fff}
+  .evd-tab:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .evd-pane .panel{padding:20px 22px}
+  .evd-pane .panel h3{font-size:17px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+  .evd-pane .panel + .panel{margin-top:14px}
+  .evd-count{margin-left:auto;font:500 12px/1 var(--mono);color:var(--cyan)}
+  /* overview: info left, players + join right */
+  .evd-ov{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:18px;align-items:start}
+  .evd-list .evd-pl:nth-child(even) .n{background:linear-gradient(180deg,#8A5CFF,#6236E8)}
+  .evd-ov-r{display:flex;flex-direction:column;gap:14px}
+  .evd-ov-r #ev-me:empty{display:none}
+  .evd-ov-r .ev-me{margin:0}
+  .evd-info .ev-night{margin:0 0 4px}
+  .evd-info .ev-clock{margin:0 0 6px}
+  .evd-info .ev-clock > div{padding:9px 12px}
+  .evd-info .ev-clock .v{font-size:16px}
+  .evd-info .ev-night .panel{padding:14px 16px;margin:8px 0;background:rgba(214,59,67,.06);box-shadow:none}
+  .evd-row{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--line-soft)}
+  .evd-rows .evd-row:first-child{border-top:0}
+  .evd-ic{width:34px;height:34px;padding:7px;border-radius:9px;background:var(--cyan-soft);color:var(--cyan);border:1px solid rgba(25,211,243,.28)}
+  .evd-row .k{font:500 10.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .evd-row .v{font-weight:600;color:var(--ivory);font-size:14.5px;line-height:1.35;margin-top:2px}
+  .evd-split{color:var(--muted-2);font-weight:500;white-space:nowrap}
+  .evd-fine{margin:8px 0 0}
+  .evd-lnk{appearance:none;border:0;background:none;padding:0;color:var(--blue-2);font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .evd-lnk:hover{color:var(--cyan)}
+  .evd-all{display:block;margin:10px 0 0;font-size:13.5px;text-decoration:none}
+  /* player rows: numbered blue badge, name, region (as the references) */
+  .evd-list{display:flex;flex-direction:column}
+  .evd-pl{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:8px 6px;border-top:1px solid var(--line-soft);
+    color:var(--ivory);text-decoration:none;border-radius:8px;min-height:44px}
+  .evd-list > .evd-pl:first-child{border-top:0}
+  a.evd-pl:hover{background:rgba(54,120,255,.10)}
+  .evd-pl .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--btn-blue);border:1px solid rgba(255,255,255,.18);color:#fff;font:800 12px/1 var(--display);box-shadow:0 4px 12px -4px rgba(54,120,255,.8)}
+  .evd-pl .nm{font-weight:600;font-size:14.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .evd-pl .rg{color:var(--muted);font-size:11.5px}
+  @media (min-width:900px){ .evd-list-full{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+    .evd-list-full > .evd-pl:nth-child(2){border-top:0} }
+  .evd-join{margin-top:14px;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .evd-price{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .evd-price .amt{font-family:var(--display);font-weight:900;font-size:30px;line-height:1;color:#fff}
+  .evd-price .lbl{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .evd-cta{width:100%;margin-top:14px}
+  .evd-cta2{width:100%;margin-top:8px}
+  .evd-side{border-color:var(--cyan-line) !important;box-shadow:0 0 44px -24px rgba(25,211,243,.7) !important}
+  /* fixtures + results lists */
+  .evd-fx{list-style:none;margin:0;padding:0}
+  .evd-fx li{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:10px 4px;border-top:1px solid var(--line-soft);font-size:14px}
+  .evd-fx li:first-child{border-top:0}
+  .evd-fx .st{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
+  .evd-fx .who{min-width:0;color:var(--ivory-dim)}
+  .evd-fx .who .w{color:#fff;font-weight:700}
+  .evd-fx .who .v{color:var(--muted);margin:0 2px}
+  .evd-fx .tbd{color:var(--muted)}
+  .evd-fx .sc{font-family:var(--mono);color:#fff;white-space:nowrap}
+  @media (max-width:720px){
+    .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block::before{height:420px}
+  }
+  /* phones: a sticky join bar (only while the join box itself is off screen) */
+  .evd-mbar{display:none}
+  @media (max-width:720px){
+    .evd-mbar:not([hidden]){display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:40;align-items:center;gap:12px;
+      padding:10px 10px 10px 16px;border-radius:14px;border:1px solid var(--card-line);background:rgba(10,20,39,.94);backdrop-filter:blur(12px);
+      box-shadow:0 16px 40px -12px rgba(0,0,0,.9),0 0 30px -14px rgba(54,120,255,.8)}
+    .evd-mbar .p{display:flex;flex-direction:column;line-height:1.1}
+    .evd-mbar .p strong{font:900 20px/1 var(--display);color:#fff}
+    .evd-mbar .p span{font:500 10.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .evd-mbar .btn{margin-left:auto;min-height:44px;padding:0 18px}
+    .route#route-event h2.evd-title{font-size:clamp(26px,7.4vw,32px)}
+    .evd-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -24px;padding:0 24px}
+    .evd-pills::-webkit-scrollbar{display:none}
+    .evd-pills .pill{flex:none}
+    .evd-tabs{margin:16px -24px 14px;border-radius:0;border-left:0;border-right:0;padding:5px 20px}
+    .evd-ov{grid-template-columns:1fr}
+    .evd-ov-r{order:-1}
+    .evd-side{display:flex;flex-direction:column}
+    .evd-side .evd-join{order:-1;margin:0 0 14px;padding:0 0 16px;border-top:0;border-bottom:1px solid var(--line-soft)}
+    .evd-tab{flex:0 0 auto;padding:11px 14px}
+    .evd-pane .panel{padding:16px}
+    .evd-fx li{grid-template-columns:1fr auto;row-gap:2px}
+    .evd-fx .st{grid-column:1/-1}
+    .route:is(#route-events,#route-event,#route-rankings,#route-membership,#route-account,#route-join,#route-rules,#route-privacy,#route-terms,#route-tournament) > section.block{padding-top:22px}
+    .evd-split{white-space:normal}
+  }
+  /* ===== Pass 8: deliberate emphasis — deeper base, figures that stand out, live that pulses ===== */
+  body:not(.fr-on):not(.tl-on):not(:has(#route-home.active)){background-color:#050A15}   /* Live, home and Friendlies keep their approved look */
+  /* prices and key figures: white-to-cyan, the one place numbers glow */
+  .route#route-events .ev-card .price,.evd-price .amt,.mem-pro .amt,#route-account .acct-pane .stat-line strong{
+    background:linear-gradient(180deg,#FFFFFF 0%,#BFF6FF 55%,#19D3F3 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 14px rgba(25,211,243,.28))}
+  .route#route-events .ev-card .price small,.mem-pro .amt span{-webkit-text-fill-color:var(--muted);filter:none}
+  .evd-price .amt{font-size:34px}
+  #rank-body td:nth-child(4){font:800 17px/1 var(--display);color:var(--cyan);text-shadow:0 0 16px rgba(25,211,243,.35)}
+  /* live: pink, pulsing — only where something is actually live */
+  .route:not(#route-home):not(#route-friendlies):not(#route-live) .pill.live{color:#FF9DBD;border-color:rgba(245,54,120,.6);background:rgba(245,54,120,.14);box-shadow:0 0 18px -6px rgba(245,54,120,.85)}
+  /* active tab: lifted blue with a fine cyan underline */
+  .evd-tab.on{box-shadow:var(--glow-blue),inset 0 -2px 0 rgba(25,211,243,.85)}
+  /* clickable cards lift a touch */
+  .route#route-events .ev-card{transition:transform .15s,border-color .15s,box-shadow .15s}
+  .route#route-events .ev-card:hover{transform:translateY(-2px)}
+  @media (prefers-reduced-motion:reduce){ .route#route-events .ev-card:hover{transform:none} }
+  /* ---------- player profile: closer to the reference (white name, rank + region line, cyan points) ---------- */
+  #route-player .pf-hero h2{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff;-webkit-text-fill-color:#fff;
+    font-size:clamp(34px,4.4vw,56px);letter-spacing:-.02em;line-height:1;text-shadow:0 0 30px rgba(54,120,255,.45)}
+  #route-player .pf-hero{background:radial-gradient(120% 140% at 0% 0%,rgba(46,112,255,.42),transparent 55%),
+      radial-gradient(70% 120% at 100% 100%,rgba(25,211,243,.10),transparent 60%),linear-gradient(120deg,#0d1f4c,#09152f 60%,#060f22)}
+  #route-player .pf-hero::after{background:linear-gradient(90deg,#3E86FF,#19D3F3 60%,rgba(25,211,243,0))}
+  #route-player .pf-tabs [aria-selected="true"]{background:var(--btn-blue);box-shadow:var(--glow-blue)}
+  @media (max-width:720px){ #route-player .pf-hero h2{font-size:clamp(30px,9vw,40px)} }
+
 </style>
 </head>
 <body>
@@ -869,64 +1585,44 @@
 
 <main class="wrap">
 
-<!-- ================= HOME ================= -->
+<!-- ================= HOME (2026-10 redesign: compact landing page) ================= -->
 <div class="route active" id="route-home">
-  <section class="hero">
-    <div class="hero-grid">
-      <div>
-        <span class="eyebrow">UK Regional Darts · Season 2026</span>
-        <h1>Compete<br>this week.</h1>
-        <p class="lede">Verified players, professional events and real rankings. Find an event in your region and register at the oche in seconds.</p>
-        <div class="hero-cta">
-          <button class="btn btn-primary" data-link="events">Browse events</button>
-          <button class="btn btn-ghost" data-link="rankings">View rankings</button>
-        </div>
-        <div class="hero-facts">
-          <div class="fact"><div class="k">Regions live</div><div class="v">Every UK region</div></div>
-          <div class="fact"><div class="k">Check-in rule</div><div class="v">10 min before start</div></div>
-          <div class="fact"><div class="k">Membership</div><div class="v">£12 / year · £6 buy-in</div></div>
-          <div class="fact"><div class="k">Format</div><div class="v">501 · nightly · 32 players</div></div>
-        </div>
+  <section class="hero home-hero">
+    <div class="tz-art" aria-hidden="true"><div class="tz-art-img"></div></div>
+    <div class="home-copy">
+      <span class="eyebrow">UK regional darts · Season 2026</span>
+      <h1 class="home-h1"><span>Real people</span><span>Real darts</span><span class="hl">Every night</span></h1>
+      <p class="lede">Nightly online darts tournaments in every UK region. Play 501 double-out on webcam against verified players, then climb the regional rankings.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" data-link="events">View tonight’s events</button>
+        <button class="btn btn-ghost" data-link="rankings">View rankings</button>
       </div>
-      <div class="hero-side">
-        <div class="card hero-feature" id="hero-feature">
-          <p class="mono" style="color:var(--muted);font-size:13px">Loading tonight’s tournaments…</p>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <h4 style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Tonight across the UK</h4>
-          <div id="hero-tonight">
-            <p class="mono" style="color:var(--muted);font-size:13px">Loading…</p>
-          </div>
-        </div>
-      </div>
+    </div>
+    <div class="home-stats" id="home-stats" aria-label="Tournza at a glance">
+      <div class="hs"><div class="v" id="hs-regions">—</div><div class="k">UK regions</div></div>
+      <div class="hs"><div class="v" id="hs-tonight">—</div><div class="k">Tournaments tonight</div></div>
+      <div class="hs"><div class="v" id="hs-players">—</div><div class="k">Players entered tonight</div></div>
+      <div class="hs"><div class="v">£6</div><div class="k">Buy-in · 501 double-out</div></div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block home-tonight">
+    <div class="section-head">
+      <div><span class="eyebrow">Tonight’s tournaments</span><h2>Playing tonight</h2></div>
+      <button class="btn btn-ghost btn-sm" data-link="events">All events →</button>
+    </div>
+    <div id="home-events"></div>
+  </section>
+
+  <section class="block home-how">
     <div class="section-head">
       <div><span class="eyebrow">How Tournza works</span><h2>Built for serious<br>regional competition</h2></div>
     </div>
     <div class="steps">
       <div class="step"><div class="n">01</div><h4>Verify</h4><p>One membership, one player profile, verified eligibility before you throw.</p></div>
-      <div class="step"><div class="n">02</div><h4>Enter</h4><p>Pick tonight's tournament in your region and pay the £6 buy-in — capped at 32 players.</p></div>
-      <div class="step"><div class="n">03</div><h4>Check in</h4><p>Check-in closes ten minutes before the start time. Cam on and ready to play.</p></div>
+      <div class="step"><div class="n">02</div><h4>Enter</h4><p>Pick tonight’s tournament in your region and pay the £6 buy-in before 19:15. Capped at 32 players.</p></div>
+      <div class="step"><div class="n">03</div><h4>Check in</h4><p>Check in between 19:00 and 19:20, cam on. The draw is at 19:30 and the first matches start straight after.</p></div>
       <div class="step"><div class="n">04</div><h4>Climb</h4><p>Results feed straight into transparent regional rankings. No politics.</p></div>
-    </div>
-  </section>
-
-  <section class="block">
-    <div class="section-head">
-      <div><span class="eyebrow">Tonight's tournaments</span><h2>Playing tonight</h2></div>
-      <button class="btn btn-ghost btn-sm" data-link="events">All regions →</button>
-    </div>
-    <div class="grid g3" id="home-events"></div>
-  </section>
-
-  <section class="block">
-    <div class="statband">
-      <div class="s"><div class="big">12</div><div class="lab">Tournaments every night</div></div>
-      <div class="s"><div class="big">32</div><div class="lab">Players per event</div></div>
-      <div class="s"><div class="big">£6</div><div class="lab">Buy-in per event</div></div>
     </div>
   </section>
 </div>
@@ -949,7 +1645,6 @@
 <!-- ================= EVENT DETAIL ================= -->
 <div class="route" id="route-event">
   <section class="block">
-    <span class="back" data-link="events">← All events</span>
     <div id="event-detail"></div>
   </section>
 </div>
@@ -963,10 +1658,10 @@
       <div class="fld"><label class="flab" for="rank-region">Region</label>
         <select id="rank-region"><option>All regions</option></select></div>
     </div>
-    <div class="detail-grid" style="grid-template-columns:1.6fr .9fr">
+    <div class="detail-grid rk-grid">
       <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Player</th><th>Region</th><th class="num">Points</th><th class="num">Wins</th><th class="num">Events</th></tr></thead>
+        <table class="rk-table">
+          <thead><tr><th>#</th><th>Player</th><th class="rk-region">Region</th><th class="num">Points</th><th class="num">Wins</th><th class="num rk-events">Events</th></tr></thead>
           <tbody id="rank-body"></tbody>
         </table>
       </div>
@@ -1009,6 +1704,7 @@
      data, and nothing in the tournament pages reads friendly data. -->
 <div class="route" id="route-friendlies">
   <section class="block">
+    <div class="tz-art" aria-hidden="true"><div class="tz-art-img"></div></div>
     <span class="eyebrow">Friendlies</span>
     <div class="section-head">
       <div>
@@ -1040,7 +1736,7 @@
           <button class="btn btn-primary" id="fr-create" style="width:100%">Create friendly &amp; get a code</button>
           <div class="fr-or">or join one</div>
           <form class="fr-join" id="fr-join-form" autocomplete="off">
-            <input id="fr-code" maxlength="6" placeholder="CODE" aria-label="Friendly code" autocapitalize="characters" spellcheck="false">
+            <input id="fr-code" maxlength="6" placeholder="Enter friendly code" aria-label="Friendly code" autocapitalize="characters" spellcheck="false">
             <button class="btn btn-ghost" type="submit">Join</button>
           </form>
           <div class="fr-err" id="fr-err" role="alert"></div>
@@ -1078,10 +1774,11 @@
 
 <!-- ================= LIVE (Stage 7) ================= -->
 <!-- the LIVE page's full-screen colour (outside the route so it covers the whole window) -->
-<div class="tl-bg" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
+<div class="tl-bg" aria-hidden="true"><span class="e"></span><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
 <div class="route" id="route-live">
   <section class="block tl">
-    <h1 class="tl-word"><span class="tl-wrap"><span class="tl-beacon" aria-hidden="true"></span><span class="tl-txt">LIVE</span></span></h1>
+    <h1 class="tl-word"><span class="tl-wrap"><span class="tl-beacon" aria-hidden="true"></span><span class="tl-txt">LIVE</span> <span class="tl-txt2">MATCHES</span></span></h1>
+    <p class="tl-sub">Watch live darts matches from across the UK</p>
     <div class="tl-bar" aria-hidden="true"></div>
     <p class="tl-count" id="tl-count" aria-live="polite"></p>
     <div class="tl-filter" id="tl-filter" role="group" aria-label="Filter by region"></div>
@@ -1092,23 +1789,33 @@
 <!-- ================= MEMBERSHIP ================= -->
 <div class="route" id="route-membership">
   <section class="block">
-    <span class="eyebrow">Membership</span>
-    <div class="price-hero">
-      <div>
-        <h2>One membership.<br>Every region.</h2>
-        <p class="lede" style="margin-top:18px">Tournza Standard covers verification, event entry and ranking eligibility for a full season. No tiers, no upsells — everyone throws on the same terms.</p>
-        <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="membership-buy-btn" data-checkout="1">Join for £12</button>
-          <button class="btn btn-ghost" data-link="events">See what's on</button>
-        </div>
+    <div class="mem-head">
+      <span class="eyebrow">Membership</span>
+      <h2>Choose how you play</h2>
+      <p class="lede">Browse for free. Join for £12 a year to enter tournaments.</p>
+    </div>
+    <div class="mem-cards">
+      <div class="mem-card">
+        <span class="pill">Free account</span>
+        <div class="amt">£0</div>
+        <p class="mem-note">Follow the action across every region.</p>
+        <ul class="incl mem-free">
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8.2" stroke="#8A9BC4" stroke-width="1.4"/><path d="M5.4 9.2l2.3 2.3 4.6-4.8" stroke="#8A9BC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Browse every event</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8.2" stroke="#8A9BC4" stroke-width="1.4"/><path d="M5.4 9.2l2.3 2.3 4.6-4.8" stroke="#8A9BC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rankings and player profiles</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8.2" stroke="#8A9BC4" stroke-width="1.4"/><path d="M5.4 9.2l2.3 2.3 4.6-4.8" stroke="#8A9BC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Watch live matches</span></li>
+        </ul>
+        <a class="btn btn-ghost mem-btn" id="mem-free-btn" href="login.html#signup">Create free account</a>
       </div>
-      <div class="plan">
-        <span class="pill green">Tournza Standard</span>
+      <div class="mem-card plan mem-pro">
+        <span class="mem-flag">Enter tournaments</span>
+        <span class="pill green">Tournza Membership</span>
         <div class="amt">£12<span> / year</span></div>
-        <p style="color:var(--muted-2);margin:0">£12 covers 12 months of membership.</p>
+        <p class="mem-note">£12 covers 12 months of membership.</p>
         <ul class="incl" id="incl"></ul>
+        <button class="btn btn-primary mem-btn" id="membership-buy-btn" data-checkout="1">Join for £12</button>
       </div>
     </div>
+    <p class="mem-foot">Each tournament has a <strong>£6 buy-in</strong>, paid when you enter — £5 of it goes into that night’s prize pool.</p>
 
     <div style="max-width:760px;margin:64px auto 0">
       <span class="eyebrow">Questions</span>
@@ -1179,36 +1886,59 @@
 <div class="route" id="route-account">
   <section class="block">
     <span class="eyebrow">Account</span>
-    <div class="section-head"><div><h2>Member dashboard</h2><p class="lede" id="acct-lede">Membership, verification and registrations.</p></div>
-      <button class="btn btn-ghost btn-sm" id="acct-view-profile" hidden>View public profile →</button></div>
-    <div class="dash">
-      <div class="panel">
-        <span class="pill green" id="acct-membership-status">Active</span>
-        <h3 style="margin:14px 0 12px">Membership</h3>
-        <div class="stat-line"><span class="mono" style="color:var(--muted)">Plan</span><span>Tournza Standard</span></div>
-        <div class="stat-line"><span class="mono" style="color:var(--muted)">Price</span><span>£12 / year</span></div>
-        <div class="stat-line"><span class="mono" style="color:var(--muted)">Member since</span><span id="acct-member-since">—</span></div>
-        <div class="stat-line"><span class="mono" style="color:var(--muted)">Your region</span>
-          <select id="acct-region" style="min-width:0">
-            <option value="">Not set</option>
-          </select>
+    <div class="section-head"><div><h2>Account settings</h2><p class="lede" id="acct-lede">Membership, verification and registrations.</p></div></div>
+    <div class="acct">
+      <nav class="acct-nav" role="tablist" aria-label="Account settings">
+        <button type="button" role="tab" data-acct-tab="profile" id="acct-tab-profile" aria-controls="acct-pane-profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>Profile</button>
+        <button type="button" role="tab" data-acct-tab="membership" id="acct-tab-membership" aria-controls="acct-pane-membership"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18"/></svg>Membership</button>
+        <button type="button" role="tab" data-acct-tab="verification" id="acct-tab-verification" aria-controls="acct-pane-verification"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.6 12.2l2.4 2.4 4.4-4.6"/></svg>Verification</button>
+        <button type="button" role="tab" data-acct-tab="events" id="acct-tab-events" aria-controls="acct-pane-events"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Your events</button>
+        <button type="button" role="tab" data-acct-tab="password" id="acct-tab-password" aria-controls="acct-pane-password"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></svg>Change password</button>
+      </nav>
+      <div class="acct-panes">
+        <div class="panel acct-pane" data-acct-pane="profile" id="acct-pane-profile" role="tabpanel" aria-labelledby="acct-tab-profile">
+          <h3>Profile</h3>
+          <div class="acct-field"><span class="k">Name</span><span class="v" id="acct-name">—</span></div>
+          <div class="acct-field"><span class="k">Email</span><span class="v" id="acct-email">—</span></div>
+          <div class="acct-field"><label class="k" for="acct-region">Region</label>
+            <span class="v"><select id="acct-region" style="min-width:0"><option value="">Not set</option></select>
+            <span class="acct-help" id="acct-region-note">You can only enter tournaments in your own region.</span></span></div>
+          <div class="acct-field"><span class="k">Public profile</span>
+            <span class="v"><button class="btn btn-ghost btn-sm" id="acct-view-profile" hidden>View public profile →</button>
+            <span class="acct-help" id="acct-no-profile">Your public player profile appears after your first tournament.</span></span></div>
+          <p class="acct-help acct-soon">Profile pictures and notifications are coming soon.</p>
         </div>
-        <p class="mono" style="color:var(--muted);font-size:11px;margin:2px 0 0" id="acct-region-note">You can only enter tournaments in your own region.</p>
-        <div class="stat-line" id="acct-renewal-line" hidden><span class="mono" style="color:var(--muted)" id="acct-renewal-label">Renews</span><span id="acct-renewal-date">—</span></div>
-        <button class="btn btn-ghost btn-sm" id="acct-manage-plan" style="margin-top:16px;width:100%" data-link="membership">Manage plan</button>
-      </div>
-      <div class="panel">
-        <span class="pill">Eligibility</span>
-        <h3 style="margin:14px 0 12px">Verification</h3>
-        <div class="stat-line"><span>Age check</span><span id="acct-age-check" class="badge-wait">◷ Pending</span></div>
-        <div class="stat-line"><span>Cam check</span><span id="acct-cam-check" class="badge-wait">◷ Pending</span></div>
-        <button class="btn btn-primary btn-sm" style="margin-top:16px;width:100%" data-link="join">Finish verification</button>
-      </div>
-      <div class="panel">
-        <span class="pill">Upcoming</span>
-        <h3 style="margin:14px 0 12px">Your entries</h3>
-        <div id="acct-entries"><div class="stat-line" style="color:var(--muted)"><span>Loading…</span><span></span></div></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:16px;width:100%" data-link="events">Find tonight's events</button>
+        <div class="panel acct-pane" data-acct-pane="membership" id="acct-pane-membership" role="tabpanel" aria-labelledby="acct-tab-membership" hidden>
+          <h3>Membership <span class="pill green" id="acct-membership-status">Active</span></h3>
+          <div class="stat-line"><span class="mono" style="color:var(--muted)">Plan</span><span>Tournza Membership</span></div>
+          <div class="stat-line"><span class="mono" style="color:var(--muted)">Price</span><span>£12 / year</span></div>
+          <div class="stat-line"><span class="mono" style="color:var(--muted)">Member since</span><span id="acct-member-since">—</span></div>
+          <div class="stat-line" id="acct-renewal-line" hidden><span class="mono" style="color:var(--muted)" id="acct-renewal-label">Renews</span><span id="acct-renewal-date">—</span></div>
+          <button class="btn btn-ghost btn-sm acct-btn" id="acct-manage-plan" data-link="membership">Manage plan</button>
+        </div>
+        <div class="panel acct-pane" data-acct-pane="verification" id="acct-pane-verification" role="tabpanel" aria-labelledby="acct-tab-verification" hidden>
+          <h3>Verification</h3>
+          <p class="acct-help">Both checks must be cleared before you can check in to a tournament.</p>
+          <div class="stat-line"><span>Age check</span><span id="acct-age-check" class="badge-wait">◷ Pending</span></div>
+          <div class="stat-line"><span>Cam check</span><span id="acct-cam-check" class="badge-wait">◷ Pending</span></div>
+          <button class="btn btn-primary btn-sm acct-btn" data-link="join">Finish verification</button>
+        </div>
+        <div class="panel acct-pane" data-acct-pane="events" id="acct-pane-events" role="tabpanel" aria-labelledby="acct-tab-events" hidden>
+          <h3>Your events</h3>
+          <div id="acct-entries"><div class="stat-line" style="color:var(--muted)"><span>Loading…</span><span></span></div></div>
+          <button class="btn btn-ghost btn-sm acct-btn" data-link="events">Find tonight's events</button>
+        </div>
+        <div class="panel acct-pane" data-acct-pane="password" id="acct-pane-password" role="tabpanel" aria-labelledby="acct-tab-password" hidden>
+          <h3>Change password</h3>
+          <form id="acct-pw-form" novalidate>
+            <div class="field"><label class="flab" for="acct-pw-new">New password</label>
+              <input id="acct-pw-new" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters"></div>
+            <div class="field"><label class="flab" for="acct-pw-confirm">Confirm new password</label>
+              <input id="acct-pw-confirm" type="password" autocomplete="new-password" minlength="6" placeholder="Type it again"></div>
+            <p class="acct-msg" id="acct-pw-msg" role="status" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary btn-sm acct-btn" id="acct-pw-btn">Update password</button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
@@ -1348,7 +2078,9 @@
       <ul>
         <li>501, double-out. Events are a group round robin into a knockout to the final, capped at 32 players.</li>
         <li>Call your score after each visit; your opponent confirms. Flag any disagreement before throwing again.</li>
-        <li>Be checked in and ready before check-in closes (10 minutes before start) or your place may go to a reserve.</li>
+        <li>Entries close at <strong>19:15</strong> on the night.</li>
+        <li>Check in on the event page between <strong>19:00 and 19:20</strong>, cam on and ready. No check-in, no place — and the buy-in isn’t refunded.</li>
+        <li>The draw is at <strong>19:30</strong> and the first matches start straight after. If fewer than 4 players check in, or the draw hasn’t run by 19:35, the night is cancelled and every buy-in is refunded.</li>
       </ul>
 
       <h3>4. Conduct</h3>
@@ -1539,6 +2271,8 @@ async function loadPlayersFromSupabase(){
     // Ranked list: players who've actually played at least one real event.
     REG = PLAYERS.filter(p=>p.events>0).sort((a,b)=> b.points-a.points || b.wins-a.wins);
     REG.forEach((p,i)=>p.rank=i+1);
+    const __regN = {};
+    REG.forEach(p=>{ __regN[p.region] = (__regN[p.region] || 0) + 1; p.regionRank = __regN[p.region]; });
 
     // Winners feed: every tournament winner, most recent first.
     WINNERS = (results||[])
@@ -1567,18 +2301,17 @@ async function loadPlayersFromSupabase(){
 }
 
 const INCLUDES = [
-  'Verified player profile across all 12 UK regions',
-  'Eligibility to enter every nightly event (£6 buy-in per event)',
-  'Full ranking eligibility and points tracking',
-  'Detailed match stats: average, checkout %, 180s',
-  'Regional leaderboards and player search',
-  'Fair-play cam verification',
+  'Enter the nightly tournaments in your region (£6 buy-in per event)',
+  'Play Friendlies against other members',
+  'Ranking points and full match stats: average, checkout %, 180s',
+  'Verified player profile',
+  'Everything in the free account',
 ];
 const FAQ = [
   ['What does the £12 membership cover?','Membership gives you a verified profile, ranking eligibility and the ability to enter events for a full year. Each event then has a £6 buy-in, paid when you register.'],
   ['How does verification work?','You complete a one-off age check and a camera check. Once cleared you can enter any event.'],
   ['What format are events?','Every region runs one tournament each evening, capped at 32 players: a group round robin followed by a knockout to the final, 501 double-out.'],
-  ['When does check-in close?','Check-in closes ten minutes before the published start time. Miss it and your place may be released to a reserve.'],
+  ['When does check-in close?','Check in on the event page between 19:00 and 19:20 on the night (entries close at 19:15). No check-in, no place, and the buy-in isn’t refunded. The draw is at 19:30.'],
   ['How are prizes paid?','Prizes are paid to verified winners via Stripe, on the day of winning or within 24 hours.'],
 ];
 
@@ -1613,13 +2346,35 @@ function evCard(e){
   </article>`;
 }
 
+// Homepage (2026-10): four at-a-glance cards and a compact preview of tonight's
+// tournaments. Counts come from the loaded data (regions from uk_regions_list,
+// tonight's tournaments and their entries); nothing is invented — "—" until loaded.
+let HOME_REGIONS = null;
+function renderHomeStats(){
+  const set = (id, v) => { const x = document.getElementById(id); if(x) x.textContent = v; };
+  if(HOME_REGIONS != null) set('hs-regions', HOME_REGIONS);
+  if(!eventsLoaded) return;
+  const todayIso = new Date().toISOString().slice(0,10);
+  const tonight = EVENTS.filter(e=>e.iso===todayIso);
+  set('hs-tonight', tonight.length);
+  set('hs-players', tonight.reduce((a,e)=>a + (Number(e.reg) || 0), 0));
+}
+function homeRow(e){
+  return `<a class="home-ev" data-link="event:${evEsc(e.id)}" href="#event:${evEsc(e.id)}">
+    <span class="top"><span class="rg">${evEsc(e.region || '')}</span>${e.live ? '<span class="pill live"><span class="dot live"></span>Live</span>' : ''}</span>
+    <strong>${evEsc(e.title)}</strong>
+    <span class="meta">${evEsc(e.time)} · ${e.reg} / ${e.cap} entered</span>
+    <span class="cap"><i style="width:${capPct(e)}%"></i></span>
+    <span class="go">View event <span aria-hidden="true">→</span></span></a>`;
+}
 function renderHome(){
+  renderHomeStats();
   const el=$('#home-events'); if(!el) return;
   if(!eventsLoaded){ el.innerHTML = stateMsg('Loading tonight’s tournaments…'); return; }
   const todayIso = new Date().toISOString().slice(0,10);
-  const tonight = EVENTS.filter(e=>e.iso===todayIso);
+  const tonight = EVENTS.filter(e=>e.iso===todayIso).sort((a,b)=>(Number(b.live)-Number(a.live)) || (b.reg-a.reg));
   el.innerHTML = tonight.length
-    ? tonight.slice(0,3).map(evCard).join('')
+    ? `<div class="home-list">${tonight.slice(0,3).map(homeRow).join('')}</div>`
     : stateMsg('No tournaments scheduled tonight — check back soon.');
 }
 
@@ -1684,84 +2439,166 @@ function renderEvents(){
   else                   msg = 'No tournaments scheduled right now — check back soon.';
   el.innerHTML = stateMsg(msg);
 }
+// Event page (pass 6, 2026-10): compact, tab-based. A slim header (Back to events,
+// name, badges), then tabs: Overview · Players · Groups · Fixtures · Live matches ·
+// Results · Rules. Groups / Fixtures / Live / Results only appear once the night has
+// that content (ev.js fills them from the same live data as the tournament page).
+// Same hooks as before: #ev-night (tonight's timeline), #ev-me (your own box),
+// #ev-buy (the buy-in button, data-tournament), and .countdown.
+const EVD_ICON = {
+  entry:'<path d="M3 7h18v10H3z"/><circle cx="12" cy="12" r="2.4"/>',
+  format:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  legs:'<path d="M5 19V5m0 0h11l-2.5 3.5L16 12H5"/>',
+  time:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  region:'<path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0113 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  checkin:'<path d="M5 12.5l4.2 4.2L19 7"/>',
+  prize:'<path d="M7 4h10v4a5 5 0 01-10 0zM12 13v4m-4 3h8M7 6H4v1a3 3 0 003 3m10-4h3v1a3 3 0 01-3 3"/>',
+  cap:'<circle cx="9" cy="9" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0111 0M16 6.2a3 3 0 010 5.6M17.5 14.3A5.5 5.5 0 0120.5 19"/>'
+};
+const evdIcon = k => `<svg class="evd-ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${EVD_ICON[k]}</svg>`;
+const evdInitial = n => evEsc((String(n || 'P').trim()[0] || 'P').toUpperCase());
+const EVD_TABS = [['overview','Overview'],['players','Players'],['groups','Groups'],['fixtures','Fixtures'],['live','Live matches'],['results','Results'],['rules','Rules']];
+let EVD_TAB = { id:null, tab:'overview' };     // keeps the open tab when the page refreshes itself
+
+function evdShowTab(tab){
+  const btn = document.querySelector(`#event-detail [data-evd-tab="${tab}"]`);
+  if(!btn || btn.hidden) tab = 'overview';
+  EVD_TAB.tab = tab;
+  document.querySelectorAll('#event-detail [data-evd-tab]').forEach(b=>{
+    const on = b.dataset.evdTab === tab;
+    b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
+  });
+  document.querySelectorAll('#event-detail [data-evd-pane]').forEach(p=>{ p.hidden = p.dataset.evdPane !== tab; });
+}
+document.addEventListener('click', ev=>{
+  const b = ev.target.closest('[data-evd-tab],[data-evd-go]'); if(!b || !b.closest('#event-detail')) return;
+  evdShowTab(b.dataset.evdTab || b.dataset.evdGo);
+  if(b.dataset.evdGo) document.querySelector('#event-detail .evd-tabs')?.scrollIntoView({ behavior:'smooth', block:'start' });
+  if(b.dataset.evdTab) b.scrollIntoView({ block:'nearest', inline:'nearest' });
+});
+document.addEventListener('keydown', ev=>{
+  const b = ev.target.closest && ev.target.closest('#event-detail [data-evd-tab]'); if(!b) return;
+  if(ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
+  const all = [...document.querySelectorAll('#event-detail [data-evd-tab]')].filter(x=>!x.hidden), i = all.indexOf(b);
+  const n = all[(i + (ev.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
+  evdShowTab(n.dataset.evdTab); n.focus(); ev.preventDefault();
+});
+
 function renderEventDetail(id){
   // DB ids are numbers but the router passes the hash arg as a string, so
   // compare loosely. No fallback to a different event — show a message instead.
   const e=EVENTS.find(x=>String(x.id)===String(id));
   if(!e){ $('#event-detail').innerHTML = stateMsg('That tournament isn’t available right now. It may have finished or been removed.'); return; }
+  if(String(EVD_TAB.id) !== String(e.id)) EVD_TAB = { id:e.id, tab:'overview' };
   const prizePerEntry = Math.max(0, e.entry - TOURNZA_FEE_PER_ENTRY);
   const pot=e.reg*prizePerEntry, full=e.cap*prizePerEntry;
-  const prize=[['1st','£'+Math.round(pot*0.5)],['2nd','£'+Math.round(pot*0.3)],['3rd','£'+Math.round(pot*0.2)]];
+  const prize=[['1st',Math.round(pot*0.5)],['2nd',Math.round(pot*0.3)],['3rd',Math.round(pot*0.2)]];
   const entered=eventPlayers(e), extra=Math.max(e.reg-entered.length,0);
   const alreadyIn = !!(authState.user && entered.some(p=>String(p.id)===String(authState.user.id)));
+  const row = (ic, k, v) => `<div class="evd-row">${evdIcon(ic)}<div><div class="k">${k}</div><div class="v">${v}</div></div></div>`;
+  const plRow = (p, i) => `<a class="evd-pl" data-link="player:${evEsc(p.id)}" href="#player:${evEsc(p.id)}"><span class="n">${i+1}</span><span class="nm">${evEsc(p.name)}</span><span class="rg mono">${evEsc(p.region)}</span></a>`;
+  const tab = (k, label) => `<button type="button" role="tab" class="evd-tab" data-evd-tab="${k}" id="evd-tab-${k}" aria-controls="evd-pane-${k}"${['groups','fixtures','live','results'].includes(k) ? ' hidden' : ''}>${label}${k === 'players' ? ` <span class="c">${e.reg}</span>` : ''}</button>`;
+  const pane = (k, html) => `<div class="evd-pane" data-evd-pane="${k}" id="evd-pane-${k}" role="tabpanel" aria-labelledby="evd-tab-${k}" hidden>${html}</div>`;
+  const preview = entered.slice(0, 6);
   $('#event-detail').innerHTML=`
-    <div class="row1" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <span class="pill fmt">${e.fmt}</span>${e.region?`<span class="pill">${e.region}</span>`:''}
-      <span class="pill mono">${e.code}</span>
-      ${e.live?'<span class="pill live"><span class="dot live"></span>Live tonight</span>':''}
+    <div class="evd-head">
+      <a class="evd-back" data-link="events" href="#events"><span aria-hidden="true">←</span> Back to events</a>
+      <h2 class="evd-title">${evEsc(e.title)}</h2>
+      <div class="evd-pills">
+        <span class="pill ${e.live ? 'live' : ''}" id="evd-phase">${e.live ? '<span class="dot live"></span>Live' : 'Upcoming'}</span>
+        <span class="pill">${evEsc(e.date)} · ${evEsc(e.time)}</span>${e.region?`<span class="pill">${evEsc(e.region)}</span>`:''}
+        <span class="pill">${e.reg}/${e.cap} players</span>
+        <span class="pill fmt">${evEsc(e.fmt)}</span>
+      </div>
     </div>
-    <h2 style="max-width:18ch">${e.title}</h2>
-    <div class="detail-grid" style="margin-top:26px">
-      <div>
-        <div id="ev-night" class="ev-night"></div>
-        <div class="panel">
-          <h3 style="font-size:19px">Event details</h3>
-          <div class="kv">
-            <div class="cell"><div class="k">When</div><div class="v">${e.date} · ${e.time}</div></div>
-            <div class="cell"><div class="k">Entries close · check-in</div><div class="v">${EV_ENTRIES} · 19:00–${e.checkin}</div></div>
-            <div class="cell"><div class="k">Format</div><div class="v">${e.fmt}</div></div>
-            <div class="cell"><div class="k">Structure</div><div class="v">${FORMAT}</div></div>
-            <div class="cell"><div class="k">Capacity</div><div class="v">${e.cap} players max</div></div>
-            <div class="cell"><div class="k">Venue</div><div class="v">Virtual · webcam</div></div>
+    <div id="evd-banner" class="evd-banner"></div>
+    <div class="evd-tabs" role="tablist" aria-label="Event">${EVD_TABS.map(([k,l])=>tab(k,l)).join('')}</div>
+    ${pane('overview', `<div class="evd-ov">
+      <div class="evd-ov-l">
+        <div class="panel evd-info">
+          <h3>Event information</h3>
+          <div id="ev-night" class="ev-night"></div>
+          <div class="evd-rows">
+            ${row('entry','Entry', `£${e.entry.toFixed(2)} buy-in · membership required`)}
+            ${row('format','Format', `${evEsc(e.fmt)} · ${evEsc(FORMAT)}`)}
+            ${row('legs','Legs', 'Groups best of 3 · Last 16 &amp; QF best of 5 · SF &amp; final best of 7')}
+            ${row('time','Start time', `${evEsc(e.date)} · ${evEsc(e.time)} — draw, then first matches`)}
+            ${row('region','Region', `${evEsc(e.region || '—')} · players from this region only`)}
+            ${row('checkin','Entries close · check-in', `${EV_ENTRIES} · 19:00–${e.checkin}`)}
+            ${row('prize','Prize pool', `£${pot} now · up to £${full} · <span class="evd-split">1st £${prize[0][1]} · 2nd £${prize[1][1]} · 3rd £${prize[2][1]}</span>`)}
           </div>
-        </div>
-        <div class="panel">
-          <h3 style="font-size:19px">Prize pool</h3>
-          <p style="color:var(--muted-2);font-size:14px;margin:6px 0 14px">Currently <strong style="color:var(--ivory)">£${pot}</strong> from ${e.reg} entries · up to £${full} at a full house. Paid via Stripe on the day.</p>
-          ${prize.map(p=>`<div class="prize-row"><span class="pos">${p[0]}</span><span>${p[1]}</span></div>`).join('')}
-        </div>
-        <div class="panel">
-          <h3 style="font-size:19px">Rules & eligibility</h3>
-          <ul class="rules">
-            <li>Verified Tournza membership required to enter</li>
-            <li>Age check and cam check must be cleared before check-in</li>
-            <li>501 double-out · group round robin then knockout to the final</li>
-            <li>Entries close at ${EV_ENTRIES} on the night</li>
-            <li>Check in between 19:00 and ${e.checkin} on the night — no check-in, no place, and the buy-in isn’t refunded</li>
-            <li>Draw at ${EV_DRAW}. Fewer than 4 checked in, or no draw by ${EV_LATE}: the night is cancelled and every buy-in refunded</li>
-          </ul>
-          <p class="form-note" style="margin-top:14px">Full <a data-link="rules" style="color:var(--blue-2)">fair-play rules</a> apply to every event.</p>
-        </div>
-        <div class="panel">
-          <h3 style="font-size:19px">Entered players</h3>
-          <div class="reglist">
-            ${entered.map(p=>`<div class="reg-row" data-link="player:${p.id}" style="cursor:pointer"><span class="dot"></span>${p.name} <span class="mono" style="color:var(--muted);margin-left:auto">${p.region}</span></div>`).join('')}
-            ${extra>0?`<div class="reg-row"><span class="dot"></span><span style="color:var(--muted-2)">+ ${extra} more entered</span></div>`:''}
-          </div>
+          <p class="form-note evd-fine">Prize pool 50% · 30% · 20%, paid via Stripe on the day. <button type="button" class="evd-lnk" data-evd-go="rules">Rules &amp; eligibility</button></p>
         </div>
       </div>
-      <div class="sticky-reg">
+      <div class="evd-ov-r">
         <div id="ev-me"></div>
-        <div class="panel">
-          <div class="price" style="font-size:34px">£${e.entry.toFixed(2)}<small>Buy-in</small></div>
-          <div class="progress" style="margin-top:16px"><i style="width:${capPct(e)}%"></i></div>
-          <div class="cap-line"><span>${e.reg} / ${e.cap} entered</span><span>${e.cap-e.reg} left</span></div>
-          ${e.live?`<p class="countdown" style="margin:16px 0 0">● Check-in closes ${e.checkin} tonight</p>`:''}
-          ${alreadyIn
-            ? `<button class="btn btn-primary" style="width:100%;margin-top:18px" disabled>You’re entered ✓</button>`
-            : `<button class="btn btn-primary" style="width:100%;margin-top:18px" data-tournament="${e.id}" id="ev-buy">Pay £6 buy-in &amp; enter</button>`}
-          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" data-link="membership">Membership required · £12/yr</button>
-        </div>
-        <div class="panel">
-          <h3 style="font-size:17px;margin-bottom:6px">At a glance</h3>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Region</span><span>${e.region}</span></div>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Capacity</span><span>${e.cap} players</span></div>
-          <div class="stat-line"><span class="mono" style="color:var(--muted)">Filled</span><span>${capPct(e)}%</span></div>
+        <div class="panel evd-side">
+          <h3>Players <span class="evd-count">${e.reg}/${e.cap}</span></h3>
+          ${preview.length ? `<div class="evd-list">${preview.map(plRow).join('')}</div>` : '<p class="form-note">No one has entered yet — be the first.</p>'}
+          ${e.reg > preview.length ? `<button type="button" class="evd-lnk evd-all" data-evd-go="players">View all ${e.reg} players →</button>` : ''}
+          <div class="evd-join">
+            <div class="evd-price"><span class="amt">£${e.entry.toFixed(2)}</span><span class="lbl">Buy-in</span></div>
+            <div class="progress"><i style="width:${capPct(e)}%"></i></div>
+            <div class="cap-line"><span>${e.reg} / ${e.cap} entered</span><span>${e.cap-e.reg} left</span></div>
+            ${e.live?`<p class="countdown" style="margin:12px 0 0">● Check-in closes ${e.checkin} tonight</p>`:''}
+            ${alreadyIn
+              ? `<button class="btn btn-primary evd-cta" disabled>You’re entered ✓</button>`
+              : `<button class="btn btn-primary evd-cta" data-tournament="${e.id}" id="ev-buy">Pay £6 buy-in &amp; enter</button>`}
+            <button class="btn btn-ghost btn-sm evd-cta2" data-link="membership">Membership required · £12/yr</button>
+          </div>
         </div>
       </div>
-    </div>`;
+    </div>`)}
+    ${pane('players', `<div class="panel">
+      <h3>Entered players <span class="evd-count">${e.reg}/${e.cap}</span></h3>
+      <div class="evd-list evd-list-full">
+        ${entered.length ? entered.map(plRow).join('') : '<p class="form-note">No one has entered yet — be the first.</p>'}
+        ${extra>0?`<div class="evd-pl"><span class="n">+</span><span class="nm" style="color:var(--muted-2)">${extra} more entered</span></div>`:''}
+      </div>
+      <p class="form-note" style="margin-top:12px">Everyone who has paid the £6 buy-in. Only players who check in between 19:00 and ${e.checkin} go into the draw.</p>
+    </div>`)}
+    ${pane('groups', '<div id="evd-groups"></div>')}
+    ${pane('fixtures', '<div id="evd-fixtures"></div>')}
+    ${pane('live', '<div id="evd-live"></div>')}
+    ${pane('results', '<div id="evd-results"></div>')}
+    ${pane('rules', `<div class="panel">
+      <h3>Rules &amp; eligibility</h3>
+      <ul class="rules">
+        <li>Verified Tournza membership required to enter</li>
+        <li>Age check and cam check must be cleared before check-in</li>
+        <li>501 double-out · group round robin then knockout to the final</li>
+        <li>Entries close at ${EV_ENTRIES} on the night</li>
+        <li>Check in between 19:00 and ${e.checkin} on the night — no check-in, no place, and the buy-in isn’t refunded</li>
+        <li>Draw at ${EV_DRAW}. Fewer than 4 checked in, or no draw by ${EV_LATE}: the night is cancelled and every buy-in refunded</li>
+      </ul>
+      <p class="form-note" style="margin-top:14px">Full <a data-link="rules" href="#rules" style="color:var(--blue-2)">fair-play rules</a> apply to every event.</p>
+    </div>`)}
+    ${alreadyIn ? '' : `<div class="evd-mbar" hidden><div class="p"><strong>£${e.entry.toFixed(2)}</strong><span>${e.reg}/${e.cap} entered</span></div>
+      <button type="button" class="btn btn-primary" data-evd-join>Enter tournament</button></div>`}`;
+  evdShowTab(EVD_TAB.tab);
+  evdWatchJoin();
   evMount(e);
 }
+// phones: the sticky join bar shows while the real join box is off screen and entry is open;
+// it simply presses the real #ev-buy button (same checkout, same checks)
+let EVD_IO = null;
+function evdMbarSync(){
+  const bar = document.querySelector('#event-detail .evd-mbar'); if(!bar) return;
+  const buy = document.getElementById('ev-buy');
+  bar.hidden = !buy || buy.disabled || !!bar.dataset.inView;
+}
+function evdWatchJoin(){
+  if(EVD_IO){ EVD_IO.disconnect(); EVD_IO = null; }
+  const bar = document.querySelector('#event-detail .evd-mbar'), box = document.querySelector('#event-detail .evd-join');
+  if(!bar || !box || !('IntersectionObserver' in window)) return;
+  EVD_IO = new IntersectionObserver(es=>{ es.forEach(x=>{ if(x.isIntersecting) bar.dataset.inView = '1'; else delete bar.dataset.inView; }); evdMbarSync(); });
+  EVD_IO.observe(box);
+}
+document.addEventListener('click', ev=>{
+  if(!ev.target.closest('[data-evd-join]')) return;
+  const buy = document.getElementById('ev-buy');
+  if(buy && !buy.disabled) buy.click(); else { evdShowTab('overview'); document.querySelector('#event-detail .evd-join')?.scrollIntoView({ behavior:'smooth', block:'center' }); }
+});
 
 function renderRankings(){
   const body=$('#rank-body'), title=$('#rank-title');
@@ -1781,12 +2618,12 @@ function renderRankings(){
         : REG;
       body.innerHTML = list.length ? list.map(p=>`
         <tr class="clk" data-link="player:${p.id}">
-          <td class="rank ${p.rank===1?'top':''}">${p.rank}</td>
-          <td><strong>${p.name}</strong></td>
-          <td style="color:var(--muted-2)">${p.region}</td>
+          <td class="rank ${p.rank===1?'top':''}"><span class="rk-n">${p.rank}</span></td>
+          <td class="rk-name"><strong>${p.name}</strong><span class="rk-reg">${p.region}</span></td>
+          <td class="rk-region" style="color:var(--muted-2)">${p.region}</td>
           <td class="num pts">${p.points}</td>
           <td class="num" style="color:var(--muted-2)">${p.wins}</td>
-          <td class="num" style="color:var(--muted-2)">${p.events}</td>
+          <td class="num rk-events" style="color:var(--muted-2)">${p.events}</td>
         </tr>`).join('') : `<tr><td colspan="6">${stateMsg('No ranked players in '+region+' yet.')}</td></tr>`;
     }
   }
@@ -1865,7 +2702,8 @@ function sparkline(form){
    Friendlies are kept separate). Nothing is estimated or invented: a missing
    value shows as "—", and a player with no finished tournaments gets an
    honest empty state. */
-const PF_PODIUM = { winner:1, runner_up:1, sf:1 };
+// a podium = finishing 2nd or joint 3rd (runner-up, semi-final). A win is counted as a win, not also as a podium.
+const PF_PODIUM = { runner_up:1, sf:1 };
 function pfEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function pfOrdinal(n){ const s = n%100>=11 && n%100<=13 ? 'th' : ({1:'st',2:'nd',3:'rd'})[n%10] || 'th'; return n + s; }
 // "1st", "2nd", "joint 3rd" … (everyone out at the same stage shares a position)
@@ -1945,12 +2783,70 @@ function renderPlayerProfile(id){
     ['Best leg', p.bestLeg!=null ? `${p.bestLeg}<small>darts</small>` : null],
   ];
   const recent = hist.slice(-10);
+  const tab = PF.id === String(id) ? PF.tab : 'overview';
+  PF.id = String(id); PF.tab = tab; PF.p = p;
+  const spark = pfSpark(recent);
+  const histTable = rows => `<table class="pf-hist">
+        <thead><tr><th>Event</th><th>Finish</th><th class="pos-col">Position</th><th class="num">Pts</th></tr></thead>
+        <tbody>${rows.slice().reverse().map(r=>{
+          const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
+          return `<tr class="${cls}">
+            <td class="ev"><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></td>
+            <td><span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span></td>
+            <td class="pos-col"><span class="pf-pos">${pfPlace(r)}</span></td>
+            <td class="num pf-pts-cell ${cls}">+${r.pts}</td></tr>`; }).join('')}</tbody>
+      </table>`;
+  const panes = {
+    overview: `
+    <div class="pf-ov">
+      <div class="pf-ov-main">
+        <div class="pf-section">
+          <span class="eyebrow">Tournament stats</span>
+          <div class="pf-stats">
+            ${stats.map(([l,v,k])=>`<div class="b ${k||''} ${v==null?'na':''}"><div class="v">${v==null?'—':v}</div><div class="l">${l}</div></div>`).join('')}
+          </div>
+        </div>
+        <div class="pf-grid">
+          <div class="pf-panel pf-chart">
+            <div class="pf-head"><h3>Recent form</h3>
+              ${recent.length ? `<div class="pf-legend" aria-hidden="true"><span class="w"><i></i>Win</span><span class="p"><i></i>Podium</span><span class="o"><i></i>Other</span></div>` : ''}</div>
+            ${recent.length ? pfGraph(recent) : stateMsg('No completed tournaments yet — form appears after the first finished night.')}
+          </div>
+          <div class="pf-panel pf-career">
+            <div class="pf-head" style="margin-bottom:4px"><h3>Career</h3></div>
+            <div class="row hi"><span>Ranking points</span><strong>${p.points}</strong></div>
+            <div class="row"><span>Tournaments</span><strong>${hist.length}</strong></div>
+            <div class="row ${wins?'w':''}"><span>Wins</span><strong>${wins}</strong></div>
+            <div class="row"><span>Podiums</span><strong>${podiums}</strong></div>
+            <div class="row best"><span>Best finish</span><strong>${best ? finishLabel(best.outcome) : '—'}</strong></div>
+          </div>
+        </div>
+      </div>
+      <aside class="pf-panel pf-recent">
+        <div class="pf-head"><h3>Recent tournaments</h3></div>
+        ${hist.length ? `<ul>${hist.slice(-5).reverse().map(r=>{
+          const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
+          return `<li class="${cls}"><div><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></div>
+            <span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span><b class="pf-pts-cell ${cls}">+${r.pts}</b></li>`; }).join('')}</ul>
+          <button type="button" class="pf-more" data-pf-tab="tournaments">All tournaments →</button>`
+          : stateMsg('No completed tournaments yet.')}
+      </aside>
+    </div>`,
+    tournaments: `<div class="pf-panel"><div class="pf-head"><h3>Tournament history</h3><span class="pf-sub">${hist.length} tournament${hist.length===1?'':'s'}</span></div>
+      ${hist.length ? histTable(hist) : stateMsg('No completed tournaments yet.')}</div>`,
+    matches: `<div class="pf-panel"><div class="pf-head"><h3>Tournament matches</h3><span class="pf-sub">Tournament matches only — Friendlies are kept separate</span></div>
+      <div id="pf-matches">${stateMsg('Loading matches…')}</div></div>`,
+  };
   el.innerHTML=`
     <div class="pf-hero profile-hero">
       <div class="ava lg">${pfEsc(p.initials)}</div>
       <div class="meta">
-        <span class="eyebrow">${p.rank?('Rank #'+p.rank+' · '):''}${pfEsc(p.region)}</span>
+        <span class="eyebrow">${p.rank ? 'Rank #' + p.rank + ' · ' : ''}${pfEsc(p.region)}</span>
         <h2>${pfEsc(p.name)}</h2>
+        <div class="pf-ranks" aria-label="Rankings">
+          <span class="pf-rank"><b>${p.rank ? '#' + p.rank : '—'}</b><i>National rank</i></span>
+          <span class="pf-rank reg"><b>${p.regionRank ? '#' + p.regionRank : '—'}</b><i>${pfEsc(p.region || 'Regional')} rank</i></span>
+        </div>
         <div class="badges">
           <span class="pf-chip"><b>${hist.length}</b> tournament${hist.length===1?'':'s'}</span>
           <span class="pf-chip ${wins?'win':''}"><b>${wins}</b> win${wins===1?'':'s'}</span>
@@ -1958,50 +2854,19 @@ function renderPlayerProfile(id){
           ${p.rating!=null?`<span class="pf-chip">Rating <b>${pfEsc(p.rating)}</b></span>`:''}
         </div>
       </div>
-      <div class="pf-pts"><div class="v">${p.points}</div><div class="l">Ranking points</div></div>
+      <div class="pf-pts"><div class="v">${p.points}</div><div class="l">Ranking points</div>${spark}</div>
     </div>
-
-    <div class="pf-section">
-      <span class="eyebrow">Tournament stats</span>
-      <div class="pf-stats">
-        ${stats.map(([l,v,k])=>`<div class="b ${k||''} ${v==null?'na':''}"><div class="v">${v==null?'—':v}</div><div class="l">${l}</div></div>`).join('')}
-      </div>
+    <div class="pf-tabs" role="tablist" aria-label="Profile sections">
+      ${[['overview','Overview'],['tournaments','Tournaments'],['matches','Match history']].map(([k,l])=>
+        `<button type="button" role="tab" id="pf-tab-${k}" aria-controls="pf-pane" aria-selected="${k===tab}" tabindex="${k===tab?0:-1}" data-pf-tab="${k}">${l}</button>`).join('')}
     </div>
-
-    <div class="pf-grid">
-      <div class="pf-panel pf-chart">
-        <div class="pf-head"><h3>Recent form</h3>
-          ${recent.length ? `<div class="pf-legend" aria-hidden="true"><span class="w"><i></i>Win</span><span class="p"><i></i>Podium</span><span class="o"><i></i>Other</span></div>` : ''}</div>
-        ${recent.length ? pfGraph(recent) : stateMsg('No completed tournaments yet — form appears after the first finished night.')}
-      </div>
-      <div class="pf-panel pf-career">
-        <div class="pf-head" style="margin-bottom:4px"><h3>Career</h3></div>
-        <div class="row hi"><span>Ranking points</span><strong>${p.points}</strong></div>
-        <div class="row"><span>Tournaments</span><strong>${hist.length}</strong></div>
-        <div class="row ${wins?'w':''}"><span>Wins</span><strong>${wins}</strong></div>
-        <div class="row"><span>Podiums</span><strong>${podiums}</strong></div>
-        <div class="row best"><span>Best finish</span><strong>${best ? finishLabel(best.outcome) : '—'}</strong></div>
-      </div>
-    </div>
-
-    <div class="pf-panel" style="margin-top:20px">
-      <div class="pf-head"><h3>Tournament history</h3></div>
-      ${hist.length ? `<table class="pf-hist">
-        <thead><tr><th>Event</th><th>Finish</th><th class="pos-col">Position</th><th class="num">Pts</th></tr></thead>
-        <tbody>${recent.slice().reverse().map(r=>{
-          const cls = r.outcome==='winner' ? 'win' : (PF_PODIUM[r.outcome] ? 'pod' : '');
-          return `<tr class="${cls}">
-            <td class="ev"><strong>${pfEsc(r.title)}</strong><span>${pfEsc(r.date)}</span></td>
-            <td><span class="pf-fin ${cls}">${finishLabel(r.outcome)}</span></td>
-            <td class="pos-col"><span class="pf-pos">${pfPlace(r)}</span></td>
-            <td class="num pf-pts-cell ${cls}">+${r.pts}</td></tr>`; }).join('')}</tbody>
-      </table>` : stateMsg('No completed tournaments yet.')}
-    </div>`;
+    <div id="pf-pane" role="tabpanel" aria-labelledby="pf-tab-${tab}">${panes[tab]}</div>`;
   PF.list = recent;
+  if(tab === 'matches') pfLoadMatches(p);
 }
 
 // tooltip: hover, keyboard focus or tap on a point
-const PF = { list: [] };
+const PF = { list: [], tab: 'overview', id: null, p: null };
 function pfShow(btn){
   const tip = $('#pf-tip'), g = $('#pf-graph'); if(!tip || !g) return;
   const r = PF.list[Number(btn.dataset.pfI)]; if(!r) return;
@@ -2024,6 +2889,69 @@ document.addEventListener('pointerout', e=>{ if(e.pointerType!=='mouse') return;
 document.addEventListener('focusin', e=>{ const b=e.target.closest && e.target.closest('.pf-dot'); if(b) pfShow(b); });
 document.addEventListener('focusout', e=>{ if(e.target.closest && e.target.closest('.pf-dot') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.pf-dot'))) pfHide(); });
 document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.pf-dot'); if(b){ pfShow(b); } else if(!(e.target.closest && e.target.closest('#pf-graph'))) pfHide(); });
+
+
+// ---- small form line beside the ranking points (same points as the chart) ----
+function pfSpark(list){
+  if(list.length < 2) return '';
+  const max = Math.max(...list.map(r=>r.pts), 1), n = list.length;
+  const P = list.map((r,i)=>[(i*(100/(n-1))).toFixed(1), (34 - (r.pts/max)*30).toFixed(1)]);
+  return `<svg class="pf-spark" viewBox="0 0 100 36" preserveAspectRatio="none" aria-hidden="true">
+    <polyline points="${P.map(q=>q.join(',')).join(' ')}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+// ---- tabs ----
+document.addEventListener('click', e=>{
+  const t = e.target.closest && e.target.closest('[data-pf-tab]'); if(!t || !PF.id) return;
+  PF.tab = t.dataset.pfTab; renderPlayerProfile(PF.id);
+  const b = document.getElementById('pf-tab-' + PF.tab); if(b && t.getAttribute('role') === 'tab') b.focus();
+});
+document.addEventListener('keydown', e=>{
+  const t = e.target.closest && e.target.closest('.pf-tabs [role=tab]'); if(!t || !['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+  const k = ['overview','tournaments','matches'], i = k.indexOf(t.dataset.pfTab);
+  const n = e.key === 'Home' ? 0 : e.key === 'End' ? 2 : (i + (e.key === 'ArrowRight' ? 1 : 2)) % 3;
+  e.preventDefault(); PF.tab = k[n]; renderPlayerProfile(PF.id); const b = document.getElementById('pf-tab-' + k[n]); if(b) b.focus();
+});
+// ---- tournament matches (public fixtures: completed tournament matches only) ----
+const PF_STAGE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
+async function pfLoadMatches(p){
+  const box = () => document.getElementById('pf-matches');
+  try{
+    const sb = window.tournzaSupabase || (typeof evClient === 'function' ? await evClient() : null);
+    if(!sb) throw new Error('offline');
+    const id = String(p.id);
+    const { data, error } = await sb.from('matches')
+      .select('id, tournament_id, stage, group_id, round, slot, player1_id, player2_id, winner_id, legs_p1, legs_p2, result_type, status')
+      .or(`player1_id.eq.${id},player2_id.eq.${id}`).eq('status', 'completed');
+    if(error) throw error;
+    const rows = (data || []).filter(m => m.winner_id || m.result_type === 'played');
+    const tids = [...new Set(rows.map(m=>m.tournament_id))];
+    let tmap = {};
+    if(tids.length){
+      const t = await sb.from('tournaments').select('id, name, tournament_date').in('id', tids);
+      (t.data || []).forEach(x=>{ tmap[String(x.id)] = x; });
+    }
+    if(PF.id !== id || PF.tab !== 'matches' || !box()) return;
+    if(!rows.length){ box().innerHTML = stateMsg('No tournament matches yet.'); return; }
+    const nm = pid => { const x = (typeof PLAYERS !== 'undefined' ? PLAYERS : []).find(q=>String(q.id)===String(pid)); return x ? x.name : 'Player'; };
+    const order = { group:0, r16:1, qf:2, sf:3, final:4 };
+    rows.sort((a,b)=> String((tmap[b.tournament_id]||{}).tournament_date||'').localeCompare(String((tmap[a.tournament_id]||{}).tournament_date||'')) || (order[b.stage]-order[a.stage]) || (b.round-a.round));
+    box().innerHTML = `<table class="pf-hist pf-matches">
+      <thead><tr><th>Event</th><th>Stage</th><th>Opponent</th><th class="num">Score</th><th class="num">Result</th></tr></thead>
+      <tbody>${rows.map(m=>{
+        const me1 = String(m.player1_id) === id, opp = me1 ? m.player2_id : m.player1_id;
+        const won = String(m.winner_id) === id, w = m.result_type === 'walkover';
+        const t = tmap[String(m.tournament_id)] || {};
+        const d = t.tournament_date ? (parseLocalDate(String(t.tournament_date).slice(0,10)) || new Date(t.tournament_date)).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+        return `<tr class="${won?'win':''}"><td class="ev"><strong>${pfEsc(t.name || 'Tournament')}</strong><span>${pfEsc(d)}</span></td>
+          <td>${PF_STAGE[m.stage] || ''}</td>
+          <td>${opp ? `<a data-link="player:${pfEsc(opp)}" href="#player:${pfEsc(opp)}">${pfEsc(nm(opp))}</a>` : '—'}</td>
+          <td class="num">${w ? 'w/o' : `${me1 ? (m.legs_p1 ?? 0) : (m.legs_p2 ?? 0)}–${me1 ? (m.legs_p2 ?? 0) : (m.legs_p1 ?? 0)}`}</td>
+          <td class="num"><span class="pf-wl ${won?'w':'l'}">${m.winner_id ? (won ? 'W' : 'L') : '—'}</span></td></tr>`; }).join('')}</tbody></table>`;
+  }catch(err){
+    console.warn('Could not load matches:', err);
+    if(box()) box().innerHTML = stateMsg('Couldn’t load matches — check your connection and try again.');
+  }
+}
 
 function renderMembership(){
   $('#incl').innerHTML = INCLUDES.map(t=>`<li><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8.2" stroke="#1fc97a" stroke-width="1.4"/><path d="M5.4 9.2l2.3 2.3 4.6-4.8" stroke="#1fc97a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${t}</span></li>`).join('');
@@ -2274,6 +3202,7 @@ async function loadRegionsFromEnum(){
     if(!regions || !regions.length){ console.warn('[regions] uk_regions_list() returned no values:', data); return; }
   }catch(e){ console.warn('[regions] could not load regions:', e); return; }
 
+  HOME_REGIONS = regions.length; renderHomeStats();             // homepage card: number of UK regions
   // Events filter: "All regions" first, then every enum value.
   const ev=$('#f-region');
   if(ev){
@@ -2872,17 +3801,58 @@ function evRender(){
       <h3 style="font-size:19px;margin:12px 0 6px">${evEsc(t.cancel_reason || 'This tournament was cancelled')}</h3>
       <p class="ev-note">Every <strong>£6 buy-in</strong> for this tournament will be refunded to the card it was paid with.</p></div>`;
   }
-  if(!tp && inPlay) html += `<a class="ev-golive" data-link="tournament:${evEsc(EV.id)}" href="#tournament:${evEsc(EV.id)}"><span class="dot"></span><span><strong>The tournament is under way</strong><br>Groups, the draw and live scores</span><span class="go">Open →</span></a>`;
-  if(phase === 'completed') html += evPodium(d);
+  if(tp && phase === 'completed') html += evPodium(d);
   if(tp && inPlay) html += evOnNow(d);
-  if(['groups','knockout','completed'].includes(phase)){
+  if(tp && ['groups','knockout','completed'].includes(phase)){
     const ko = d.fixtures.filter(f=>f.stage !== 'group');
     if(ko.length) html += `<div class="panel"><h3 style="font-size:19px">Knockout</h3>${evBracket(ko)}</div>`;
     if(d.groups.length) html += `<div class="panel"><h3 style="font-size:19px">Groups</h3><div class="ev-groups">${d.groups.map(g=>evGroup(g, d)).join('')}</div></div>`;
   }
+  if(!tp) evdFill(d, phase, inPlay);     // event page: the night goes into its own tabs
   if(tp && phase === 'open') html += `<div class="panel"><p class="ev-note">The draw is at <strong>${EV_DRAW}</strong>. Groups and the first matches appear here as soon as it’s made.</p></div>`;
   night.innerHTML = html;
   me.innerHTML = evMe(d, phase, win);
+}
+
+// ---- event page tabs (pass 6): Groups · Fixtures · Live matches · Results, from the same data ----
+const EVD_PHASE = { open:'Upcoming', groups:'Live · Groups', knockout:'Live · Knockout', completed:'Finished', cancelled:'Cancelled' };
+function evdFixRow(f, d){
+  const g = f.stage === 'group' ? d.groups.find(x=>x.id === f.group_id) : null;
+  const stage = g ? 'Group ' + evEsc(g.label) : (EV_STAGE_ONE[f.stage] || 'Match');
+  const p1 = f.player1_id ? evName(f.player1_id) : `<span class="tbd">${evSource(f.source_p1)}</span>`;
+  const p2 = f.player2_id ? evName(f.player2_id) : `<span class="tbd">${evSource(f.source_p2)}</span>`;
+  const w = id => f.winner_id && f.winner_id === id ? ' class="w"' : '';
+  return `<li><span class="st mono">${stage}</span><span class="who"><span${w(f.player1_id)}>${p1}</span> <span class="v">v</span> <span${w(f.player2_id)}>${p2}</span></span><span class="sc">${evScore(f)}</span></li>`;
+}
+function evdFill(d, phase, inPlay){
+  const set = (sel, html) => { const x = $(sel); if(x) x.innerHTML = html; };
+  const showTab = (k, on) => { const b = document.querySelector(`#event-detail [data-evd-tab="${k}"]`); if(b) b.hidden = !on; };
+  const pill = $('#evd-phase');
+  if(pill){ pill.className = 'pill' + (inPlay ? ' live' : phase === 'completed' ? ' green' : '');
+    pill.innerHTML = (inPlay ? '<span class="dot live"></span>' : '') + (EVD_PHASE[phase] || 'Upcoming'); }
+  set('#evd-banner', inPlay
+    ? `<a class="ev-golive" data-link="tournament:${evEsc(EV.id)}" href="#tournament:${evEsc(EV.id)}"><span class="dot"></span><span><strong>The tournament is under way</strong><br>Groups, the draw and live scores</span><span class="go">Open →</span></a>`
+    : phase === 'completed'
+    ? `<a class="ev-golive" data-link="tournament:${evEsc(EV.id)}" href="#tournament:${evEsc(EV.id)}"><span class="dot"></span><span><strong>Tournament finished</strong><br>Results, the draw and every match</span><span class="go">Open →</span></a>` : '');
+  const drawn = ['groups','knockout','completed'].includes(phase);
+  const fx = drawn ? d.fixtures : [];
+  const order = { final:0, sf:1, qf:2, r16:3, group:4 };
+  const done = fx.filter(f=>f.status === 'completed').sort((a,b)=>(order[a.stage] ?? 5) - (order[b.stage] ?? 5) || b.round - a.round || a.slot - b.slot);
+  const todo = fx.filter(f=>f.status !== 'completed').sort((a,b)=>(order[b.stage] ?? 5) - (order[a.stage] ?? 5) || a.round - b.round || a.slot - b.slot);
+  const ko = fx.filter(f=>f.stage !== 'group');
+  const onNow = fx.filter(f=>(f.status === 'ready' || f.status === 'live') && f.live_match_id);
+  showTab('groups', drawn && d.groups.length > 0);
+  set('#evd-groups', drawn && d.groups.length ? `<div class="panel"><h3>Groups</h3><div class="ev-groups">${d.groups.map(g=>evGroup(g, d)).join('')}</div></div>` : '');
+  showTab('fixtures', fx.length > 0);
+  set('#evd-fixtures', fx.length ? (ko.length ? `<div class="panel"><h3>Knockout</h3>${evBracket(ko)}</div>` : '')
+    + `<div class="panel"><h3>${todo.length ? 'Still to play' : 'Fixtures'}</h3>${todo.length ? `<ul class="evd-fx">${todo.map(f=>evdFixRow(f, d)).join('')}</ul>` : '<p class="ev-note">Every match has been played.</p>'}</div>` : '');
+  showTab('live', inPlay);
+  set('#evd-live', inPlay ? evOnNow(d) : '');
+  showTab('results', phase === 'completed' || done.length > 0);
+  set('#evd-results', (phase === 'completed' ? evPodium(d) : '')
+    + (done.length ? `<div class="panel"><h3>Results <span class="evd-count">${done.length} played</span></h3><ul class="evd-fx">${done.map(f=>evdFixRow(f, d)).join('')}</ul></div>` : ''));
+  if(typeof evdShowTab === 'function') evdShowTab(EVD_TAB.tab);   // falls back to Overview if the open tab went away
+  if(typeof evdMbarSync === 'function') evdMbarSync();          // phone join bar follows the real buy-in button
 }
 
 // ---- tournament page: header, matches on now ----
@@ -3099,7 +4069,8 @@ function tlRender(rows){
       <div class="tl-region">${evEsc(t.region || '')}</div>
       <h3>${evEsc(t.tournament_name)}</h3>
       <div class="tl-now"><b>${n}</b><span>match${n === 1 ? '' : 'es'}<br>on now</span></div>
-      <a class="tl-open" data-link="tournament:${id}" href="#tournament:${id}">Open tournament <span aria-hidden="true">→</span></a>
+      <span class="tl-chev" aria-hidden="true">›</span>
+      <a class="tl-open" data-link="tournament:${id}" href="#tournament:${id}" aria-label="Watch live: ${evEsc(t.tournament_name)}"><span class="play" aria-hidden="true">▶</span>Watch live</a>
     </div>`;
   }).join('')}</div>`;
 }
@@ -3125,8 +4096,9 @@ function tpLogo(){
   return m ? m[1] : null;
 }
 const TP_FINISH = { winner:'CHAMPION', runner_up:'RUNNER-UP', sf:'SEMI-FINALIST', qf:'QUARTER-FINALIST', r16:'LAST 16', group:'GROUP STAGE' };
-const TPC = { ink:'#04060d', ink2:'#090e1c', card:'#0e1526', card2:'#131c33', ivory:'#f4f7ff', dim:'#93a2c9', muted:'#5c6c93',
-              cyan:'#12d6ff', cyan2:'#4de3ff', mag:'#ff2f6e', mag2:'#ff5c8a', lime:'#39ff9e', amber:'#ffb020', line:'#1d2945' };
+// colours: the site palette (2026-10 refresh) — layout, type and content unchanged
+const TPC = { ink:'#070D1A', ink2:'#0B1528', card:'#101D35', card2:'#16284A', ivory:'#EAF0FF', dim:'#A3B1D6', muted:'#6F80AA',
+              cyan:'#19D3F3', cyan2:'#5FE3FA', mag:'#F53678', mag2:'#FF6A9B', lime:'#39ff9e', amber:'#ffb020', line:'#1d2945' };
 
 function tpDraw(JsPDF, n){
   const doc = new JsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
@@ -3359,6 +4331,8 @@ go((location.hash||'#home').slice(1)||'home');
     if(footJoin) footJoin.hidden = true;
     if(navLogin) navLogin.hidden = true;
     userMenu.hidden = false;
+    const memFree = $('#mem-free-btn');
+    if(memFree){ memFree.textContent = 'You have an account ✓'; memFree.setAttribute('href', '#account'); memFree.dataset.link = 'account'; }
 
     // Did we just return from Stripe membership checkout?
     const params = new URLSearchParams(location.search);
@@ -3431,6 +4405,9 @@ go((location.hash||'#home').slice(1)||'home');
 
     const lede = $('#acct-lede');
     if(lede) lede.textContent = 'Membership, verification and registrations for ' + (profile.full_name || (authState.user && displayName(authState.user)) || 'you') + '.';
+    const acctName = $('#acct-name'), acctEmail = $('#acct-email');
+    if(acctName) acctName.textContent = profile.full_name || (authState.user && displayName(authState.user)) || '—';
+    if(acctEmail) acctEmail.textContent = (authState.user && authState.user.email) || '—';
 
     const since = $('#acct-member-since');
     if(since) since.textContent = profile.created_at
@@ -3522,6 +4499,7 @@ go((location.hash||'#home').slice(1)||'home');
       } else {
         viewProfileBtn.hidden = true; // no public player profile until they've entered a tournament
       }
+      const noProfile = $('#acct-no-profile'); if(noProfile) noProfile.hidden = !!hasPlayerProfile;
     }
 
     const entriesEl = $('#acct-entries');
@@ -3548,6 +4526,47 @@ go((location.hash||'#home').slice(1)||'home');
   }
   window.renderAccountDashboard = renderAccountDashboard; // go() lives outside this module and needs to reach this
 
+  // ---- Account settings (pass 5): sidebar sections + change password ----
+  // The password change is Supabase auth's own updateUser for the signed-in user (the same
+  // call the reset-password page uses) — no new server code.
+  let acctTab = 'profile';
+  function acctShow(tab){
+    acctTab = tab;
+    document.querySelectorAll('#route-account [data-acct-tab]').forEach(b=>{
+      const on = b.dataset.acctTab === tab;
+      b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
+    });
+    document.querySelectorAll('#route-account [data-acct-pane]').forEach(p=>{ p.hidden = p.dataset.acctPane !== tab; });
+  }
+  acctShow(acctTab);
+  document.addEventListener('click', ev=>{
+    const b = ev.target.closest('#route-account [data-acct-tab]'); if(b) acctShow(b.dataset.acctTab);
+  });
+  document.addEventListener('keydown', ev=>{
+    const b = ev.target.closest && ev.target.closest('#route-account [data-acct-tab]'); if(!b) return;
+    const fwd = ev.key === 'ArrowDown' || ev.key === 'ArrowRight', back = ev.key === 'ArrowUp' || ev.key === 'ArrowLeft';
+    if(!fwd && !back) return;
+    const all = [...document.querySelectorAll('#route-account [data-acct-tab]')], i = all.indexOf(b);
+    const n = all[(i + (fwd ? 1 : all.length - 1)) % all.length];
+    acctShow(n.dataset.acctTab); n.focus(); ev.preventDefault();
+  });
+  const pwForm = $('#acct-pw-form');
+  if(pwForm) pwForm.addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const a = $('#acct-pw-new').value, b = $('#acct-pw-confirm').value, msg = $('#acct-pw-msg'), btn = $('#acct-pw-btn');
+    const say = (t, good) => { msg.textContent = t; msg.classList.toggle('ok', !!good); msg.classList.toggle('bad', !good); };
+    if(a.length < 6) return say('Your new password needs at least 6 characters.');
+    if(a !== b) return say('The two passwords don’t match.');
+    btn.disabled = true; const label = btn.textContent; btn.textContent = 'Updating…';
+    try{
+      const { error } = await sb.auth.updateUser({ password: a });
+      if(error) throw error;
+      pwForm.reset(); say('Password updated ✓', true);
+    }catch(err){
+      say((err && err.message) || 'Could not update your password — try again.');
+    }finally{ btn.disabled = false; btn.textContent = label; }
+  });
+
   function onSignedOut(){
     authState.signedIn = false; authState.user = null;
     closeMenu();
@@ -3556,6 +4575,8 @@ go((location.hash||'#home').slice(1)||'home');
     if(footJoin) footJoin.hidden = false;
     if(navLogin) navLogin.hidden = false;
     applyMembership(false);
+    const memFree = $('#mem-free-btn');
+    if(memFree){ memFree.textContent = 'Create free account'; memFree.setAttribute('href', 'login.html#signup'); delete memFree.dataset.link; }
     // a logged-out visitor sitting on the Account route → send to login
     const acct = $('#route-account');
     if(acct && acct.classList.contains('active')) window.location.href='login.html';
