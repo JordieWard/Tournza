@@ -7,9 +7,9 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#07101f">
 <title>Tournza — UK regional virtual darts</title>
-<meta name="description" content="Verified players. Professional events. Real rankings. Find UK regional darts events and register in seconds.">
+<meta name="description" content="Real players. Professional events. Real rankings. Find UK regional darts events and register in seconds.">
 <meta property="og:title" content="Tournza — UK regional virtual darts">
-<meta property="og:description" content="Verified players. Professional events. Real rankings.">
+<meta property="og:description" content="Real players. Professional events. Real rankings.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -454,6 +454,14 @@
   .fr-player .who b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .fr-player .who span{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
   .fr-player .who span.av{color:var(--green-bright)}
+  .fr-player .fr-3da{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;margin-right:4px;flex:none}
+  .fr-player .fr-3da b{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ivory);font-variant-numeric:tabular-nums}
+  .fr-player .fr-3da span{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted)}
+  .fr-player .who .fr-3da-in{display:none;font-style:normal;color:var(--ivory-dim)}
+  @media (max-width:720px){
+    .fr-player .fr-3da{display:none}
+    .fr-player .who .fr-3da-in{display:block;margin-top:2px}
+  }
   .ava.fr{background:var(--fr);width:40px;height:40px;border-radius:10px;font-size:15px}
   .fr-banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 18px;border-radius:var(--r);
     border:1px solid var(--fr-line);background:linear-gradient(90deg,var(--fr-soft),transparent);margin-bottom:12px}
@@ -1610,7 +1618,7 @@
     <div class="home-copy">
       <span class="eyebrow">UK regional darts · Season 2026</span>
       <h1 class="home-h1"><span>Real people</span><span>Real darts</span><span class="hl">Every night</span></h1>
-      <p class="lede">Nightly online darts tournaments in every UK region. Play 501 double-out on webcam against verified players, then climb the regional rankings.</p>
+      <p class="lede">Nightly online darts tournaments in every UK region. Play 501 double-out on webcam against real players, then climb the regional rankings.</p>
       <div class="hero-cta">
         <button class="btn btn-primary" data-link="events">View tonight’s events</button>
         <button class="btn btn-ghost" data-link="rankings">View rankings</button>
@@ -1637,7 +1645,7 @@
       <div><span class="eyebrow">How Tournza works</span><h2>Built for serious<br>regional competition</h2></div>
     </div>
     <div class="steps">
-      <div class="step"><div class="n">01</div><h4>Verify</h4><p>One membership, one player profile, verified eligibility before you throw.</p></div>
+      <div class="step"><div class="n">01</div><h4>Join</h4><p>One membership, one player profile, set up before you throw.</p></div>
       <div class="step"><div class="n">02</div><h4>Enter</h4><p>Pick tonight’s tournament in your region and pay the £6 buy-in before 19:15. Capped at 32 players.</p></div>
       <div class="step"><div class="n">03</div><h4>Check in</h4><p>Check in between 19:00 and 19:20, cam on. The draw is at 19:30 and the first matches start straight after.</p></div>
       <div class="step"><div class="n">04</div><h4>Climb</h4><p>Results feed straight into transparent regional rankings. No politics.</p></div>
@@ -1648,7 +1656,6 @@
 <!-- ================= EVENTS ================= -->
 <div class="route" id="route-events">
   <section class="block">
-    <span class="eyebrow">Events</span>
     <div class="section-head"><div><h2>What's on &amp; coming up</h2><p class="lede">One tournament per UK region, every evening. 32 players, group round robin into a knockout final, £6 buy-in.</p></div></div>
     <div class="filters">
       <div class="fld"><label class="flab" for="f-region">Region</label>
@@ -1670,7 +1677,6 @@
 <!-- ================= RANKINGS ================= -->
 <div class="route" id="route-rankings">
   <section class="block">
-    <span class="eyebrow">Rankings</span>
     <div class="section-head"><div><h2 id="rank-title">National standings</h2><p class="lede">Points are awarded by finishing place at every regional event and update automatically. Tap a player to open their profile.</p></div></div>
     <div class="filters">
       <div class="fld"><label class="flab" for="rank-region">Region</label>
@@ -1695,7 +1701,6 @@
 <!-- ================= PLAYERS ================= -->
 <div class="route" id="route-players">
   <section class="block">
-    <span class="eyebrow">Players</span>
     <div class="section-head"><div><h2>Player directory</h2><p class="lede">Our top players by region. Search by name or region to find any registered player.</p></div></div>
     <div class="filters">
       <div class="fld"><label class="flab" for="p-region">Region</label>
@@ -1723,7 +1728,6 @@
 <div class="route" id="route-friendlies">
   <section class="block">
     <div class="tz-art" aria-hidden="true"><div class="tz-art-img"></div></div>
-    <span class="eyebrow">Friendlies</span>
     <div class="section-head">
       <div>
         <h2>Friendlies</h2>
@@ -1808,7 +1812,6 @@
 <div class="route" id="route-membership">
   <section class="block">
     <div class="mem-head">
-      <span class="eyebrow">Membership</span>
       <h2>Choose how you play</h2>
       <p class="lede">Browse for free. Join for £12 a year to enter tournaments.</p>
     </div>
@@ -1843,57 +1846,42 @@
   </section>
 </div>
 
-<!-- ================= JOIN / CONTACT ================= -->
+<!-- ================= CONTACT ================= -->
+<!-- route id stays "join" so every existing link (footer "Contact", #join) still lands here -->
 <div class="route" id="route-join">
   <section class="block">
     <div class="detail-grid">
       <div>
-        <span class="eyebrow">Join · Contact</span>
-        <h2 style="margin-top:10px">Register your interest</h2>
-        <p class="lede" style="margin-top:14px">Tell us your region and we'll set up your verified profile and point you at your first event. Already a member? Use this form to reach the regional desk.</p>
+        <span class="eyebrow">Contact</span>
+        <h2 style="margin-top:10px">Get in touch</h2>
+        <p class="lede" style="margin-top:14px">Questions about events, membership, results or anything else — send us a message and it comes straight to the Tournza team.</p>
         <form id="join-form" novalidate>
+          <input type="hidden" name="_subject" value="Tournza contact form">
+          <input type="hidden" name="event" id="jf-event">
           <div class="form-grid" style="margin-top:22px">
             <div class="field"><label class="flab" for="jf-name">Full name</label>
-              <input id="jf-name" name="name" autocomplete="name"><span class="err">Enter your name.</span></div>
+              <input id="jf-name" name="name" autocomplete="name" required><span class="err">Enter your full name.</span></div>
             <div class="field"><label class="flab" for="jf-email">Email</label>
-              <input id="jf-email" name="email" type="email" autocomplete="email"><span class="err">Enter a valid email.</span></div>
-            <div class="field"><label class="flab" for="jf-region">Region</label>
-              <select id="jf-region" name="region"><option value="">Choose a region</option></select><span class="err">Pick a region.</span></div>
-            <div class="field"><label class="flab" for="jf-reason">I'm here to</label>
-              <select id="jf-reason" name="reason"><option>Join as a new player</option><option>Register for an event</option><option>Ask about an event</option><option>Suggest a new region</option><option>Something else</option></select></div>
-            <div class="field full"><label class="flab" for="jf-msg">Message <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
-              <textarea id="jf-msg" name="message" rows="4" placeholder="Anything we should know — preferred nights, current average, questions…"></textarea></div>
-            <input type="hidden" name="event" id="jf-event">
-            <div class="field full">
-              <label class="check"><input type="checkbox" id="jf-agree" name="agree" value="yes"><span>I'm 18 or over and agree to the Tournza fair-play terms and privacy notice.</span></label>
-              <span class="err" style="padding-left:29px">Please confirm to continue.</span>
-              <span class="form-note" style="padding-left:29px">Read our <a data-link="terms" style="color:var(--blue-2)">Terms</a> and <a data-link="privacy" style="color:var(--blue-2)">Privacy Policy</a>.</span>
-            </div>
+              <input id="jf-email" name="email" type="email" autocomplete="email" required><span class="err">Enter a valid email.</span></div>
+            <div class="field full"><label class="flab" for="jf-msg">Message</label>
+              <textarea id="jf-msg" name="message" rows="6" required placeholder="How can we help?"></textarea><span class="err">Write a message.</span></div>
           </div>
           <div style="display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap">
-            <button type="submit" class="btn btn-primary" id="jf-submit">Send &amp; create profile</button>
-            <span class="form-note" id="jf-note">Your details go straight to admin@tournza.co.uk.</span>
+            <button type="submit" class="btn btn-primary" id="jf-submit">Send message</button>
+            <span class="form-note" id="jf-note">We only use your details to reply. See our <a data-link="privacy" style="color:var(--blue-2)">Privacy Policy</a>.</span>
           </div>
-          <div class="toast" id="join-toast"></div>
+          <div class="toast" id="join-toast" role="status" aria-live="polite"></div>
         </form>
       </div>
       <div class="sticky-reg">
         <div class="panel">
-          <span class="pill">Regional desk</span>
-          <h3 style="margin:14px 0 6px">Talk to a human</h3>
-          <p style="color:var(--muted-2);font-size:14.5px">Verification queries, event swaps and disputes go to your regional co-ordinator.</p>
+          <span class="pill">Email us</span>
+          <h3 style="margin:14px 0 6px">Rather use your own email?</h3>
+          <p style="color:var(--muted-2);font-size:14.5px">Write to us direct — it reaches the same inbox.</p>
           <div class="kv" style="grid-template-columns:1fr">
-            <div class="cell"><div class="k">Email</div><div class="v">admin@tournza.co.uk</div></div>
+            <div class="cell"><div class="k">Email</div><div class="v"><a href="mailto:admin@tournza.co.uk" style="color:inherit">admin@tournza.co.uk</a></div></div>
             <div class="cell"><div class="k">Response time</div><div class="v">Within 2 working days</div></div>
           </div>
-        </div>
-        <div class="panel">
-          <h3 style="font-size:18px;margin-bottom:6px">What happens next</h3>
-          <ul class="rules" style="margin-top:6px">
-            <li>We create your verified profile</li>
-            <li>You complete age + cam check</li>
-            <li>You're cleared to register for events</li>
-          </ul>
         </div>
       </div>
     </div>
@@ -1903,13 +1891,11 @@
 <!-- ================= ACCOUNT ================= -->
 <div class="route" id="route-account">
   <section class="block">
-    <span class="eyebrow">Account</span>
-    <div class="section-head"><div><h2>Account settings</h2><p class="lede" id="acct-lede">Membership, verification and registrations.</p></div></div>
+    <div class="section-head"><div><h2>Account settings</h2><p class="lede" id="acct-lede">Your profile, membership and tournaments.</p></div></div>
     <div class="acct">
       <nav class="acct-nav" role="tablist" aria-label="Account settings">
         <button type="button" role="tab" data-acct-tab="profile" id="acct-tab-profile" aria-controls="acct-pane-profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>Profile</button>
         <button type="button" role="tab" data-acct-tab="membership" id="acct-tab-membership" aria-controls="acct-pane-membership"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18"/></svg>Membership</button>
-        <button type="button" role="tab" data-acct-tab="verification" id="acct-tab-verification" aria-controls="acct-pane-verification"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.6 12.2l2.4 2.4 4.4-4.6"/></svg>Verification</button>
         <button type="button" role="tab" data-acct-tab="events" id="acct-tab-events" aria-controls="acct-pane-events"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Your events</button>
         <button type="button" role="tab" data-acct-tab="password" id="acct-tab-password" aria-controls="acct-pane-password"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></svg>Change password</button>
       </nav>
@@ -1933,13 +1919,6 @@
           <div class="stat-line"><span class="mono" style="color:var(--muted)">Member since</span><span id="acct-member-since">—</span></div>
           <div class="stat-line" id="acct-renewal-line" hidden><span class="mono" style="color:var(--muted)" id="acct-renewal-label">Renews</span><span id="acct-renewal-date">—</span></div>
           <button class="btn btn-ghost btn-sm acct-btn" id="acct-manage-plan" data-link="membership">Manage plan</button>
-        </div>
-        <div class="panel acct-pane" data-acct-pane="verification" id="acct-pane-verification" role="tabpanel" aria-labelledby="acct-tab-verification" hidden>
-          <h3>Verification</h3>
-          <p class="acct-help">Both checks must be cleared before you can check in to a tournament.</p>
-          <div class="stat-line"><span>Age check</span><span id="acct-age-check" class="badge-wait">◷ Pending</span></div>
-          <div class="stat-line"><span>Cam check</span><span id="acct-cam-check" class="badge-wait">◷ Pending</span></div>
-          <button class="btn btn-primary btn-sm acct-btn" data-link="join">Finish verification</button>
         </div>
         <div class="panel acct-pane" data-acct-pane="events" id="acct-pane-events" role="tabpanel" aria-labelledby="acct-tab-events" hidden>
           <h3>Your events</h3>
@@ -1978,17 +1957,16 @@
       <h3>2. What we collect</h3>
       <ul>
         <li>Account details when you sign up: your name, email address, and a password (stored securely and never visible to us — see Section 4).</li>
-        <li>Details you give us through the join/contact form: your name, email address, region, the reason you're contacting us and any message.</li>
+        <li>Details you give us through the contact form: your name, email address and your message.</li>
         <li>Your confirmation that you are 18 or over.</li>
         <li>Event registrations, results, and rankings data, and your membership status.</li>
-        <li>Fair-play verification status (age check and cam check) once completed.</li>
         <li>Payment is handled by our payment provider (Stripe). We receive confirmation of payment and, for members, an ongoing subscription reference so membership can renew automatically — but we <strong>do not collect or store your card details</strong> ourselves.</li>
       </ul>
 
       <h3>3. How we use it and our lawful basis</h3>
       <ul>
         <li><strong>To run your account, membership, and event entries</strong> — lawful basis: performance of a contract.</li>
-        <li><strong>To verify eligibility and protect fair play</strong> — lawful basis: legitimate interests in running fair, secure competition.</li>
+        <li><strong>To confirm eligibility and protect fair play</strong> — lawful basis: legitimate interests in running fair, secure competition.</li>
         <li><strong>To send you service emails</strong> — confirming a payment, entry, or password reset — lawful basis: performance of a contract / legitimate interests in operating the service.</li>
         <li><strong>To send you optional updates about events</strong> — lawful basis: your consent, which you can withdraw at any time.</li>
       </ul>
@@ -1998,7 +1976,7 @@
       <ul>
         <li><strong>Supabase</strong> — hosts our database and handles account sign-in.</li>
         <li><strong>Stripe</strong> — processes membership and event payments, and manages your subscription if you're a member.</li>
-        <li><strong>Formspree</strong> — transmits join/contact form submissions to us.</li>
+        <li><strong>Formspree</strong> — transmits contact form submissions to us.</li>
         <li><strong>Resend</strong> — delivers service emails (payment confirmations, entry confirmations, password resets) on our behalf.</li>
       </ul>
       <p>We may disclose data if required by law.</p>
@@ -2044,19 +2022,19 @@
       <p>You must be 18 or over and provide accurate information. You're responsible for keeping your login and profile details secure.</p>
 
       <h3>3. Membership</h3>
-      <p>Membership costs <strong>£12 per year</strong>, billed through Stripe, and renews annually unless cancelled before the renewal date. Membership covers your verified profile and eligibility to register for events. Each event also carries a <strong>£6 buy-in</strong>, shown and paid at the point of entry.</p>
+      <p>Membership costs <strong>£12 per year</strong>, billed through Stripe, and renews annually unless cancelled before the renewal date. Membership covers your player profile and eligibility to register for events. Each event also carries a <strong>£6 buy-in</strong>, shown and paid at the point of entry.</p>
 
       <h3>4. Events, fees and prizes</h3>
       <p>We run one tournament per UK region every evening. Each event is capped at <strong>32 players</strong> and played as a group round robin followed by a knockout to the final, 501 double-out. The <strong>£6 buy-in</strong> is paid via Stripe and entry closes at the published check-in time. Of each £6 buy-in, Tournza keeps £1 and the remaining <strong>£5 goes into that event's prize pool</strong>. We may amend, reschedule or cancel an event; if we cancel an event you've paid to enter, we'll refund that buy-in.</p>
 
       <h3>5. Fair play and conduct</h3>
-      <p>You agree to play honestly, complete any camera check we ask for, and follow our fair-play rules. We may disqualify, suspend or remove players for cheating, abuse or breaching these terms, without refund where appropriate.</p>
+      <p>You agree to play honestly, on camera, and follow our fair-play rules. We may disqualify, suspend or remove players for cheating, abuse or breaching these terms, without refund where appropriate.</p>
 
       <h3>6. Payments and refunds</h3>
       <p>Payments are processed securely by Stripe. Except where required by law or stated above, membership fees and event entries are non-refundable once an event has started.</p>
 
       <h3>7. Prizes</h3>
-      <p>Prizes are paid to verified winners via <strong>Stripe</strong>, on the day of winning or within 24 hours. Winners are responsible for any tax on prizes.</p>
+      <p>Prizes are paid to winners via <strong>Stripe</strong>, on the day of winning or within 24 hours. Winners are responsible for any tax on prizes.</p>
 
       <h3>8. Liability</h3>
       <p>Tournza is provided "as is". We don't exclude liability for anything that can't be excluded by law, but to the extent permitted we aren't liable for indirect losses or for issues caused by your equipment or connection.</p>
@@ -2118,7 +2096,7 @@
       <p>Raise an issue with the official during the match, or email <strong>admin@tournza.co.uk</strong> afterwards with your event and the time of the incident. We review the recording where available; the official's final decision stands.</p>
 
       <h3>7. Eligibility</h3>
-      <p>Events are for verified members aged 18 or over with a cleared age and camera check. See our <a data-link="terms" style="color:var(--blue-2)">Terms</a> and <a data-link="privacy" style="color:var(--blue-2)">Privacy Policy</a>.</p>
+      <p>Events are for members aged 18 or over. See our <a data-link="terms" style="color:var(--blue-2)">Terms</a> and <a data-link="privacy" style="color:var(--blue-2)">Privacy Policy</a>.</p>
     </div>
   </section>
 </div>
@@ -2130,7 +2108,7 @@
     <div class="foot-grid">
       <div style="max-width:300px">
         <div class="logo foot" aria-label="Tournza">Tournza</div>
-        <p style="color:var(--muted);font-size:13.5px;margin-top:16px">Verified players. Professional events. Real rankings.</p>
+        <p style="color:var(--muted);font-size:13.5px;margin-top:16px">Real players. Professional events. Real rankings.</p>
       </div>
       <div class="foot-links">
         <div class="foot-col"><span class="h">Regions</span>
@@ -2322,15 +2300,14 @@ const INCLUDES = [
   'Enter the nightly tournaments in your region (£6 buy-in per event)',
   'Play Friendlies against other members',
   'Ranking points and full match stats: average, checkout %, 180s',
-  'Verified player profile',
+  'Your public player profile',
   'Everything in the free account',
 ];
 const FAQ = [
-  ['What does the £12 membership cover?','Membership gives you a verified profile, ranking eligibility and the ability to enter events for a full year. Each event then has a £6 buy-in, paid when you register.'],
-  ['How does verification work?','You complete a one-off age check and a camera check. Once cleared you can enter any event.'],
+  ['What does the £12 membership cover?','Membership gives you a player profile, ranking eligibility and the ability to enter events for a full year. Each event then has a £6 buy-in, paid when you register.'],
   ['What format are events?','Every region runs one tournament each evening, capped at 32 players: a group round robin followed by a knockout to the final, 501 double-out.'],
   ['When does check-in close?','Check in on the event page between 19:00 and 19:20 on the night (entries close at 19:15). No check-in, no place, and the buy-in isn’t refunded. The draw is at 19:30.'],
-  ['How are prizes paid?','Prizes are paid to verified winners via Stripe, on the day of winning or within 24 hours.'],
+  ['How are prizes paid?','Prizes are paid to winners via Stripe, on the day of winning or within 24 hours.'],
 ];
 
 /* ---------------- renderers ---------------- */
@@ -2582,8 +2559,7 @@ function renderEventDetail(id){
     ${pane('rules', `<div class="panel">
       <h3>Rules &amp; eligibility</h3>
       <ul class="rules">
-        <li>Verified Tournza membership required to enter</li>
-        <li>Age check and cam check must be cleared before check-in</li>
+        <li>Tournza membership required to enter</li>
         <li>501 double-out · group round robin then knockout to the final</li>
         <li>Entries close at ${EV_ENTRIES} on the night</li>
         <li>Check in between 19:00 and ${e.checkin} on the night — no check-in, no place, and the buy-in isn’t refunded</li>
@@ -3102,7 +3078,6 @@ document.addEventListener('click',e=>{
   if(t.dataset.event){
     go('join');
     const ev=$('#jf-event'); if(ev) ev.value=t.dataset.event;
-    const reason=$('#jf-reason'); if(reason) reason.value='Register for an event';
     const msg=$('#jf-msg'); if(msg && !msg.value) msg.value='I\'d like to register for: '+t.dataset.event;
     return;
   }
@@ -3130,22 +3105,20 @@ $('#rank-region').addEventListener('change',renderRankings);
 $('#f-region').addEventListener('change',renderEvents);
 $('#f-window').addEventListener('change',renderEvents);
 
-/* join form */
+/* contact form */
 $('#join-form').addEventListener('submit',async e=>{
   e.preventDefault();
   const f=e.target, fields=[
     ['#jf-name', v=>v.trim().length>1],
-    ['#jf-email', v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)],
-    ['#jf-region', v=>v!==''],
+    ['#jf-email', v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())],
+    ['#jf-msg', v=>v.trim().length>0],
   ];
   let ok=true;
   fields.forEach(([sel,test])=>{
     const inp=$(sel), field=inp.closest('.field');
     const good=test(inp.value); field.classList.toggle('bad',!good); if(!good) ok=false;
   });
-  const agree=$('#jf-agree'), agreeField=agree.closest('.field');
-  if(!agree.checked){agreeField.classList.add('bad'); ok=false;} else agreeField.classList.remove('bad');
-  if(!ok) return;
+  if(!ok){ const bad=f.querySelector('.field.bad input, .field.bad textarea'); if(bad) bad.focus(); return; }
 
   const t=$('#join-toast'), btn=$('#jf-submit');
   const first=$('#jf-name').value.trim().split(' ')[0];
@@ -3165,7 +3138,7 @@ $('#join-form').addEventListener('submit',async e=>{
     if(WEB3FORMS_KEY) data.append('access_key',WEB3FORMS_KEY);
     const res=await fetch(FORM_ENDPOINT,{method:'POST',body:data,headers:{'Accept':'application/json'}});
     if(res.ok){
-      show('Thanks, '+first+' — that\'s in. We\'ll set up your verified profile and be in touch within two working days.',false);
+      show('Thanks, '+first+' — your message is in. We\'ll reply to you within two working days.',false);
       f.reset();
     }else{
       show('Something went wrong sending that. Please email admin@tournza.co.uk and we\'ll sort it.',true);
@@ -3423,13 +3396,40 @@ function frJoinLobby(){
       out.push({ id, name: m.name || 'Player', status: inMatch ? 'in_match' : 'available' });
     });
     out.sort((a,b)=> (a.status===b.status ? a.name.localeCompare(b.name) : a.status==='available' ? -1 : 1));
+    // someone arriving, or back from a match: their average may have moved, so fetch it again
+    out.forEach(p=>{ const was = (FR.players||[]).find(x=>x.id===p.id); if(!was || was.status!==p.status) delete FR.avg[p.id]; });
     FR.players = out;
     frRenderPlayers();
+    frLoadAverages();
   });
   ch.subscribe(status=>{
     if(status==='SUBSCRIBED') ch.track({ id: me, name: FR.name, status:'available', at: Date.now() });
   });
 }
+
+/* ----- each lobby player's Friendly 3-dart average (their running Friendly stats; Friendlies only) ----- */
+FR.avg = {};                                   // id → { v: average or null, at: when fetched }
+async function frLoadAverages(){
+  const now = Date.now();
+  const ids = FR.players.map(p=>p.id).filter(id=>!FR.avg[id] || now - FR.avg[id].at > 5*60*1000);
+  if(!ids.length || !FR.sb) return;
+  try{
+    const { data, error } = await FR.sb.rpc('friendly_averages', { p_ids: ids });
+    if(error) throw error;
+    ids.forEach(id=>{ FR.avg[id] = { v:null, at:now }; });
+    (data||[]).forEach(r=>{ FR.avg[r.player_id] = { v: r.average == null ? null : Number(r.average), at:now }; });
+    frRenderPlayers();
+  }catch(e){ console.warn('friendly averages:', e); }   // the lobby works without them
+}
+const frAvgIn = id => {                 // phones: the same number on the status line, so names keep their room
+  const a = FR.avg[id];
+  return a ? `<i class="fr-3da-in">3DA ${a.v == null ? '–' : a.v.toFixed(2)}</i>` : '';
+};
+const frAvgCell = id => {
+  const a = FR.avg[id];
+  if(!a) return '';
+  return `<div class="fr-3da" title="Friendly 3-dart average"><b>${a.v == null ? '–' : a.v.toFixed(2)}</b><span>3DA</span></div>`;
+};
 
 function frRenderPlayers(){
   const box = $('#fr-players'); if(!box) return;
@@ -3449,7 +3449,8 @@ function frRenderPlayers(){
         : `<button class="btn btn-ghost btn-sm" data-fr-challenge="${frEsc(p.id)}" data-fr-name="${frEsc(p.name)}" ${FR.busy?'disabled':''}>Challenge</button>`;
     return `<div class="fr-player">
       <div class="ava fr">${frEsc(frInitials(p.name))}</div>
-      <div class="who"><b>${frEsc(p.name)}</b><span class="${p.status==='available'?'av':''}">${p.status==='available'?'● Available':'In a match'}</span></div>
+      <div class="who"><b>${frEsc(p.name)}</b><span class="${p.status==='available'?'av':''}">${p.status==='available'?'● Available':'In a match'}${frAvgIn(p.id)}</span></div>
+      ${frAvgCell(p.id)}
       ${btn}</div>`;
   }).join('') + (avail ? '' : `<p class="fr-sub" style="margin-top:10px">Everyone online is mid-match.</p>`);
 }
@@ -4200,7 +4201,8 @@ function tpDraw(JsPDF, n){
 
   // footer
   ink(TPC.muted); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-  doc.text('TOURNZA.CO.UK  ·  REGIONAL ONLINE DARTS  ·  EVERY NIGHT', W / 2, H - 10, { align:'center' });
+  doc.text('TOURNZA.CO.UK  ·  REGIONAL ONLINE DARTS  ·  EVERY NIGHT', W / 2, H - 15, { align:'center' });
+  tzSocialRow(doc, W / 2, H - 8, TPC.dim);
   return doc;
 }
 async function tpPoster(id){
@@ -4302,6 +4304,7 @@ function mpDraw(JsPDF, d){
   s.text('tournza.co.uk', 22+lw+4, 273+lh/2+1.4, { align:'left' });
   const gen = new Date().toLocaleString(undefined, { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
   s.text(`Generated ${gen}`, a-22, 273+lh/2+1.4, { align:'right' });
+  tzSocialRow(s, a/2, 273+lh/2+1.4, MP.ivoryDim);                  // @tournza + socials, as the match room's poster
   if(logo) op(0.055, ()=>{ try{ s.addImage(logo, 'PNG', a/2-66, l/2-31, 150, 34.883720930232556, undefined, undefined, -18); }catch(_){} });
   return s;
 }
@@ -4349,6 +4352,19 @@ document.addEventListener('click', async ev=>{
     notify((err && err.message && !/fetch|network|load/i.test(err.message)) ? err.message : 'Couldn’t make the poster — try again.', 'warn');
   }finally{ b.disabled = false; b.textContent = label; }
 });
+
+/* @tournza social icons for the posters (TikTok, Instagram, Facebook, X — Simple Icons, CC0), 96px PNG.
+   GENERATED by test/tools/make-social-icons.mjs. */
+const TZ_SOCIAL_ICONS = ["data:image/png;base64,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","data:image/png;base64,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","data:image/png;base64,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","data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAQAElEQVR4AdxdDZAcxXV+b3bvpCD5tCvJVXY5ceK/yFSwq4SEbo+isC9ItyfFCiQBFcgOkAInpCD8GIcfGxM5gG0ZggGbH1dCYYKRVUJx2cERt3dQMi6Xbk+SSRWmyrFJDHbsilI+3e4JgXV3u9P+3t6P72b6zc/+zK49Nb3b/br7dU9/Mz3v9evucQjHULH0WKFYMkm54bHJS1Dsb9X50kumG+13BE5tx6GxiU94L7oGwEw6czUZ81NvZKvCrqk+cvDwybe0in87+P78ZHkPyt0IZz2NMXsGe1d/xhtZA2D7Rn7DddIXI9LAtfxk4p4pd+ZrLS8ooQKGRid2o6i/gLOfhp5fdip7mS2yBoBEbO3tGSVD91FCBxN9sDA68bcJFdeyYoZHS5cz800BBby8oprZ3t/PFVuaBQAkck1X5mZ0Rf8l/oTcvc8eKb8zobKaXszQaHmzS/QvGmN0J+Ppbtpyzjn8mpZmCQAbN/KMY2gHngQrWhqTuunMy6tVsw/9Ix6Iurm0JWPh6In3MrvfYKYUWQ5jaIqJB887M/sTS/QCaQkAQt1y9urvg+k/il9x+11D/XEckSkqvIS8oVCcDHqEJU1HuZoAUakME/EKUg7c/Tvzucz3lOgFsg8AidnSm7kT//bMhi5w0unxrX3Zb0d1xM5OgPA6eFpPJnPnyKGJ91kjO4x48BWzHAJEgYh/j5TDGL4FbfN1JXoJ2QoAM5tUitEVmVNLUkuAKW2qM/sPvGyWSTCKy/dmXiF2rlPTgqfLtO/oUdOlpumACOkqp4+Vn2Ki92vVwZ3/2GBfRqQiLckSuhUASbH5rMyPidjaNTDxOme8fA/FOADCo2ToaTUL83uPV0p3qfEdEDE8Vr6PmD6kVgXiJq7zSjXeEqECIGnzfdkvAtFvi9/rmOmawuHSuV56ULh7OV1qDP1CT8Mff2bsRJ8e36SYOtgMjZWvQrZr4eynMT8QcZOZXXsCOzUQAMmyzOm6xJA5IX6vM67Ze/A/SxkvXQv3r8+WUcEPa/Ggs+NW9j591JwGf8ecGEL4E4jnD2oVwk06njbLA8VNLW8oAP2bVh5DoqttDNAVvXX6FP2rLU6jQTIYIeKHSDuY395dKd2nRSdNF+EA97T0+2gGS+nG/BLtMHje2af93BIbSrIz9WQbyK3+KlD+poc8G2TaXhgrWdXs2QT+3+qaVR/DU/VDf8w8hT86XCwPzIfa9f/coTfeVnVomJh/R6mDMQ5dlI8gbir5KRIAknnZMrpc7b+NefBA8Y3flXRR3Lb38BSnui4kQ6rC5xrz1TjdW5Ry46SRbrDCp0Zwd+uDhsw3Y4DtP+Lw9aaNDED/+mzZYf6Il8FsmFek6NRTs/5ov/mz3vSSccw/aKmZ6c1TU/QVasMBcdPprpS/gTv/dK149AiPQeK5W4uPSo8MgDAcyGWGjSFl7INzheLELZIuqstvyn6WArRkJjofL8CdUfk1K11hrCzXuCWA3wgaP5a4qfGKBYAwmenKXAeJ4Kfi9znDdxSOvHaGj64QmNlUaflFAEHVktFNPVxT/RUezSZjgO0mAP9XKl+Im9PpzAWoeyxxU+MXG4BA2wE02rha8rbcaT/Do26VsqTSnKDt4JnR0p/jnviclGtz6HZq4qa0gS2+HlpsAKSQmu2AjFUTRoOtS42XY/WN+d7s47jTVS2ZYTsYLk6oIEmdGnWFYnkDytkDPvjDr/dsUNz0spsP1wWAZF6Tzn6SjLHbDpj+ri4tmcz/CW+bw7vnnlbZDp57ofT7EIuHmEkb32pY3LRdk9Ac+anHhdkO/FpycCn966ElO3yxmopbYzv47nfNmyrTBHGT1mpls6GPNypuarzrBkAYiu2A2Nwufq9j4vha8qbsd9DP3u/ltSi8YbhY8s0sWBQfy3vwoEm/nipL1/ceLSPq89hAX/ZeLb5RekMASOEDvVl5adltB0zbh8ZKl0q6qG5tOvP36A6CtORdMjwQlV9QuqnlpceJ6QMBaZombmplNAwAM+u2A5TKxjx0IIaWLF2baMm486aR3X9C0mqG7WCoWLoddd/pL2CO0mRxc46r769hAISj2A6M49wgfr/jurRkNM5tfl5zlFnbgW+OzVxs6N/w2OQlTPRpLSGewGNpjG42U9zUymoKAMJ8sDfzCCoOU52EvK4OLbk3A1HWBNiS+cZn6rAdjBQnc8a4j3truBCGuJlyaaDe0c0FPhE9TQNAyluWTn8E4mJJ/D4XU0uW/KIlA1SrLQLxsW0HQ4cm31017gHktZo+0e25MrpZEy6QKImzqQD0b+wZB8PLrRVH312flkz65C2xHcyUH7CW5yHWRlYdd4SZsp6oxcEbWyVuLi5ksR/ttTjYuB8i279jbGevjRPDlpw6Xv68LU6joUFEO9VHWpmuCLMdyMTZqSlzgIn+gLTDmIcHc9nEDUFNB0Cub0Ul+9foOjSt9tq4WvKKSuaKAH4UZjuQibNMHGRrHhnIZVs61CHtYnMtAUCm4jkOq1PQ42rJwo+dmpaMbtp/GehWVNsBxnhEWlInzoLhi3Ojm/D6eTdKCcvfEgCk0IFN2ecxVvSw+L0Od2O9WrKqkTLR+cPFiSUGI5k4i+7wVm/582E8VcfS1DWQhLg5X6b3v2UASEHVtdkbjKH/Eb/PMdWjJd8KUL/v4zVHwAD9g/O2A+nmEBbDylys98+8LuLm5tzK//fGJBluKQBi+yXiHXi20RbkP4z54oGYWrKbTsOA42clFJ6zHYyMvnY6urmn0TWlhG53zp8lKW7a60DRjfIagzD6YF/mBSaSftiXlNFgDp36mi8igLD1rJ4fAlBF6yZiog+6NHOYwZu0w9C1+VxmRItOkt7SJ2D+QiZ7M7vQaC/Ohxf/o6HOGRot37yYFuaviYuGnlfTMa9U4yBuyow/NT7hiEQA2MFcxYjdDoBgHWBjMnfGsSVLG3Wnui7GS1TTkiWJzbVN3LRVRmiJACAFSdeBu/2T4vc5np1xHWd2tMzYY3KuoIgHwG+ruKlVMzEApALod++BFHNI/F4HcNaNV2LaknOZ/WjYJ7y8vGE8KW0XN711mg8nCoAU6hJ/GCCcFL/XMdF1hbHyH3vpQeGVlczV4Bc8L5N5sN3ipnYNiQOwtS/7KjnO9VqFjHFjTUkULdkw/6XGr0Y3tLn234E/TjvqlO/NPIpuoWArm+uwJUMqOkhkvrzAz+/5zDNHTqzzk9tPaQsActmBtgOGllwsBd/VwmSRm05nPwat+yeLSAteJurmanXfPmNSC8QO8bQNgEDbQa1xzJfiaMkynsOplGrjBQjvXzVW3lVj3UE/bQNA2kBsB5oUw8Q9KZp6UtJFdflNPYfA7/6A9LcVRid7A+ITj2orAHK1IsUYfUbcudCSrQsFJa/NuWsyN4OfOq3FkPtknBWetjKaSWs7ACLFBNkOoCXfFUdLlgFAmdZChiq2hsIA3buc4+V/ssW1g9Z2AOSixXagdh1MaarM7Dv4ilkuaaO42uIPYnVaCxNdPXy4fF4UXq1O0xEAyEXWug6j2Q749Klj8bRkjMLupoDFH67rPiHzQqXsdrqOAUC6DgqwHaDruAbmxaBVK+Q9gqa1MPSNk6nSI948SYc7BgC5cNy1L7ChO8Rvc8aYJ2vTS2yRFto2WfxBfI0lqkZi5p0wW/5pLdCmn44CQNpgMpe5A+8Du+2A6c1x1yVDS34CL2SZAS3sfc4l+srBoyfW+iISIjQRgObUWGwHeAqeU7mJljxa/qgab4mobZGgiLrMlJ2uVPSpihZ+zSR1HAAycZaYVJOjXDyT+wBGTd8h/iiuf322zLPTWpTkvA36RixQFUaxyR0FQOjE2fnLY14Oo/t+vBN4nhT2n9+U/Q7SqDPfmN0vFA6/oe4BhLwtOTsGgLCJs96rR9dxJp6CXV56UHhNOnOTIaNoybyCqqf2BuVvRVxHAFCTbMInztqu/7aRI6X1tggbLXzxB5+NrijW0IetnDi0jgAgwsRZzYLmuFXaL/s6RL1o0ZKZ2G6bBhNms3vo8Gt/BG8iZ9sBKBRL+9EgfQFXO5Jy0htgdvRvnzab6Z3dlZI6ZXE2ydLffC5zT5CWTG5lT1K2g7YCUBgty+aA6sRZNPoPptOZCzb39vyImG5c2oyLQ/w3zdWSCbaDktRtcSEt8bcNgFlx06hdAV6WS9Zp5XOrH4KCZt0+TVoGElF8LZn1xR+G+Ca8D84U3q10bQFAJs4aE3+dVtD2aZCK4mvJvavVxR9MMm3T7Gu17SBxAETchAwvQwOx12nJZCx0RQFLlmg7RNPIk7Xkzg5a/AFQ3+WMl1TdQfI36hIF4NmxE2tIxE2YG7WKYxjihsHe1eouVIjbY4i+qeUn494fx5YsBiGe1ZLB1s+Vma8KWwLlzxWdkhgAsk6raqpDHLJOK9+XDV10F7h9Gs2uSzbGoKhoDSFasjH0BS112BIoLV8UemIAyDotVGgjnP009K2BiOu0+tdnyw7zktUwS5lybjjmnhJruzK34MVv1ZIZo7Ct2j4tEQAgTdyFBlLFTTz7L3a/JXMRQwtCukjnQC4zDFn+n/XEvCuOLTlMS8bjdH6hOHmxXl59MS0HQMRNtOsntOrhrvtZmroG+t/BmqKlZaXpdPZ60j69Alty3HXJoiU7hm7VCjRU/fL8EigtTVx6SwEIFTfJvM7p9JZ6J87KZKygT68wcew9rgf6sveSsvgD/HqmmvzplZYBECpu4nYyxrkgv7HHvutWxFtpq3x6Rdk+TVgw17HHdcDiDyZq6qdXWgJAFHETBV8JG/Cz0kiNujVB26eBOfSOeHtcb1p5jIMXfzTt0ytoB2rqEUncJHM3HvWmbcoqL1D03TvQddgnY1Edu3fJ4g9jRFP2tw83b/u0pgMQRdzM51Y3fcxdlpwG7cRLYkseK13qb02dsrKavQpCgrblwga849QXts51aUxTASgUy7IcVRU3UfTRboib+G/sVHJDofosor4HZz9jrksO1ZJd/nSj26c1DQARNyGXq3cEZP1XU5warEfctLemn8rMJqV9egXJGUMgqbh7XNdsyfY9UvFUpd0GP73SFADwKJ5rAkY38RifINfZgnH942iHlp6bz8r8GA0TZDvIQTGM1QXOveTtWyTMbp8mimZd19UwAEOHJt8NKUMd3UStZjDYtX3w7FX/DX8iJ94xgbYDYhNrj2t5yaec9IV4iq3rnInq//RKQwBEETeZncvQN8uUEEryCLQdEHWLlhxnXTKe3h+h/tqK/tjbp4FX7awbgGjiJt050Lsq1l4QtVo14SfMdoD3wbrjM+XdcYoazGXvI0VLJua3d82U74/DT9LWDUCouEn0b/lc9lNSSLvcICxe6DZ02wHT9fL+ilO/btGSDZVseZjpyri2g7oAKBQnRNxTxU28dEfftjKz01bJpGnBtgO8DVyzN846AXmy2DGqPhHXdhAbgOHR0uVErH4pA3fcq8uW8bYzMJ9vTAAAAmpJREFUzmDlhUWJHv3rg20H6IreejJdClpj7Ktvvnf1t3Cd1i0S8BSo26f5GIEQCwB5XF0idRcqWJVKIm72r8+WwbtjzoEQ2wFAuARK5IVxKiyLC4nM/9ryMPm3T7OlE1pkAOTzrSJuAuGUZPQ6NP5Uip1tSYqb3joEhQNtB8hoyH00zli/aMlkUrJ7Fx4GMPCcuFEXtk/zRC0JRgJAxE1TqYwwNMkluRcFUIudW3KriotIHeWNYDvoma7OxJqcm+9bNQbl27oPqrRVFNtBKAC/FjdZ/06YoU9t7ct+vaNa3FKZrSG2A2L6wFCxpG4kYmFJ5U1Z+ZKIVUtm2A6GxibUJVLCLxSAMHHTYMg235dNZBqfVLhRtybEdgD+u/HE/yH+I507mKuiJcM0ajWpskt3B316JRCA4bGJz6EWqrhJUEqWncpehjS/MacMKwTbDqi76lb2x5mcO6sls11LDrEdqACIuGmMwnS2uV+Wz7f297PVCDKbpDN/w20H/L7M4VKsATb0Ag/IDalc8YaRsbJ14bgVgFBxk2g83U11fb5VqWDiZIxPiTKp2g7k5isUSyaOk3eIdiHG0O0224EPgDBxE33dL5l48Lwzs9a9ebQKdBqdIb4E2Q6aXl8mq+1gCQB4+awxlUBx08gHDvK5jHrnNL3iLWQYbjtocuFiO/AMAC4AIJthzM7dZF3c5MY/39rkS2qYXT5k3UHDBXgZYABw8adXFgCYPlZ+CmnVuZtQtJry+VaU0XFnkO2gBZVlZ9Fn22sAFIoTn8cL5EMBhbX8e1oBZbc8SkY4cf3WdQctKVxsB5Xyl4T3rwAAAP//g+8OWQAAAAZJREFUAwDtbAjvK9a1LgAAAABJRU5ErkJggg=="];
+// draw "[icons] @tournza" centred on cx, baseline y (mm), in a jsPDF doc
+function tzSocialRow(doc, cx, y, color){
+  const sz = 3.6, gap = 1.8, label = '@tournza';
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+  const tw = doc.getTextWidth(label), w = TZ_SOCIAL_ICONS.length * (sz + gap) + 0.6 + tw;
+  let x = cx - w / 2;
+  TZ_SOCIAL_ICONS.forEach(png=>{ try{ doc.addImage(png, 'PNG', x, y - sz + 0.55, sz, sz); }catch(_){} x += sz + gap; });
+  doc.setTextColor(color); doc.text(label, x + 0.6, y);
+}
 
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves
@@ -4500,7 +4516,7 @@ go((location.hash||'#home').slice(1)||'home');
     applyMembership(await loadMembership(user));
   }
 
-  // ---- Account dashboard: real profile, verification, and entries ----
+  // ---- Account dashboard: real profile, membership and entries ----
   // Cached so navigating to #account doesn't need a fresh fetch every time;
   // onSignedIn refreshes it once per session, and a successful entry/payment
   // return also triggers a fresh load via onSignedIn running again.
@@ -4509,7 +4525,7 @@ go((location.hash||'#home').slice(1)||'home');
     try{
       const [{ data: profile }, { data: entries }] = await Promise.all([
         sb.from('profiles')
-          .select('full_name, membership_status, created_at, age_verified, cam_verified, stripe_customer_id, current_period_end, cancel_at_period_end, region')
+          .select('full_name, membership_status, created_at, stripe_customer_id, current_period_end, cancel_at_period_end, region')
           .eq('id', user.id).maybeSingle(),
         sb.from('tournament_entries')
           .select('id, tournaments(id, name, tournament_date, phase)')
@@ -4529,7 +4545,7 @@ go((location.hash||'#home').slice(1)||'home');
     const { profile, entries, hasPlayerProfile } = acctData;
 
     const lede = $('#acct-lede');
-    if(lede) lede.textContent = 'Membership, verification and registrations for ' + (profile.full_name || (authState.user && displayName(authState.user)) || 'you') + '.';
+    if(lede) lede.textContent = 'Profile, membership and tournaments for ' + (profile.full_name || (authState.user && displayName(authState.user)) || 'you') + '.';
     const acctName = $('#acct-name'), acctEmail = $('#acct-email');
     if(acctName) acctName.textContent = profile.full_name || (authState.user && displayName(authState.user)) || '—';
     if(acctEmail) acctEmail.textContent = (authState.user && authState.user.email) || '—';
@@ -4608,13 +4624,6 @@ go((location.hash||'#home').slice(1)||'home');
       }
     }
 
-    const ageEl = $('#acct-age-check'), camEl = $('#acct-cam-check');
-    if(ageEl) ageEl.outerHTML = profile.age_verified
-      ? '<span id="acct-age-check" class="badge-ok">✓ Verified</span>'
-      : '<span id="acct-age-check" class="badge-wait">◷ Pending</span>';
-    if(camEl) camEl.outerHTML = profile.cam_verified
-      ? '<span id="acct-cam-check" class="badge-ok">✓ Verified</span>'
-      : '<span id="acct-cam-check" class="badge-wait">◷ Pending</span>';
 
     const viewProfileBtn = $('#acct-view-profile');
     if(viewProfileBtn){
