@@ -4366,6 +4366,145 @@ function tzSocialRow(doc, cx, y, color){
   doc.setTextColor(color); doc.text(label, x + 0.6, y);
 }
 
+/* ---------------- "Your match is ready" alerts (pass 11, 2026-10) ----------------
+   On every Tournza page (site + watch page) while it's open: when YOUR tournament match is ready
+   and you haven't opened the match room yet —
+     • ready:            one ping, a short buzz (phones that support it) and a pop-up at the top
+     • 1 minute left:    two pings, a double buzz, the pop-up turns urgent
+   The pop-up goes as soon as you've joined (or the match is no longer waiting for you).
+   Read-only: my_tournament_match() + your own live_matches row. Nothing is written.
+   Limits (browsers): sound/buzz need one tap on the page first; phones pause pages that aren't on screen. */
+(function(){
+  if(window.__tzAlert) return; window.__tzAlert = true;
+  const WINDOW_MS = 180000, WARN_AT = 120000;          // 3-minute no-show rule; warn with 1 minute left
+  const A = { sb:null, ctx:null, m:null, done:{}, timer:null, warnT:null, el:null, title:document.title, flash:null };
+  const store = {                                       // one ping per match across tabs (best effort)
+    seen(k){ try{ return localStorage.getItem('tz.alert.' + k) === '1'; }catch(_){ return !!A.done[k]; } },
+    mark(k){ A.done[k] = true; try{ localStorage.setItem('tz.alert.' + k, '1'); }catch(_){} },
+  };
+  // ---- sound: a short two-note chime, made in the browser (no file to load) ----
+  const unlock = ()=>{
+    try{
+      const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+      if(!A.ctx) A.ctx = new C();
+      if(A.ctx.state === 'suspended') A.ctx.resume();
+    }catch(_){}
+  };
+  ['pointerdown','keydown','touchstart'].forEach(e=>window.addEventListener(e, unlock, { capture:true, passive:true }));
+  function chime(at){
+    const c = A.ctx; if(!c) return;
+    [[880, 0], [1318.5, 0.13]].forEach(([f, d])=>{
+      const o = c.createOscillator(), g = c.createGain(), t = at + d;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+      o.connect(g).connect(c.destination); o.start(t); o.stop(t + 0.45);
+    });
+  }
+  function ping(times){
+    try{ unlock(); if(A.ctx){ const t = A.ctx.currentTime + 0.05; for(let i=0;i<times;i++) chime(t + i * 0.7); } }catch(_){}
+    try{ if(navigator.vibrate) navigator.vibrate(times > 1 ? [220,120,220,120,220] : [260]); }catch(_){}
+    window.__tzAlertLog = (window.__tzAlertLog || []).concat([{ times, at: Date.now() }]);   // for the tests
+  }
+  // ---- the pop-up ----
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  function css(){
+    if(document.getElementById('tz-alert-css')) return;
+    const s = document.createElement('style'); s.id = 'tz-alert-css';
+    s.textContent = `
+.tz-alert{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:2147483000;
+  width:min(560px,calc(100vw - 32px));display:flex;align-items:center;gap:14px;padding:14px 14px 14px 18px;border-radius:16px;
+  background:linear-gradient(180deg,#14224a,#0c1631);border:1px solid rgba(77,163,255,.55);color:#edf2ff;
+  box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04) inset,0 0 34px rgba(54,120,255,.35);
+  font:500 14.5px/1.35 var(--body,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);transition:transform .35s cubic-bezier(.2,.9,.3,1.2)}
+.tz-alert.show{transform:translate(-50%,0)}
+.tz-alert.urgent{border-color:rgba(245,54,120,.75);box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 38px rgba(245,54,120,.45)}
+.tz-alert .dot{flex:none;width:12px;height:12px;border-radius:50%;background:#2fd27c;box-shadow:0 0 0 0 rgba(47,210,124,.7);animation:tzaPulse 1.4s infinite}
+.tz-alert.urgent .dot{background:#f53678;box-shadow:0 0 0 0 rgba(245,54,120,.7)}
+@keyframes tzaPulse{70%{box-shadow:0 0 0 10px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+.tz-alert .txt{flex:1;min-width:0}
+.tz-alert .txt b{display:block;font-family:var(--display,inherit);font-size:15.5px;font-weight:800;letter-spacing:.01em;color:#fff}
+.tz-alert .txt span{color:#b9c8ef;font-size:13.5px}
+.tz-alert .go{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border-radius:999px;
+  background:linear-gradient(180deg,#3f8cff,#2563eb);color:#fff;font-weight:800;font-size:14px;text-decoration:none;white-space:nowrap;touch-action:manipulation}
+.tz-alert.urgent .go{background:linear-gradient(180deg,#f0346f,#cf1f5e)}
+.tz-alert .x{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#93a2c9;font-size:20px;line-height:1;cursor:pointer}
+.tz-alert .x:hover{color:#fff;background:rgba(255,255,255,.06)}
+.tz-alert a:focus-visible,.tz-alert button:focus-visible{outline:2px solid #4de3ff;outline-offset:2px}
+@media (max-width:520px){.tz-alert{gap:10px;padding:12px 10px 12px 14px}.tz-alert .txt b{font-size:14.5px}.tz-alert .txt span{font-size:12.5px}.tz-alert .go{padding:0 13px}}
+@media (prefers-reduced-motion:reduce){.tz-alert{transition:none}.tz-alert .dot{animation:none}}`;
+    document.head.appendChild(s);
+  }
+  function show(m, urgent){
+    css();
+    const by = new Date(new Date(m.ready_at).getTime() + WINDOW_MS).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    if(!A.el){
+      A.el = document.createElement('div'); A.el.className = 'tz-alert'; A.el.setAttribute('role', 'alert'); A.el.dataset.testid = 'match-alert';
+      document.body.appendChild(A.el);
+      A.el.addEventListener('click', e=>{ if(e.target.closest('.x')) hide(true); });
+    }
+    A.el.classList.toggle('urgent', !!urgent);
+    A.el.innerHTML = `<span class="dot" aria-hidden="true"></span>
+      <div class="txt"><b>${urgent ? '1 minute left to join' : 'Your match is ready'}</b><span>v ${esc(m.opponent || 'your opponent')} · join by ${by} or it’s a walkover</span></div>
+      <a class="go" href="play.html?match=${encodeURIComponent(m.code)}">Play now</a>
+      <button type="button" class="x" aria-label="Dismiss">×</button>`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>A.el && A.el.classList.add('show')));
+    flashTitle(urgent ? '⚠ 1 minute left to join' : '● Your match is ready');
+  }
+  function hide(byUser){
+    if(A.el){ const el = A.el; el.classList.remove('show'); setTimeout(()=>el.remove(), 400); A.el = null; }
+    if(!byUser){ clearTimeout(A.warnT); A.warnT = null; }
+    flashTitle(null);
+  }
+  function flashTitle(t){                               // background tabs: the tab title blinks
+    clearInterval(A.flash); A.flash = null;
+    if(!t){ if(A.title) document.title = A.title; return; }
+    A.title = A.title || document.title; let on = false;
+    A.flash = setInterval(()=>{ on = !on; document.title = on ? t : A.title; if(!document.hidden && !on){ clearInterval(A.flash); A.flash = null; document.title = A.title; } }, 1000);
+  }
+  // ---- watching for your match ----
+  function ukHour(){ try{ return Number(new Intl.DateTimeFormat('en-GB', { hour:'2-digit', hour12:false, timeZone:'Europe/London' }).format(new Date())) % 24; }catch(_){ return new Date().getHours(); } }
+  const evening = ()=>{ const h = ukHour(); return h >= 19 || h < 2; };
+  async function check(){
+    const sb = A.sb; if(!sb) return;
+    let m = null;
+    try{
+      const { data:s } = await sb.auth.getSession();
+      if(!s || !s.session) return stop();
+      const r = await sb.rpc('my_tournament_match'); m = r.data || null;
+      if(m && m.status === 'ready' && m.match_id){
+        const lm = await sb.from('live_matches').select('p1_joined_at, p2_joined_at, status').eq('id', m.match_id).maybeSingle();
+        const row = lm.data;
+        if(row && (row[m.seat === 'p1' ? 'p1_joined_at' : 'p2_joined_at'] || !['waiting','ready'].includes(row.status))) m = null;   // you're in already
+      } else m = null;
+    }catch(_){ return; }                                // a blip: try again next time
+    if(!m || !m.ready_at){ if(A.m) hide(false); A.m = null; return; }
+    const since = Date.now() - new Date(m.ready_at).getTime();
+    if(since > WINDOW_MS + 15000){ if(A.m) hide(false); A.m = null; return; }   // window over: the server has decided it
+    const urgent = since >= WARN_AT;
+    const changed = !A.m || A.m.match_id !== m.match_id || A.urgent !== urgent;
+    A.m = m; A.urgent = urgent;
+    if(changed) show(m, urgent);
+    const k = m.match_id + (urgent ? '.1min' : '.ready');
+    if(!store.seen(k)){ store.mark(k); if(urgent) store.mark(m.match_id + '.ready'); ping(urgent ? 2 : 1); }
+    clearTimeout(A.warnT);                              // the 1-minute warning lands on time, not at the next check
+    if(!urgent) A.warnT = setTimeout(check, Math.max(500, WARN_AT - since + 200));
+  }
+  function stop(){ clearTimeout(A.timer); A.timer = null; if(A.m) hide(false); A.m = null; }
+  function loop(){
+    clearTimeout(A.timer);
+    check().finally(()=>{ A.timer = setTimeout(loop, (window.__tzAlertFast || A.m || evening()) ? 10000 : 300000); });
+  }
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && A.sb) loop(); });
+  // the page's own Supabase client (signed-in session); wait for it rather than making a second one
+  let tries = 0;
+  (function wait(){
+    const sb = window.tournzaSupabase;
+    if(sb && sb.rpc){ A.sb = sb; loop(); return; }
+    if(++tries < 120) setTimeout(wait, 500);
+  })();
+  window.tzAlertCheck = check;                          // for the tests
+})();
+
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves
 loadTournamentsFromSupabase();
