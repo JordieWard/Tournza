@@ -1569,6 +1569,301 @@
   .route#route-players input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(25,211,243,.2)}
   @media (prefers-reduced-motion:reduce){ .route#route-players .player-card:hover{transform:none} }
 
+  /* ================= OWN YOUR REGION — OYR flagship (pass 13) =================
+     OYR brand rules (reuse for merch / socials / event graphics):
+       ink   #050B1A → #0A1630 navy · electric blue #3678FF · cyan #19D3F3 · white type
+       angle 115° (the logo's frame and the site's diagonals) · chamfered corners 14px
+       type  Archivo 900 uppercase, tight; slogan "#OwnYourRegion"
+       gold / silver / bronze only for 1st / 2nd / 3rd */
+  .oyr{--oyr-ink:#050B1A;--oyr-navy:#0A1630;--oyr-blue:#3678FF;--oyr-cyan:#19D3F3;--oyr-line:rgba(77,141,255,.38);--oyr-cut:14px;
+    --gold-a:#FFD66B;--gold-b:#C98A12;--silver-a:#EEF3FB;--silver-b:#98A6BF;--bronze-a:#F2A86E;--bronze-b:#A8541F;position:relative}
+
+  /* ---- switch: National · Regional (OYR) — the same Tournza rankings ---- */
+  .oyr-switch{display:inline-flex;gap:4px;padding:4px;border-radius:999px;border:1px solid var(--oyr-line,rgba(77,141,255,.38));background:rgba(5,11,26,.72)}
+  .oyr-switch a{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 16px;border-radius:999px;text-decoration:none;
+    font:700 13.5px/1 var(--body);color:var(--ivory-dim);transition:background .15s,color .15s}
+  .oyr-switch a:hover{color:#fff}
+  .oyr-switch a.on{background:var(--btn-blue);color:#fff;box-shadow:var(--glow-blue)}
+  .oyr-switch b{font:900 11px/1 var(--display);letter-spacing:.06em;padding:3px 6px;border-radius:5px;background:rgba(255,255,255,.16)}
+  .oyr-switch a:not(.on) b{background:rgba(25,211,243,.14);color:var(--cyan)}
+  .oyr-switch a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  #route-rankings .oyr-switch{margin:0 0 20px}
+
+  /* ---- hero: chamfered navy panel, the logo as the mark, diagonal light ---- */
+  .oyr-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:20px;
+    padding:clamp(30px,3.6vw,48px) clamp(4px,1vw,12px);margin-bottom:22px}
+  /* the burst: bright blue smoke exploding from behind the logo, fading out into the page on every side
+     (oyr-smoke.webp is made by build/make_oyr_smoke.py on black; `screen` drops the black) */
+  .oyr-hero-bg{position:absolute;top:-90px;bottom:-80px;left:calc((100% - 100vw) / 2 + 10px);right:calc((100% - 100vw) / 2 + 10px);   /* to the window's edges, never past them */
+   z-index:0;pointer-events:none;overflow:hidden;mix-blend-mode:screen;   /* the whole layer lightens the page */
+    -webkit-mask-image:radial-gradient(closest-side at 56% 50%,#000 60%,transparent 100%);mask-image:radial-gradient(closest-side at 56% 50%,#000 60%,transparent 100%)}
+  .oyr-hero-bg i{position:absolute;inset:0}
+  .oyr-hero-bg .smk{background:url(assets/oyr-smoke.webp) 62% 50%/cover no-repeat;filter:brightness(1.25) saturate(1.15)}
+  .oyr-hero-bg .smk.b{mix-blend-mode:screen}
+  .oyr-hero-bg .smk.b{opacity:.75;transform:scale(1.18) rotate(-4deg);transform-origin:68% 48%;filter:saturate(1.2);animation:oyrBillow 16s ease-in-out infinite alternate}
+  @keyframes oyrBillow{from{transform:scale(1.12) rotate(-5deg)}to{transform:scale(1.26) rotate(3deg) translateX(-2%)}}
+  .oyr-hero-bg .beam{left:52%;right:auto;width:2px;top:-20%;bottom:-20%;transform:skewX(-25deg);background:rgba(160,230,255,.85);box-shadow:0 0 16px 2px rgba(25,211,243,.9);mix-blend-mode:screen}
+  .oyr-hero-bg .beam.c{left:61%;width:1px;opacity:.6}
+  .oyr-hero-bg .sheen{left:-30%;right:auto;width:16%;transform:skewX(-25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);animation:oyrSweep 9s ease-in-out infinite}
+  @keyframes oyrSweep{0%,55%{left:-30%}100%{left:130%}}
+  /* keeps the white title readable over the brightest smoke */
+  .oyr-hero-bg .scrim{background:radial-gradient(48% 70% at 22% 52%,rgba(4,9,24,.72),rgba(4,9,24,.28) 60%,transparent 80%)}
+  .oyr-copy{position:relative;z-index:1;min-width:0}
+  .route#route-regional h2.oyr-title{margin:18px 0 0;font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.84;letter-spacing:-.025em;
+    font-size:clamp(50px,6.6vw,94px);color:#fff;text-shadow:none;   /* no glow on the type: Chrome draws a dark box behind a text-shadow this size */
+    background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:#fff}
+  .oyr-title span{display:block}
+  .route#route-regional .oyr-title .hl{color:var(--oyr-cyan);-webkit-text-fill-color:var(--oyr-cyan)}
+  .oyr-tag{display:inline-flex;align-items:center;gap:10px;margin:16px 0 0;font:900 italic clamp(15px,1.6vw,19px)/1 var(--display);letter-spacing:.02em;color:#fff}
+  .oyr-tag::before{content:"";width:28px;height:4px;background:linear-gradient(90deg,var(--oyr-blue),var(--oyr-cyan));transform:skewX(-25deg)}
+  .oyr-lede{max-width:500px;margin:14px 0 0;color:var(--ivory-dim);font-size:15.5px;line-height:1.55}
+  .oyr-mark{position:relative;z-index:1;display:grid;place-items:center}
+  .oyr-mark::before{content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(54,120,255,.45),transparent);filter:blur(10px)}
+  .oyr-logo{position:relative;width:min(100%,330px);aspect-ratio:1;background:url(assets/oyr-logo.webp) center/contain no-repeat;
+    -webkit-mask-image:radial-gradient(closest-side,#000 64%,transparent 100%);mask-image:radial-gradient(closest-side,#000 64%,transparent 100%);
+    animation:oyrGlow 6s ease-in-out infinite}
+  @keyframes oyrGlow{50%{filter:brightness(1.18) saturate(1.15)}}
+
+  /* ---- region tiles: big, bold, angled ---- */
+  .oyr-pick{margin:0 0 26px}
+  .oyr-pick-h{margin:0 0 12px;font:500 11.5px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
+  .oyr-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+  .oyr-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:92px;padding:16px 18px 14px;text-align:left;cursor:pointer;
+    border:0;color:var(--ivory);background:linear-gradient(180deg,#13254A,#0B1834);touch-action:manipulation;
+    clip-path:polygon(var(--oyr-cut) 0,100% 0,100% calc(100% - var(--oyr-cut)),calc(100% - var(--oyr-cut)) 100%,0 100%,0 var(--oyr-cut));
+    box-shadow:inset 0 0 0 1px rgba(77,141,255,.32);transition:transform .18s,background .18s,box-shadow .18s}
+  .oyr-tile::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:rgba(77,141,255,.35);transition:background .18s}
+  .oyr-tile:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px var(--oyr-cyan)}
+  .oyr-tile:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--oyr-cyan),0 0 0 3px rgba(25,211,243,.35)}
+  .oyr-tile .rn{font:900 19px/1.05 var(--display);text-transform:uppercase;letter-spacing:-.005em;color:#fff}
+  .oyr-tile .ld{font:600 13px/1.25 var(--body);color:var(--ivory-dim);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oyr-tile .ct{font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .oyr-tile.mine .ct{color:var(--cyan)}
+  .oyr-tile .tick{position:absolute;top:10px;right:12px;font:800 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:4px 7px;border-radius:4px;background:#fff;color:#0B1D45}
+  .oyr-tile.on{background:linear-gradient(115deg,#2F6BFF 0%,#1F55E8 60%,#1A8FE0 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 14px 34px -14px rgba(54,120,255,.95)}
+  .oyr-tile.on::after{background:#fff}
+  .oyr-tile.on .ld{color:#fff}
+  .oyr-tile.on .ct{color:rgba(255,255,255,.82)}
+
+  /* ---- the selected region ---- */
+  .oyr-stage.in{animation:oyrIn .35s ease-out both}
+  @keyframes oyrIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .oyr-rhead{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin:0 0 16px}
+  .oyr-rhead h3{margin:0;font:900 clamp(34px,5vw,62px)/.9 var(--display);text-transform:uppercase;letter-spacing:-.02em;color:#fff}
+  .oyr-owner{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:13px;color:var(--ivory-dim);
+    border:1px solid rgba(255,214,107,.4);background:rgba(255,214,107,.07)}
+  .oyr-owner b{color:var(--gold-a)}
+  .oyr-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:0 0 16px;background:rgba(77,141,255,.28);border:1px solid rgba(77,141,255,.28);border-radius:12px;overflow:hidden}
+  .oyr-fact{display:flex;flex-direction:column;gap:6px;padding:16px 18px;background:#0B1730;min-width:0}
+  .oyr-fact b{font:900 26px/1 var(--display);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oyr-fact span{font:500 10.5px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+  .oyr-fact i{font-style:normal;font-size:12px;color:var(--muted-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oyr-me{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin:0 0 20px;padding:12px 18px;border-radius:12px;
+    background:linear-gradient(90deg,rgba(25,211,243,.16),rgba(25,211,243,.03));border:1px solid var(--cyan-line);box-shadow:inset 4px 0 0 var(--oyr-cyan)}
+  .oyr-me .k{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+  .oyr-me .v{font:800 16px/1.2 var(--display);color:#fff}
+  .oyr-me .v b{font-size:20px}
+  .oyr-me .g{font-size:13.5px;color:var(--ivory-dim)}
+
+  /* ---- podium: 2nd · 1st · 3rd, metal reserved for the places ---- */
+  .oyr-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:14px;max-width:960px;margin:34px auto 30px;padding:0;list-style:none}
+  .oyr-pslot{min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+  .oyr-step{--a:var(--silver-a);--b:var(--silver-b);--glow:rgba(238,243,251,.28);display:flex;flex-direction:column;text-decoration:none;color:inherit;min-width:0}
+  .oyr-step.p1{--a:var(--gold-a);--b:var(--gold-b);--glow:rgba(255,200,80,.42)}
+  .oyr-step.p3{--a:var(--bronze-a);--b:var(--bronze-b);--glow:rgba(242,168,110,.3)}
+  .oyr-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 14px 18px;min-width:0;
+    border:1.5px solid transparent;border-bottom:0;border-radius:16px 16px 0 0;
+    background:linear-gradient(180deg,#17305F 0%,#0E1D3D 100%) padding-box,linear-gradient(180deg,var(--a),rgba(255,255,255,.06) 70%) border-box}
+  .oyr-card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.07) 45%,transparent 60%)}
+  .oyr-step.p1 .oyr-card{padding-top:34px;box-shadow:0 -18px 60px -30px var(--glow)}
+  .oyr-crown{position:absolute;top:-22px;left:50%;width:48px;transform:translateX(-50%);fill:var(--gold-a);filter:drop-shadow(0 4px 10px rgba(255,190,60,.55))}
+  .oyr-ribbon{position:absolute;top:10px;left:10px;font:800 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;padding:5px 8px;border-radius:4px;
+    background:linear-gradient(180deg,var(--gold-a),var(--gold-b));color:#2A1A00}
+  .oyr-ava{display:grid;place-items:center;width:76px;height:76px;margin-bottom:12px;border-radius:50%;padding:3px;
+    background:conic-gradient(from 210deg,var(--a),var(--b),var(--a),var(--b),var(--a));box-shadow:0 0 28px -6px var(--glow)}
+  .oyr-ava span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#24479A,#0F1F44);
+    font:900 25px/1 var(--display);color:#fff}
+  .oyr-step.p1 .oyr-ava{width:100px;height:100px}
+  .oyr-step.p1 .oyr-ava span{font-size:33px}
+  .oyr-name{font:800 17px/1.2 var(--display);color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oyr-name em{font:800 9.5px/1 var(--mono);font-style:normal;letter-spacing:.14em;text-transform:uppercase;vertical-align:3px;margin-left:4px;padding:3px 6px;border-radius:4px;background:var(--oyr-cyan);color:#04223A}
+  .oyr-step.p1 .oyr-name{font-size:22px}
+  .oyr-pts{margin-top:6px;display:flex;align-items:baseline;gap:5px}
+  .oyr-pts b{font:900 32px/1 var(--display);color:var(--a)}
+  .oyr-step.p1 .oyr-pts b{font-size:44px}
+  .oyr-pts span{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+  .oyr-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:12px}
+  .oyr-stats span{display:inline-flex;align-items:baseline;gap:4px;padding:5px 9px;border-radius:999px;font:500 11px/1 var(--mono);color:var(--muted-2);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+  .oyr-stats b{font:800 13px/1 var(--display);color:#fff}
+  .oyr-sub{margin-top:10px;font-size:12px;color:var(--muted)}
+  .oyr-plinth{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:96px;border-radius:0 0 12px 12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--a) 0,var(--b) 6px,#132650 6px,#0A1631 100%)}
+  .oyr-plinth::after{content:"";position:absolute;inset:6px 0 0;background:linear-gradient(115deg,transparent 0 40%,rgba(255,255,255,.05) 40% 55%,transparent 55%)}
+  .oyr-step.p1 .oyr-plinth{height:142px}
+  .oyr-step.p3 .oyr-plinth{height:72px}
+  .oyr-plinth .n{font:900 clamp(40px,5vw,64px)/1 var(--display);background:linear-gradient(180deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+  .oyr-step.p1 .oyr-plinth .n{font-size:clamp(56px,7vw,88px)}
+  .oyr-step.p3 .oyr-plinth .n{font-size:clamp(34px,4vw,50px)}
+  .oyr-plinth .t{font:800 12px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--a)}
+  a.oyr-step{transition:transform .2s}
+  a.oyr-step:hover{transform:translateY(-5px)}
+  a.oyr-step:hover .oyr-card{box-shadow:0 -18px 60px -24px var(--glow)}
+  a.oyr-step:focus-visible{outline:2px solid var(--oyr-cyan);outline-offset:5px;border-radius:16px}
+  .oyr-step.you .oyr-card{background:linear-gradient(180deg,#173C6E 0%,#0E2244 100%) padding-box,linear-gradient(180deg,var(--a),rgba(25,211,243,.4) 70%) border-box}
+  .oyr-step.empty .oyr-card{background:rgba(11,24,52,.55);border:1.5px dashed rgba(152,166,191,.35);border-bottom:0}
+  .oyr-step.empty .oyr-ava{background:none;border:2px dashed rgba(152,166,191,.4);box-shadow:none}
+  .oyr-step.empty .oyr-ava span{background:none;color:var(--muted)}
+  .oyr-step.empty .oyr-name{color:var(--muted-2)}
+  .oyr-step.empty .oyr-pts b{color:var(--muted)}
+  .oyr-step.empty .oyr-plinth{opacity:.55}
+  /* entrance: the plinths rise once, when a region is opened */
+  .oyr-stage.in .oyr-plinth{animation:oyrRise .55s cubic-bezier(.2,.8,.2,1) both;transform-origin:bottom}
+  .oyr-stage.in .oyr-card{animation:oyrIn .45s ease-out both}
+  .oyr-stage.in .s2 .oyr-plinth,.oyr-stage.in .s2 .oyr-card{animation-delay:.08s}
+  .oyr-stage.in .s3 .oyr-plinth,.oyr-stage.in .s3 .oyr-card{animation-delay:.16s}
+  @keyframes oyrRise{from{transform:scaleY(.3)}to{transform:none}}
+
+  /* ---- leaderboard: every ranked player in the region ---- */
+  .oyr-lb{max-width:960px;margin:0 auto}
+  .oyr-lb-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 10px}
+  .oyr-lb-h h4{margin:0;font:900 18px/1 var(--display);text-transform:uppercase;letter-spacing:.01em;color:#fff}
+  .oyr-lb-h .mono{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  #route-regional .oyr-table tbody tr{transition:background .15s}
+  #route-regional .oyr-table tbody tr:hover{background:rgba(54,120,255,.10)}
+  #route-regional .oyr-table tbody tr:focus-visible{outline:2px solid var(--oyr-cyan);outline-offset:-2px}
+  #route-regional .oyr-table td.rank .rk-n{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:9px;font:900 14px/1 var(--display);
+    border:1px solid var(--card-line);color:var(--ivory);background:rgba(255,255,255,.03)}
+  #route-regional .oyr-table tr.t1 .rk-n{background:linear-gradient(180deg,var(--gold-a),var(--gold-b));border-color:transparent;color:#2A1A00}
+  #route-regional .oyr-table tr.t2 .rk-n{background:linear-gradient(180deg,var(--silver-a),var(--silver-b));border-color:transparent;color:#18202E}
+  #route-regional .oyr-table tr.t3 .rk-n{background:linear-gradient(180deg,var(--bronze-a),var(--bronze-b));border-color:transparent;color:#2A1200}
+  #route-regional .oyr-table td.rk-name strong{font-size:15.5px;color:#fff}
+  #route-regional .oyr-table td.pts{font:900 18px/1 var(--display);color:var(--oyr-cyan)}
+  #route-regional .oyr-table td.num:not(.pts){color:var(--muted-2)}
+  #route-regional .oyr-table tr.you{background:linear-gradient(90deg,rgba(25,211,243,.16),rgba(25,211,243,.02));box-shadow:inset 3px 0 0 var(--oyr-cyan)}
+  .youtag{margin-left:8px;font:800 9.5px/1 var(--mono);font-style:normal;letter-spacing:.14em;text-transform:uppercase;vertical-align:2px;padding:3px 6px;border-radius:4px;background:var(--oyr-cyan);color:#04223A}
+  .oyr-note{max-width:960px;margin:0 auto;text-align:center;color:var(--muted-2)}
+  .oyr-wait{padding:20px 0}
+
+  /* ---- sign-off band ---- */
+  .oyr-cta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;max-width:960px;margin:30px auto 0;padding:22px 26px;
+    clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,26px 100%,0 calc(100% - 26px));
+    background:linear-gradient(115deg,#0F2B6B 0%,#123A8F 55%,#0E5AA8 100%)}
+  .oyr-cta b{display:block;font:900 clamp(22px,2.6vw,30px)/1 var(--display);text-transform:uppercase;color:#fff}
+  .oyr-cta span{display:block;margin-top:6px;font:900 italic 14px/1 var(--display);color:var(--oyr-cyan)}
+  .oyr-cta .btns{display:flex;flex-wrap:wrap;gap:10px}
+
+  /* ---- tablets / small laptops ---- */
+  @media (max-width:920px){
+    .oyr-hero{grid-template-columns:minmax(0,1fr) minmax(0,.62fr)}
+    .oyr-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  /* ---- phones: the logo leads, then title, tiles you can swipe, podium, table ---- */
+  @media (max-width:720px){
+    .oyr-hero{grid-template-columns:1fr;gap:0;padding:14px 0 22px;margin:0 0 14px;text-align:center}
+    .oyr-hero-bg{inset:-40px -24px -40px;-webkit-mask-image:radial-gradient(closest-side at 50% 44%,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side at 50% 44%,#000 66%,transparent 100%)}
+    .oyr-hero-bg .smk{background-image:url(assets/oyr-smoke-m.webp);background-position:50% 22%}
+    .oyr-hero-bg .smk.b{transform-origin:50% 30%}
+    .oyr-hero-bg .beam{left:64%}
+    .oyr-hero-bg .beam.c{left:76%}
+    .oyr-hero-bg .scrim{background:radial-gradient(80% 36% at 50% 62%,rgba(4,9,24,.7),rgba(4,9,24,.25) 65%,transparent 85%)}
+    .oyr-mark{order:-1;margin:2px 0 4px}
+    .oyr-logo{width:min(48vw,200px)}
+    .oyr-copy{display:flex;flex-direction:column;align-items:center}
+    .oyr-switch{order:9;margin-top:18px}
+    .route#route-regional h2.oyr-title{margin-top:6px;font-size:clamp(46px,14.5vw,68px)}
+    .oyr-title span{display:inline}
+    .oyr-title .hl{display:block}
+    .oyr-lede{font-size:14.5px}
+    .oyr-picker{display:flex;overflow-x:auto;gap:8px;margin:0 -16px;padding:2px 16px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+    .oyr-picker::-webkit-scrollbar{display:none}
+    .oyr-tile{flex:none;width:168px;min-height:84px;padding:14px 14px 12px;scroll-snap-align:start}
+    .oyr-tile .rn{font-size:17px}
+    .oyr-tile:hover{transform:none}
+    .oyr-rhead h3{font-size:clamp(32px,10vw,44px)}
+    .oyr-fact{padding:12px 14px}
+    .oyr-fact b{font-size:21px}
+    .oyr-podium{gap:7px;margin-top:30px}
+    .oyr-card{padding:18px 5px 12px}
+    .oyr-step.p1 .oyr-card{padding-top:28px}
+    .oyr-ribbon{display:none}
+    .oyr-crown{width:38px;top:-18px}
+    .oyr-ava{width:50px;height:50px;padding:2px;margin-bottom:8px}
+    .oyr-ava span{font-size:17px}
+    .oyr-step.p1 .oyr-ava{width:66px;height:66px}
+    .oyr-step.p1 .oyr-ava span{font-size:22px}
+    .oyr-name{font-size:13.5px;white-space:normal;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    .oyr-step.p1 .oyr-name{font-size:15px}
+    .oyr-pts b{font-size:23px}
+    .oyr-step.p1 .oyr-pts b{font-size:30px}
+    .oyr-pts span{font-size:9.5px}
+    .oyr-stats{display:none}
+    .oyr-sub{display:none}
+    .oyr-plinth{height:62px;flex-direction:column;gap:2px}
+    .oyr-step.p1 .oyr-plinth{height:94px}
+    .oyr-step.p3 .oyr-plinth{height:46px}
+    .oyr-plinth .n{font-size:30px}
+    .oyr-step.p1 .oyr-plinth .n{font-size:44px}
+    .oyr-step.p3 .oyr-plinth .n{font-size:26px}
+    .oyr-step.p3 .oyr-plinth .t{display:none}
+    .oyr-plinth .t{font-size:9.5px}
+    .oyr-cta{padding:20px 18px;flex-direction:column;align-items:flex-start}
+    .oyr-cta .btns{width:100%}
+    .oyr-cta .btns .btn{flex:1;white-space:nowrap;padding-left:12px;padding-right:12px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .oyr-logo,.oyr-hero-bg i,.oyr-hero-bg .smk.b,.oyr-stage.in,.oyr-stage.in .oyr-plinth,.oyr-stage.in .oyr-card{animation:none}
+    a.oyr-step:hover,.oyr-tile:hover{transform:none}
+  }
+
+  /* ---------- nav: Rankings → National / Regional ---------- */
+  .nav-dd{position:relative;display:flex}
+  .nav-dd > a .car{display:inline-block;margin-left:6px;font-size:10px;opacity:.7;transition:transform .2s}
+  .nav-dd-menu{position:absolute;left:50%;top:calc(100% + 10px);transform:translate(-50%,6px);min-width:240px;padding:6px;z-index:70;
+    background:#0E1B33;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px -20px rgba(0,0,0,.75);
+    opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility 0s .15s}
+  .nav-dd-menu::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px}       /* hover bridge */
+  .nav-dd.open .nav-dd-menu,.nav-dd:focus-within .nav-dd-menu{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .15s,transform .15s}
+  @media (hover:hover){ .nav-dd:hover .nav-dd-menu{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .15s,transform .15s} .nav-dd:hover > a .car{transform:rotate(180deg)} }
+  nav.main .nav-dd-menu a{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;border-radius:8px;
+    background:none;box-shadow:none;color:var(--ivory);font-weight:700;white-space:nowrap}
+  nav.main .nav-dd-menu a span{font:500 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  nav.main .nav-dd-menu a:hover,nav.main .nav-dd-menu a.active{background:rgba(54,120,255,.14);color:#fff;box-shadow:none}
+  nav.main .nav-dd-menu a.active span{color:var(--cyan)}
+  @media (max-width:1099px){   /* burger menu: phones and (pass 13) tablets */
+    nav.main.open .nav-dd{flex-direction:column}
+    nav.main.open .nav-dd > a{display:none}
+    nav.main.open .nav-dd-menu{position:static;transform:none;opacity:1;visibility:visible;min-width:0;padding:0;background:none;border:0;box-shadow:none}
+    nav.main.open .nav-dd-menu::before{display:none}
+    nav.main.open .nav-dd-menu a{flex-direction:row;align-items:center;padding:14px 14px;font-size:16px;font-weight:600}
+    nav.main.open .nav-dd-menu a span{display:none}
+    nav.main.open .nav-dd-menu a.active{background:var(--btn-blue);box-shadow:var(--glow-blue)}
+  }
+
+  /* ---------- tablets & small laptops (721–1099px): the links didn't fit on one line and wrapped,
+     so they move into the ☰ menu, as on phones; Join / your name stay in the bar (pass 13) ---------- */
+  @media (min-width:721px) and (max-width:1099px){
+    nav.main{display:none}
+    nav.main.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:4px;z-index:80;
+      background:rgba(7,13,26,.97);border-bottom:1px solid var(--line);padding:14px 24px}
+    nav.main.open a{padding:14px 14px;font-size:16px}
+    .burger{display:block;width:44px;height:44px;border-radius:12px;margin-left:14px}
+    header .bar > .nav-cta,header .bar > .user-menu{margin-left:auto}
+  }
+
+  /* ---------- rank movement (pass 13): ▲ up · ▼ down · – same · NEW; never colour alone (arrow + number) ---------- */
+  .mv{display:inline-flex;align-items:center;gap:2px;margin-left:8px;padding:3px 6px;border-radius:5px;vertical-align:middle;
+    font:800 11px/1 var(--mono);letter-spacing:.02em;white-space:nowrap}
+  .mv.up{color:#2FE08C;background:rgba(47,224,140,.12)}
+  .mv.down{color:#FF6A8E;background:rgba(255,106,142,.12)}
+  .mv.same{color:var(--muted);background:rgba(255,255,255,.05);min-width:20px;justify-content:center}
+  .mv.new{color:var(--cyan);background:rgba(25,211,243,.12);letter-spacing:.1em;font-size:9.5px}
+  .mv .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .mv-note{margin:0 0 12px;font:500 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--muted-2)}
+  .mv-note .mv{margin:0 2px 0 0;padding:2px 4px}
+  #route-rankings td.rank,#route-regional td.rank{white-space:nowrap}
+  .oyr-pts .mv{margin-left:6px;align-self:center}
+  @media (max-width:720px){ .mv{margin-left:5px;padding:2px 4px;font-size:10px} }
+
 </style>
 </head>
 <body>
@@ -1583,7 +1878,13 @@
       <nav class="main" id="nav">
         <a data-link="events">Events</a>
         <a data-link="live" class="nav-live">Live</a>
-        <a data-link="rankings">Rankings</a>
+        <div class="nav-dd" id="nav-rank">
+          <a data-link="rankings" href="#rankings" class="nav-rank" aria-haspopup="true" aria-expanded="false">Rankings<span class="car" aria-hidden="true">▾</span></a>
+          <div class="nav-dd-menu" role="menu" aria-label="Rankings">
+            <a role="menuitem" data-link="rankings" href="#rankings">National rankings<span>UK-wide standings</span></a>
+            <a role="menuitem" data-link="regional" href="#regional">Regional rankings<span>Own your region</span></a>
+          </div>
+        </div>
         <a data-link="players">Players</a>
         <a data-link="friendlies" class="nav-fr">Friendlies</a>
         <a data-link="membership">Membership</a>
@@ -1616,7 +1917,6 @@
   <section class="hero home-hero">
     <div class="tz-art" aria-hidden="true"><div class="tz-art-img"></div></div>
     <div class="home-copy">
-      <span class="eyebrow">UK regional darts · Season 2026</span>
       <h1 class="home-h1"><span>Real people</span><span>Real darts</span><span class="hl">Every night</span></h1>
       <p class="lede">Nightly online darts tournaments in every UK region. Play 501 double-out on webcam against real players, then climb the regional rankings.</p>
       <div class="hero-cta">
@@ -1678,10 +1978,8 @@
 <div class="route" id="route-rankings">
   <section class="block">
     <div class="section-head"><div><h2 id="rank-title">National standings</h2><p class="lede">Points are awarded by finishing place at every regional event and update automatically. Tap a player to open their profile.</p></div></div>
-    <div class="filters">
-      <div class="fld"><label class="flab" for="rank-region">Region</label>
-        <select id="rank-region"><option>All regions</option></select></div>
-    </div>
+    <nav class="oyr-switch" aria-label="Tournza rankings"><a class="on" aria-current="page" data-link="rankings" href="#rankings">National</a><a data-link="regional" href="#regional">Regional <b>OYR</b></a></nav>
+    <p class="mv-note" id="rank-move-note"></p>
     <div class="detail-grid rk-grid">
       <div class="tbl-wrap">
         <table class="rk-table">
@@ -1695,6 +1993,32 @@
         <div id="results-feed"></div>
       </div>
     </div>
+  </section>
+</div>
+
+<!-- ================= OWN YOUR REGION — OYR flagship (regional rankings; pass 12 → 13 redesign) ================= -->
+<!-- OYR is Tournza's regional competition brand: same Tournza rankings, presented region by region. -->
+<div class="route" id="route-regional">
+  <section class="block oyr">
+    <div class="oyr-hero">
+      <div class="oyr-hero-bg" aria-hidden="true"><i class="smk"></i><i class="smk b"></i><i class="beam"></i><i class="beam c"></i><i class="sheen"></i><i class="scrim"></i></div>
+      <div class="oyr-copy">
+        <nav class="oyr-switch" aria-label="Tournza rankings">
+          <a data-link="rankings" href="#rankings">National</a>
+          <a class="on" aria-current="page" data-link="regional" href="#regional">Regional <b>OYR</b></a>
+        </nav>
+        <h2 class="oyr-title"><span>Own</span> <span>your</span> <span class="hl">region</span></h2>
+        <p class="oyr-tag">#OwnYourRegion</p>
+        <p class="oyr-lede">Every region has a number one. Play the nightly tournaments, climb your region’s table and take the top spot — the same Tournza ranking points as the national standings.</p>
+      </div>
+      <div class="oyr-mark"><div class="oyr-logo" role="img" aria-label="OYR — Own Your Region logo"></div></div>
+    </div>
+
+    <div class="oyr-pick">
+      <h3 class="oyr-pick-h" id="oyr-pick-h">Choose your region</h3>
+      <div class="oyr-picker" id="oyr-picker" role="tablist" aria-labelledby="oyr-pick-h"></div>
+    </div>
+    <div class="oyr-board" id="oyr-board" role="tabpanel" aria-live="polite"></div>
   </section>
 </div>
 
@@ -2265,10 +2589,20 @@ async function loadPlayersFromSupabase(){
     PLAYERS.forEach(p=>{ p.form = p.recent.slice(-8).map(r=>(r.outcome==='winner'||r.outcome==='runner_up')?'W':'L'); });
 
     // Ranked list: players who've actually played at least one real event.
-    REG = PLAYERS.filter(p=>p.events>0).sort((a,b)=> b.points-a.points || b.wins-a.wins);
+    REG = PLAYERS.filter(p=>p.events>0).sort((a,b)=> b.points-a.points || b.wins-a.wins || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0));
     REG.forEach((p,i)=>p.rank=i+1);
     const __regN = {};
     REG.forEach(p=>{ __regN[p.region] = (__regN[p.region] || 0) + 1; p.regionRank = __regN[p.region]; });
+    // movement arrows: the standings going into the last tournament night (stored by the server). No baseline → no arrows.
+    try{
+      sb.rpc('tz_rank_baseline').then(({ data, error })=>{
+        if(error || !data || !data.length){ window.TZ_BASE = null; return; }
+        const b = { asOf: data[0].as_of, nat:{}, reg:{} };
+        data.forEach(r=>{ b.nat[r.player_id] = r.national_rank; b.reg[r.player_id] = r.regional_rank; });
+        window.TZ_BASE = b;
+        renderRankings();
+      }, ()=>{});
+    }catch(_){}
 
     // Winners feed: every tournament winner, most recent first.
     WINNERS = (results||[])
@@ -2285,6 +2619,7 @@ async function loadPlayersFromSupabase(){
   }catch(err){
     console.error('Could not load players/results:', err);
     PLAYERS = []; REG = []; WINNERS = [];   // no stale or placeholder data is kept
+    window.TZ_RANK_ERR = true;               // pass 13: OYR says "couldn't load" rather than "nobody ranked"
   }finally{
     playersLoaded = true;
     renderRankings(); renderPlayers();
@@ -2572,6 +2907,8 @@ function renderEventDetail(id){
 }
 
 function renderRankings(){
+  if(typeof renderRegional === 'function') renderRegional();     // the regional page draws from the same table
+  const mvNote = $('#rank-move-note'); if(mvNote) mvNote.innerHTML = tzMoveNote();
   const body=$('#rank-body'), title=$('#rank-title');
   const region = $('#rank-region')?.value || 'All regions';
   const byRegion = region && region !== 'All regions';
@@ -2589,7 +2926,7 @@ function renderRankings(){
         : REG;
       body.innerHTML = list.length ? list.map(p=>`
         <tr class="clk" data-link="player:${p.id}">
-          <td class="rank ${p.rank===1?'top':''}"><span class="rk-n">${p.rank}</span></td>
+          <td class="rank ${p.rank===1?'top':''}"><span class="rk-n">${p.rank}</span>${tzMove(window.TZ_BASE && window.TZ_BASE.nat[p.id], p.rank)}</td>
           <td class="rk-name"><strong>${p.name}</strong><span class="rk-reg">${p.region}</span></td>
           <td class="rk-region" style="color:var(--muted-2)">${p.region}</td>
           <td class="num pts">${p.points}</td>
@@ -2950,7 +3287,7 @@ function buildTicker(){
 }
 
 /* ---------------- router ---------------- */
-const ROUTES=['home','events','event','tournament','live','rankings','players','player','friendlies','membership','join','account','privacy','terms','rules'];
+const ROUTES=['home','events','event','tournament','live','rankings','regional','players','player','friendlies','membership','join','account','privacy','terms','rules'];
 // True once we've left the homepage and created a browser-history "anchor"
 // for it — see go() below. Reset to false once we're back on it, so leaving
 // again later still sets up a fresh anchor for the next Back press.
@@ -2966,11 +3303,15 @@ function go(target){
     || (name==='event'&&a.dataset.link==='events')
     || (name==='tournament'&&a.dataset.link==='live')
     || (name==='player'&&a.dataset.link==='players')
+    || (name==='regional'&&a.classList.contains('nav-rank'))
     || (name==='join'&&a.dataset.link==='membership' && false)));
   if(name==='event') renderEventDetail(arg); else if(name==='tournament') tpMount(arg); else evLeave();
   if(name==='live') tlMount(); else tlLeave();
   document.body.classList.toggle('tl-on', name==='live');   // LIVE's full-screen colour
   if(name==='player') renderPlayerProfile(arg);
+  if(name==='regional') renderRegional(arg);
+  const navDd = $('#nav-rank');                                    // close the Rankings menu after picking
+  if(navDd){ navDd.classList.remove('open'); if(navDd.contains(document.activeElement)) document.activeElement.blur(); }
   if(name==='account' && window.renderAccountDashboard) window.renderAccountDashboard();
   document.body.classList.toggle('fr-on', name==='friendlies');   // Friendlies' own pink theme
   if(name==='friendlies') frEnter(); else frLeave();
@@ -3100,7 +3441,6 @@ $('#burger').addEventListener('click',()=>{
 /* player search + region filter */
 $('#p-search').addEventListener('input',renderPlayers);
 $('#p-region').addEventListener('change',renderPlayers);
-$('#rank-region').addEventListener('change',renderRankings);
 /* events filters — region + date both re-render the list */
 $('#f-region').addEventListener('change',renderEvents);
 $('#f-window').addEventListener('change',renderEvents);
@@ -3207,15 +3547,9 @@ async function loadRegionsFromEnum(){
     regions.forEach(r=> pf.add(new Option(r)));
     if([...pf.options].some(o=>o.value===cur)) pf.value=cur;
   }
-  // Rankings filter: same pattern again.
-  const rf=$('#rank-region');
-  if(rf){
-    const cur=rf.value;
-    rf.innerHTML='';
-    rf.add(new Option('All regions'));
-    regions.forEach(r=> rf.add(new Option(r)));
-    if([...rf.options].some(o=>o.value===cur)) rf.value=cur;
-  }
+  // Regional rankings (OWN YOUR REGION): one button per region, same list
+  window.TZ_REGIONS = regions.slice();
+  if(typeof renderRegional === 'function') renderRegional();
 }
 // Build a local Date from a Y-M-D string. Never `new Date("YYYY-MM-DD")` — a
 // bare date is parsed as UTC midnight and can shift the day across timezones.
@@ -4504,6 +4838,200 @@ function tzSocialRow(doc, cx, y, color){
   })();
   window.tzAlertCheck = check;                          // for the tests
 })();
+
+/* ---------------- OWN YOUR REGION (OYR): regional rankings (pass 12; flagship redesign pass 13, 2026-10) ----------------
+   OYR is a presentation of the SAME Tournza rankings, one region at a time:
+     • REG (built by loadPlayersFromSupabase) — each player's stored ranking points added up, ordered by
+       points then wins; here it's filtered to the player's home region and numbered 1, 2, 3… in that order
+       (the same rule as p.regionRank). Nothing is recalculated, stored or invented.
+     • Region facts only where the data already exists: ranked players, finished tournaments (one winner
+       result each, from WINNERS), points on the board (sum of those players' points), leader, latest champion.
+     • Signed in and ranked in this region: your rank, points and the gap to the place above.
+   Opens on your own region when signed in, else the region with the most ranked players; each region has
+   its own link (#regional:Wales). Regions come from the live uk_regions list. */
+const OYR = { region:null, chosen:false, mine:null, uid:null, asked:false, shown:null };
+const oyrEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const oyrInit = n => String(n||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const oyrN = v => Number(v) || 0;
+const oyrPl = (n, one, many) => `${n} ${n === 1 ? one : (many || one + 's')}`;
+const OYR_PLACE = { 1:'1st', 2:'2nd', 3:'3rd' };
+const OYR_CROWN = '<svg class="oyr-crown" viewBox="0 0 48 32" aria-hidden="true"><path d="M4 26 L2 8 L14 17 L24 3 L34 17 L46 8 L44 26 Z"/><rect x="4" y="27.5" width="40" height="3.5" rx="1.5"/></svg>';
+
+function oyrRegions(){
+  const list = (window.TZ_REGIONS && window.TZ_REGIONS.length) ? window.TZ_REGIONS.slice() : [];
+  (typeof REG !== 'undefined' ? REG : []).forEach(p=>{ if(p.region && !list.includes(p.region)) list.push(p.region); });
+  return list;
+}
+async function oyrMyRegion(){
+  if(OYR.asked) return; OYR.asked = true;
+  try{
+    const sb = window.tournzaSupabase; if(!sb){ OYR.asked = false; return; }
+    const { data:s } = await sb.auth.getSession(); const uid = s && s.session && s.session.user && s.session.user.id;
+    if(!uid) return;
+    OYR.uid = String(uid);
+    const loaded = typeof playersLoaded !== 'undefined' && playersLoaded;
+    const me = (typeof PLAYERS !== 'undefined' ? PLAYERS : []).find(p=>String(p.id) === OYR.uid);
+    if(me && me.region) OYR.mine = me.region;
+    else { const r = await sb.from('profiles').select('region').eq('id', uid).maybeSingle(); if(r.data && r.data.region) OYR.mine = r.data.region; }
+    if(!OYR.mine && !loaded) OYR.asked = false;          // try again once the players have loaded
+    if(document.querySelector('#route-regional.active')) renderRegional();
+  }catch(_){ OYR.asked = false; }
+}
+
+// ---- one podium place ----
+function oyrStep(p, place){
+  if(!p) return `<div class="oyr-step p${place} empty" aria-label="${OYR_PLACE[place]} place: nobody yet">
+      <div class="oyr-card"><div class="oyr-ava"><span>?</span></div><div class="oyr-name">Up for grabs</div><div class="oyr-pts"><b>—</b></div><div class="oyr-sub">Win points in this region to take it</div></div>
+      <div class="oyr-plinth"><span class="n">${place}</span><span class="t">${OYR_PLACE[place]}</span></div></div>`;
+  const you = OYR.uid && String(p.id) === OYR.uid;
+  const stat = (v, k) => `<span><b>${oyrEsc(v)}</b>${k}</span>`;
+  return `<a class="oyr-step p${place}${you ? ' you' : ''}" data-link="player:${oyrEsc(p.id)}" href="#player:${oyrEsc(p.id)}"
+      aria-label="${OYR_PLACE[place]} place: ${oyrEsc(p.name)}${you ? ' (you)' : ''}, ${oyrN(p.points)} points. Open profile">
+      <div class="oyr-card">
+        ${place === 1 ? `${OYR_CROWN}<span class="oyr-ribbon">Region leader</span>` : ''}
+        <div class="oyr-ava"><span>${oyrEsc(p.initials || oyrInit(p.name))}</span></div>
+        <div class="oyr-name">${oyrEsc(p.name)}${you ? ' <em>You</em>' : ''}</div>
+        <div class="oyr-pts"><b>${oyrN(p.points)}</b><span>pts</span>${tzMove(window.TZ_BASE && window.TZ_BASE.reg[p.id], place)}</div>
+        <div class="oyr-stats">${stat(oyrN(p.wins), oyrN(p.wins) === 1 ? 'win' : 'wins')}${stat(oyrN(p.events), oyrN(p.events) === 1 ? 'event' : 'events')}${p.avg != null && p.avg !== '' ? stat(p.avg, 'avg') : ''}</div>
+      </div>
+      <div class="oyr-plinth"><span class="n">${place}</span><span class="t">${OYR_PLACE[place]}</span></div></a>`;
+}
+
+function renderRegional(arg){
+  const pick = $('#oyr-picker'), board = $('#oyr-board');
+  if(!pick || !board) return;
+  if(arg){ OYR.region = decodeURIComponent(arg); OYR.chosen = true; }
+  oyrMyRegion();
+  const regions = oyrRegions();
+  const loaded = typeof playersLoaded === 'undefined' || playersLoaded;
+  const ranked = (typeof REG !== 'undefined' ? REG : []);
+  const inRegion = r => ranked.filter(p=>p.region === r);
+  const listed = !!(window.TZ_REGIONS && window.TZ_REGIONS.length);
+  if(OYR.chosen && OYR.region && listed && !regions.includes(OYR.region)) OYR.chosen = false;   // a link to a region that isn't on the list
+  if(!OYR.chosen){
+    const busiest = regions.slice().sort((a,b)=>inRegion(b).length - inRegion(a).length)[0];
+    OYR.region = (OYR.mine && regions.includes(OYR.mine)) ? OYR.mine : (busiest || null);
+  }
+  if(OYR.chosen && OYR.region && !regions.includes(OYR.region)) regions.push(OYR.region);       // linked before the list has loaded
+
+  // ---- the region tiles: name, its current #1 (or "up for grabs"), how many are ranked ----
+  pick.innerHTML = regions.map(r=>{
+    const on = r === OYR.region, list = inRegion(r), lead = list[0];
+    return `<button type="button" role="tab" id="oyr-tab-${oyrEsc(r.replace(/\W+/g,'-'))}" aria-selected="${on}" tabindex="${on ? 0 : -1}"
+        class="oyr-tile${on ? ' on' : ''}${r === OYR.mine ? ' mine' : ''}" data-oyr-region="${oyrEsc(r)}">
+      <span class="rn">${oyrEsc(r)}</span>
+      <span class="ld">${!loaded ? '&nbsp;' : lead ? '#1 ' + oyrEsc(lead.name) : 'Up for grabs'}</span>
+      <span class="ct">${loaded ? list.length + ' ranked' : ''}${r === OYR.mine ? ' · yours' : ''}</span>
+      ${on ? '<span class="tick" aria-hidden="true">Selected</span>' : ''}
+    </button>`;
+  }).join('');
+
+  if(!loaded){ board.innerHTML = `<div class="oyr-wait">${stateMsg('Loading the regional tables…')}</div>`; OYR.shown = null; return; }
+  if(window.TZ_RANK_ERR){ board.innerHTML = `<div class="oyr-wait">${stateMsg('The rankings couldn’t be loaded just now — refresh the page to try again.')}</div>`; OYR.shown = null; return; }
+  if(!OYR.region){ board.innerHTML = `<div class="oyr-wait">${stateMsg('Regions are loading…')}</div>`; return; }
+
+  const R = OYR.region, list = inRegion(R).map((p,i)=>({ ...p, rrank:i+1 }));
+  const lead = list[0];
+  const finished = (typeof WINNERS !== 'undefined' ? WINNERS : []).filter(w=>w.region === R);
+  const pts = list.reduce((s,p)=>s + oyrN(p.points), 0);
+  const fact = (v, k, sub) => `<div class="oyr-fact"><b>${v}</b><span>${k}</span>${sub ? `<i>${sub}</i>` : ''}</div>`;
+  const facts = `<div class="oyr-facts">
+      ${fact(list.length, list.length === 1 ? 'Ranked player' : 'Ranked players')}
+      ${fact(finished.length, finished.length === 1 ? 'Tournament played' : 'Tournaments played')}
+      ${fact(pts, 'Points on the board')}
+      ${fact(lead ? oyrEsc(lead.name) : '—', 'Region leader', finished[0] ? 'Latest champion: ' + oyrEsc(finished[0].name) + (finished[0].date ? ' · ' + oyrEsc(finished[0].date) : '') : '')}
+    </div>`;
+
+  // ---- your standing (signed in) ----
+  let mine = '';
+  const meAt = OYR.uid ? list.findIndex(p=>String(p.id) === OYR.uid) : -1;
+  if(meAt >= 0){
+    const me = list[meAt], above = list[meAt - 1];
+    const gap = above ? oyrN(above.points) - oyrN(me.points) : 0;
+    mine = `<div class="oyr-me"><span class="k">Your standing</span>
+      <span class="v"><b>#${me.rrank}</b> in ${oyrEsc(R)} · ${oyrPl(oyrN(me.points), 'pt')}</span>
+      <span class="g">${!above ? 'You own this region. Keep it.' : gap > 0 ? `${oyrPl(gap, 'point')} behind #${above.rrank} ${oyrEsc(above.name)}` : `Level on points with #${above.rrank} ${oyrEsc(above.name)}`}</span></div>`;
+  } else if(OYR.uid && OYR.mine === R){
+    mine = `<div class="oyr-me"><span class="k">Your standing</span><span class="v">Not ranked yet</span><span class="g">Play a ${oyrEsc(R)} tournament to get on the board.</span></div>`;
+  }
+
+  const podium = `<div class="oyr-podium" role="list" aria-label="${oyrEsc(R)} top three">${[2,1,3].map(n=>`<div role="listitem" class="oyr-pslot s${n}">${oyrStep(list[n-1], n)}</div>`).join('')}</div>`;
+  const table = list.length ? `<div class="oyr-lb">
+      <div class="oyr-lb-h"><h4>${oyrEsc(R)} standings</h4><span class="mono">${oyrPl(list.length, 'player')}</span></div>${window.TZ_BASE ? `<p class="mv-note">${tzMoveNote()}</p>` : ''}
+      <div class="tbl-wrap"><table class="rk-table oyr-table">
+        <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col" class="num">Points</th><th scope="col" class="num">Wins</th><th scope="col" class="num rk-events">Events</th></tr></thead>
+        <tbody>${list.map(p=>{
+          const you = OYR.uid && String(p.id) === OYR.uid;
+          return `<tr class="clk${p.rrank <= 3 ? ' top t' + p.rrank : ''}${you ? ' you' : ''}" data-link="player:${oyrEsc(p.id)}" tabindex="0">
+            <td class="rank"><span class="rk-n" aria-label="Rank ${p.rrank}">${p.rrank}</span>${tzMove(window.TZ_BASE && window.TZ_BASE.reg[p.id], p.rrank)}</td>
+            <td class="rk-name"><strong>${oyrEsc(p.name)}</strong>${you ? '<em class="youtag">You</em>' : ''}</td>
+            <td class="num pts">${oyrN(p.points)}</td>
+            <td class="num">${oyrN(p.wins)}</td>
+            <td class="num rk-events">${oyrN(p.events)}</td></tr>`;
+        }).join('')}</tbody></table></div></div>`
+    : `<p class="oyr-note">Nobody has a ranking in ${oyrEsc(R)} yet. Play tonight’s ${oyrEsc(R)} tournament and the top spot could be yours.</p>`;
+  const cta = `<div class="oyr-cta"><div><b>Represent ${oyrEsc(R)}.</b><span>#OwnYourRegion</span></div>
+      <div class="btns"><a class="btn btn-primary" data-link="events" href="#events">Play in ${oyrEsc(R)}</a><a class="btn btn-ghost" data-link="rankings" href="#rankings">National standings</a></div></div>`;
+
+  const changed = OYR.shown !== R;
+  board.innerHTML = `<div class="oyr-stage${changed ? ' in' : ''}">
+      <div class="oyr-rhead"><h3>${oyrEsc(R)}</h3>${lead ? `<span class="oyr-owner">Owned by <b>${oyrEsc(lead.name)}</b></span>` : '<span class="oyr-owner">No owner yet</span>'}</div>
+      ${facts}${mine}${podium}${table}${cta}</div>`;
+  OYR.shown = R;
+  // phones: slide the tile row (only the row, never the page) so the selected region is in view
+  const tab = pick.querySelector('.oyr-tile.on');
+  if(tab && changed && pick.scrollWidth > pick.clientWidth){ try{ pick.scrollTo({ left: Math.max(0, tab.offsetLeft - (pick.clientWidth - tab.offsetWidth) / 2), behavior:'smooth' }); }catch(_){} }
+}
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest && e.target.closest('[data-oyr-region]'); if(!b) return;
+  OYR.region = b.dataset.oyrRegion; OYR.chosen = true;
+  try{ history.replaceState(null, '', '#regional:' + encodeURIComponent(OYR.region)); }catch(_){}
+  renderRegional();
+});
+document.addEventListener('keydown', e=>{
+  // region tiles: arrow keys move along them (tabs pattern)
+  const b = e.target.closest && e.target.closest('[data-oyr-region]');
+  if(b && ['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){
+    const all = [...document.querySelectorAll('[data-oyr-region]')], i = all.indexOf(b);
+    const n = e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length-1] : all[(i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length];
+    if(n){ e.preventDefault(); n.click(); const again = document.querySelector(`[data-oyr-region="${CSS.escape(n.dataset.oyrRegion)}"]`); if(again) again.focus(); }
+    return;
+  }
+  // leaderboard rows are focusable: Space opens the profile too (Enter is handled site-wide for [data-link])
+  const tr = e.target.closest && e.target.closest('#oyr-board tr.clk');
+  if(tr && e.key === ' '){ e.preventDefault(); go(tr.dataset.link); }
+});
+
+// touch screens wider than a phone (no hover): the first tap on "Rankings" opens National / Regional
+(function(){
+  const dd = $('#nav-rank'); if(!dd) return;
+  const top = dd.querySelector('.nav-rank');
+  const set = on => { dd.classList.toggle('open', on); top.setAttribute('aria-expanded', on ? 'true' : 'false'); };
+  top.addEventListener('click', e=>{
+    if(window.matchMedia('(hover: hover)').matches || window.innerWidth <= 720) return;
+    if(!dd.classList.contains('open')){ e.preventDefault(); e.stopPropagation(); set(true); }
+  });
+  document.addEventListener('click', e=>{ if(!e.target.closest || !e.target.closest('#nav-rank')) set(false); });
+  dd.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ set(false); top.focus(); } });
+})();
+
+/* ---- rank movement (pass 13): places moved at the last tournament night ----
+   window.TZ_BASE = the standings going into the latest night with results (tz_rank_baseline(), stored in
+   ranking_history). No baseline (not installed yet, or the very first night) → no arrows at all. */
+function tzMove(prev, now){
+  if(!window.TZ_BASE) return '';
+  if(prev == null) return '<span class="mv new" title="New in the rankings at the last tournament night">NEW</span>';
+  const d = Number(prev) - Number(now);
+  if(d > 0) return `<span class="mv up" title="Up ${d} at the last tournament night"><span aria-hidden="true">▲</span>${d}<span class="sr"> up</span></span>`;
+  if(d < 0) return `<span class="mv down" title="Down ${-d} at the last tournament night"><span aria-hidden="true">▼</span>${-d}<span class="sr"> down</span></span>`;
+  return '<span class="mv same" title="No change at the last tournament night"><span aria-hidden="true">–</span><span class="sr">no change</span></span>';
+}
+function tzMoveNote(){
+  const B = window.TZ_BASE; if(!B || !B.asOf) return '';
+  const d = parseLocalDate(B.asOf), when = d ? d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : '';
+  return `<span class="mv up" aria-hidden="true">▲</span><span class="mv down" aria-hidden="true">▼</span> Places moved at the last tournament night${when ? ' (' + when + ')' : ''}`;
+}
 
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves
