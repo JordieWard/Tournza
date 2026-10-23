@@ -1683,6 +1683,7 @@
     background:conic-gradient(from 210deg,var(--a),var(--b),var(--a),var(--b),var(--a));box-shadow:0 0 28px -6px var(--glow)}
   .oyr-ava span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#24479A,#0F1F44);
     font:900 25px/1 var(--display);color:#fff}
+  .oyr-ava img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
   .oyr-step.p1 .oyr-ava{width:100px;height:100px}
   .oyr-step.p1 .oyr-ava span{font-size:33px}
   .oyr-name{font:800 17px/1.2 var(--display);color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1864,6 +1865,21 @@
   .oyr-pts .mv{margin-left:6px;align-self:center}
   @media (max-width:720px){ .mv{margin-left:5px;padding:2px 4px;font-size:10px} }
 
+  /* admin Phase 2: profile pictures + suspension notice */
+  .ava img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+  .ava:has(img){overflow:hidden;background:var(--panel-2, #10203f)}
+  .acct-pic{display:flex;gap:16px;align-items:flex-start}
+  .acct-pic .ava.lg{flex:none}
+  .acct-pic-side{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .acct-pic-status{font-size:14px;color:var(--muted)}
+  .acct-pic-status.ok{color:var(--green-bright, #3ddc84)} .acct-pic-status.bad{color:#ff8a8a} .acct-pic-status.wait{color:#ffc36b}
+  .acct-pic-btn{align-self:flex-start;cursor:pointer}
+  .acct-pic-btn.disabled{opacity:.45;pointer-events:none}
+  .acct-pic-btn:focus-within{outline:2px solid var(--blue, #3678ff);outline-offset:2px}
+  .acct-suspended{margin:0 0 18px;padding:14px 16px;border-radius:12px;background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.35);color:#ffb3b3;line-height:1.5}
+  .acct-suspended a,.tz-susp-strip a{color:inherit;text-decoration:underline}
+  .tz-susp-strip{position:relative;z-index:60;padding:8px 16px;text-align:center;font-size:13.5px;background:#5a1620;color:#ffd5d5}
+  @media (max-width:560px){ .acct-pic{flex-direction:column} }
 </style>
 </head>
 <body>
@@ -2216,6 +2232,7 @@
 <div class="route" id="route-account">
   <section class="block">
     <div class="section-head"><div><h2>Account settings</h2><p class="lede" id="acct-lede">Your profile, membership and tournaments.</p></div></div>
+    <div class="acct-suspended" id="acct-suspended" role="alert" hidden><b>Your account is suspended.</b> You can’t enter tournaments, check in or play Friendlies, and your player profile is hidden. Contact <a href="mailto:admin@tournza.co.uk">admin@tournza.co.uk</a>.</div>
     <div class="acct">
       <nav class="acct-nav" role="tablist" aria-label="Account settings">
         <button type="button" role="tab" data-acct-tab="profile" id="acct-tab-profile" aria-controls="acct-pane-profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>Profile</button>
@@ -2234,7 +2251,16 @@
           <div class="acct-field"><span class="k">Public profile</span>
             <span class="v"><button class="btn btn-ghost btn-sm" id="acct-view-profile" hidden>View public profile →</button>
             <span class="acct-help" id="acct-no-profile">Your public player profile appears after your first tournament.</span></span></div>
-          <p class="acct-help acct-soon">Profile pictures and notifications are coming soon.</p>
+          <div class="acct-field acct-pic-field"><span class="k">Profile picture</span>
+            <span class="v"><span class="acct-pic">
+              <span class="ava lg" id="acct-pic-ava" aria-hidden="true">?</span>
+              <span class="acct-pic-side">
+                <span class="acct-pic-status" id="acct-pic-status" role="status" aria-live="polite">Loading…</span>
+                <label class="btn btn-ghost btn-sm acct-pic-btn" id="acct-pic-label">Upload a picture<input type="file" id="acct-pic-file" accept="image/jpeg,image/png,image/webp" hidden></label>
+                <span class="acct-help">JPG, PNG or WebP, up to 10 MB — we trim it to a square. It must be you or darts-related: no offensive content, nudity, other people, logos you don’t own, or contact details. It shows once a Tournza admin approves it (usually within 72 hours).</span>
+              </span>
+            </span></span></div>
+          <p class="acct-help acct-soon">Notifications are coming soon.</p>
         </div>
         <div class="panel acct-pane" data-acct-pane="membership" id="acct-pane-membership" role="tabpanel" aria-labelledby="acct-tab-membership" hidden>
           <h3>Membership <span class="pill green" id="acct-membership-status">Active</span></h3>
@@ -2535,6 +2561,9 @@ function finishLabel(outcome){ return FINISH[outcome] || '—'; }
 // a result only counts once you've added a row in `results` for a finished
 // tournament. Nothing is fabricated: no players table rows → an honest empty
 // state, exactly like the events loader.
+// approved profile pictures live in the public 'avatars' Storage folder (admin-approved only)
+function tzAvatarUrl(path){ return SUPABASE_URL + '/storage/v1/object/public/avatars/' + String(path).split('/').map(encodeURIComponent).join('/'); }
+window.tzAvatarUrl = tzAvatarUrl;
 async function loadPlayersFromSupabase(){
   try{
     if(typeof supabase === 'undefined') throw new Error('Supabase SDK unavailable');
@@ -2560,6 +2589,8 @@ async function loadPlayersFromSupabase(){
       // being hand-typed per player: "Jordan Ward" → "JW".
       initials: (p.name||'').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?',
       region: p.region || '',
+      regionSince: p.region_since ? String(p.region_since).slice(0,10) : '',
+      avatar: p.avatar_path ? tzAvatarUrl(p.avatar_path) : null,
       rating: p.rating ?? null,
       avg: p.avg ?? null,
       checkout: p.checkout_pct ?? null,
@@ -2570,7 +2601,9 @@ async function loadPlayersFromSupabase(){
       c100: p.count_100 ?? null,
       c140: p.count_140 ?? null,
       // Filled in below from `results` — matches the old computed fields.
-      points: 0, wins: 0, events: 0, recent: [], form: []
+      points: 0, wins: 0, events: 0, recent: [], form: [],
+      // regional table: only tournaments in their current region, since they joined it (an admin move starts it again)
+      regPoints: 0, regWins: 0, regEvents: 0
     }));
     const byId = Object.fromEntries(PLAYERS.map(p=>[p.id,p]));
 
@@ -2583,6 +2616,9 @@ async function loadPlayersFromSupabase(){
       p.points += Number(r.ranking_points) || 0;
       p.events += 1;
       if(r.outcome==='winner') p.wins += 1;
+      if(t.region && t.region === p.region && (!p.regionSince || iso >= p.regionSince)){
+        p.regPoints += Number(r.ranking_points) || 0; p.regEvents += 1; if(r.outcome==='winner') p.regWins += 1;
+      }
       p.recent.push({ title: t.name || 'Tournament', date, outcome: r.outcome, position: r.position ?? null, pts: Number(r.ranking_points) || 0, tid: r.tournament_id ?? null });
     });
     // form: W = reached the final (winner or runner-up), L = out before it
@@ -2592,7 +2628,9 @@ async function loadPlayersFromSupabase(){
     REG = PLAYERS.filter(p=>p.events>0).sort((a,b)=> b.points-a.points || b.wins-a.wins || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0));
     REG.forEach((p,i)=>p.rank=i+1);
     const __regN = {};
-    REG.forEach(p=>{ __regN[p.region] = (__regN[p.region] || 0) + 1; p.regionRank = __regN[p.region]; });
+    REG.slice().filter(p=>p.regEvents>0)
+      .sort((a,b)=> b.regPoints-a.regPoints || b.regWins-a.regWins || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0))
+      .forEach(p=>{ __regN[p.region] = (__regN[p.region] || 0) + 1; p.regionRank = __regN[p.region]; });
     // movement arrows: the standings going into the last tournament night (stored by the server). No baseline → no arrows.
     try{
       sb.rpc('tz_rank_baseline').then(({ data, error })=>{
@@ -2955,7 +2993,7 @@ function renderRankings(){
 function playerCard(p){
   return `<article class="card clk player-card" data-link="player:${p.id}">
     <div class="top">
-      <div class="ava">${p.initials}</div>
+      <div class="ava">${p.avatar ? `<img src="${p.avatar}" alt="" loading="lazy">` : p.initials}</div>
       <div><h3 style="font-size:19px">${p.name}</h3>
         <div class="mono" style="font-size:12.5px;color:var(--muted-2)">${p.region} · #${p.rank}</div></div>
     </div>
@@ -3150,7 +3188,7 @@ function renderPlayerProfile(id){
   };
   el.innerHTML=`
     <div class="pf-hero profile-hero">
-      <div class="ava lg">${pfEsc(p.initials)}</div>
+      <div class="ava lg">${p.avatar ? `<img src="${pfEsc(p.avatar)}" alt="">` : pfEsc(p.initials)}</div>
       <div class="meta">
         <span class="eyebrow">${p.rank ? 'Rank #' + p.rank + ' · ' : ''}${pfEsc(p.region)}</span>
         <h2>${pfEsc(p.name)}</h2>
@@ -4841,6 +4879,8 @@ function tzSocialRow(doc, cx, y, color){
 
 /* ---------------- OWN YOUR REGION (OYR): regional rankings (pass 12; flagship redesign pass 13, 2026-10) ----------------
    OYR is a presentation of the SAME Tournza rankings, one region at a time:
+     • Phase 2: a player's regional total counts only tournaments in their current region since they joined it
+       (an admin region move starts it again; national points stay).
      • REG (built by loadPlayersFromSupabase) — each player's stored ranking points added up, ordered by
        points then wins; here it's filtered to the player's home region and numbered 1, 2, 3… in that order
        (the same rule as p.regionRank). Nothing is recalculated, stored or invented.
@@ -4889,7 +4929,7 @@ function oyrStep(p, place){
       aria-label="${OYR_PLACE[place]} place: ${oyrEsc(p.name)}${you ? ' (you)' : ''}, ${oyrN(p.points)} points. Open profile">
       <div class="oyr-card">
         ${place === 1 ? `${OYR_CROWN}<span class="oyr-ribbon">Region leader</span>` : ''}
-        <div class="oyr-ava"><span>${oyrEsc(p.initials || oyrInit(p.name))}</span></div>
+        <div class="oyr-ava">${p.avatar ? `<img src="${oyrEsc(p.avatar)}" alt="" loading="lazy">` : `<span>${oyrEsc(p.initials || oyrInit(p.name))}</span>`}</div>
         <div class="oyr-name">${oyrEsc(p.name)}${you ? ' <em>You</em>' : ''}</div>
         <div class="oyr-pts"><b>${oyrN(p.points)}</b><span>pts</span>${tzMove(window.TZ_BASE && window.TZ_BASE.reg[p.id], place)}</div>
         <div class="oyr-stats">${stat(oyrN(p.wins), oyrN(p.wins) === 1 ? 'win' : 'wins')}${stat(oyrN(p.events), oyrN(p.events) === 1 ? 'event' : 'events')}${p.avg != null && p.avg !== '' ? stat(p.avg, 'avg') : ''}</div>
@@ -4905,7 +4945,11 @@ function renderRegional(arg){
   const regions = oyrRegions();
   const loaded = typeof playersLoaded === 'undefined' || playersLoaded;
   const ranked = (typeof REG !== 'undefined' ? REG : []);
-  const inRegion = r => ranked.filter(p=>p.region === r);
+  // regional table (Phase 2): only results from tournaments in the player's current region since they joined it
+  // (p.regPoints etc., worked out in loadPlayersFromSupabase); national points are untouched
+  const inRegion = r => ranked.filter(p=>p.region === r && (p.regEvents == null || p.regEvents > 0))
+    .map(p=>p.regEvents == null ? p : ({ ...p, points:p.regPoints, wins:p.regWins, events:p.regEvents }))
+    .sort((a,b)=> b.points-a.points || b.wins-a.wins || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0));
   const listed = !!(window.TZ_REGIONS && window.TZ_REGIONS.length);
   if(OYR.chosen && OYR.region && listed && !regions.includes(OYR.region)) OYR.chosen = false;   // a link to a region that isn't on the list
   if(!OYR.chosen){
@@ -5032,6 +5076,120 @@ function tzMoveNote(){
   const d = parseLocalDate(B.asOf), when = d ? d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : '';
   return `<span class="mv up" aria-hidden="true">▲</span><span class="mv down" aria-hidden="true">▼</span> Places moved at the last tournament night${when ? ' (' + when + ')' : ''}`;
 }
+
+/* ---------------- Account: profile picture + suspension notice (admin Phase 2, 2026-10) ----------------
+   Profile picture: the player picks a JPG / PNG / WebP (up to 10 MB); the browser trims it to a centred square,
+   makes it 512×512 and uploads it to the PRIVATE 'avatars-pending' folder under their own id; picture_submit()
+   records it. Only a Tournza admin can approve it (it's then copied to the public folder) — until then the
+   current picture stays. The decision (and the reason, if it wasn't approved) shows here.
+   Suspension: my_account_status() — a suspended player sees the notice at the top of their account page
+   and a slim strip on every page. All blocking is done by the database; this only explains it. */
+(function(){
+  if(window.__tzAcctExtra) return; window.__tzAcctExtra = true;
+  const MAX_BYTES = 10 * 1024 * 1024, SIZE = 512;
+  const X = { sb:null, uid:null, suspended:false, busy:false };
+  const $id = (i) => document.getElementById(i);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const avatarUrl = (path) => (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : '') + '/storage/v1/object/public/avatars/' + String(path).split('/').map(encodeURIComponent).join('/');
+  window.tzAvatarUrl = window.tzAvatarUrl || avatarUrl;
+  const when = (iso) => { try{ return new Date(iso).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }); }catch(_){ return ''; } };
+
+  function strip(on){
+    let el = $id('tz-susp-strip');
+    if(on && !el){
+      el = document.createElement('div'); el.id = 'tz-susp-strip'; el.className = 'tz-susp-strip'; el.setAttribute('role', 'status');
+      el.innerHTML = 'Your account is suspended — contact <a href="mailto:admin@tournza.co.uk">admin@tournza.co.uk</a>';
+      document.body.prepend(el);
+    }
+    if(el) el.hidden = !on;
+    const box = $id('acct-suspended'); if(box) box.hidden = !on;
+  }
+
+  async function status(){
+    try{
+      const { data } = await X.sb.rpc('my_account_status');
+      X.suspended = !!(data && data.suspended);
+    }catch(_){ X.suspended = false; }
+    strip(X.suspended);
+  }
+
+  function say(text, kind){
+    const s = $id('acct-pic-status'); if(!s) return;
+    s.innerHTML = text; s.className = 'acct-pic-status' + (kind ? ' ' + kind : '');
+  }
+
+  async function loadPic(){
+    const ava = $id('acct-pic-ava'), label = $id('acct-pic-label'), file = $id('acct-pic-file');
+    if(!ava) return;
+    let d = null;
+    try{ const r = await X.sb.rpc('my_picture'); if(r.error) throw r.error; d = r.data || {}; }
+    catch(_){ say('Couldn’t load your picture — refresh to try again.', 'bad'); return; }
+    if(d.approved_path) ava.innerHTML = `<img src="${esc(avatarUrl(d.approved_path))}" alt="">`;
+    else ava.textContent = (($id('acct-name') && $id('acct-name').textContent) || '?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
+    const pend = d.pending, last = d.last_decision;
+    if(pend) say(`<b>Waiting for review</b> — sent ${esc(when(pend.submitted_at))}. Your current picture stays until it’s approved.`, 'wait');
+    else if(last && last.status === 'rejected') say(`<b>Your last picture wasn’t approved:</b> ${esc(last.reason || 'it didn’t meet the picture rules')}. You can upload another.`, 'bad');
+    else if(last && last.status === 'approved') say('Your picture is approved and showing on your player profile.', 'ok');
+    else say(d.approved_path ? 'Your picture is showing on your player profile.' : 'No picture yet — your initials show instead.');
+    const off = X.suspended;
+    if(label) label.classList.toggle('disabled', off);
+    if(file) file.disabled = off;
+    if(off) say('Picture uploads are off while your account is suspended.', 'bad');
+  }
+
+  // centred square, 512×512, WebP (or JPEG where the browser can't make WebP)
+  async function squareImage(f){
+    const url = URL.createObjectURL(f);
+    try{
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('That file isn’t an image we can read')); i.src = url; });
+      const s = Math.min(img.naturalWidth, img.naturalHeight);
+      if(!s) throw new Error('That file isn’t an image we can read');
+      const c = document.createElement('canvas'); c.width = c.height = SIZE;
+      const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+      g.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, SIZE, SIZE);
+      let blob = await new Promise(r => c.toBlob(r, 'image/webp', 0.86));
+      if(!blob || blob.type !== 'image/webp') blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
+      if(!blob) throw new Error('Couldn’t prepare the picture');
+      return blob;
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  async function upload(f){
+    if(X.busy || !X.uid) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)) return say('Use a JPG, PNG or WebP picture.', 'bad');
+    if(f.size > MAX_BYTES) return say('That picture is over 10 MB — choose a smaller one.', 'bad');
+    X.busy = true; say('Uploading…', 'wait');
+    try{
+      const blob = await squareImage(f);
+      const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+      const id = (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16)));
+      const path = `${X.uid}/${id}.${ext}`;
+      const up = await X.sb.storage.from('avatars-pending').upload(path, blob, { contentType: blob.type, upsert: false });
+      if(up.error) throw up.error;
+      const r = await X.sb.rpc('picture_submit', { p_path: path });
+      if(r.error) throw r.error;
+      await loadPic();
+    }catch(e){
+      say(esc((e && e.message) || 'The upload didn’t work — try again.'), 'bad');
+    }finally{ X.busy = false; const fi = $id('acct-pic-file'); if(fi) fi.value = ''; }
+  }
+
+  async function init(){
+    if(typeof supabase === 'undefined' || typeof SUPABASE_URL === 'undefined') return;
+    X.sb = X.sb || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let session = null;
+    try{ session = (await X.sb.auth.getSession()).data.session; }catch(_){}
+    X.uid = session && session.user ? session.user.id : null;
+    if(!X.uid){ strip(false); return; }
+    await status();
+    await loadPic();
+  }
+
+  document.addEventListener('change', (e) => {
+    if(e.target && e.target.id === 'acct-pic-file' && e.target.files && e.target.files[0]) upload(e.target.files[0]);
+  });
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves
 renderRankings(); renderPlayers(); renderMembership();            // loading state until loadPlayersFromSupabase resolves

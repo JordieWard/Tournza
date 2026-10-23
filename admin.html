@@ -179,6 +179,47 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
 }
 @media (prefers-reduced-motion:reduce){.ad-toast{transition:none}}
 .ad-warn{color:#FFC36B;background:rgba(255,170,40,.10);border:1px solid rgba(255,170,40,.28);border-radius:10px;padding:10px 12px;line-height:1.45}
+
+/* ---- Phase 2: actions, players, pictures ---- */
+.ad-modal-c{max-height:calc(100vh - 32px);overflow:auto}
+.ad-modal-intro p{margin:0 0 10px}
+.ad-check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ivory-dim);cursor:pointer}
+.ad-check input{width:auto;min-height:0;margin-top:3px;accent-color:var(--blue)}
+.ad-order{list-style:decimal inside;margin:0;padding:0;display:grid;gap:6px}
+.ad-order li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line-2);border-radius:9px;background:#0A1530}
+.ad-order li span:first-child{font-weight:700}
+.ad-pick{border:0;padding:0;margin:0;display:grid;gap:8px}
+.ad-pick label{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line-2);border-radius:9px;cursor:pointer;font-weight:600}
+.ad-pick label:has(input:checked){border-color:var(--cyan);background:rgba(25,211,243,.08)}
+.ad-pick input{width:auto;min-height:0;accent-color:var(--cyan)}
+.ad-sel{user-select:all;word-break:break-all}
+.ad-ava{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#24479A,#0F1F44);font:800 15px/1 var(--display);color:#fff}
+.ad-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.ad-ava.sm{width:32px;height:32px;font-size:12px}
+.ad-ava.lg{width:76px;height:76px;font-size:26px}
+.ad-prow{display:flex;align-items:center;gap:10px}
+.ad-phead{display:flex;align-items:center;gap:18px;margin:0 0 16px}
+.ad-phead .ad-h1{margin-bottom:4px}
+.ad-psearch{display:flex;gap:8px;margin:0 0 14px;max-width:520px}
+.ad-psearch input{flex:1;min-width:0}
+.ad-note{margin:0 0 14px}
+.ad-notes{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ad-notes li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#0B1730}
+.ad-note-b{white-space:pre-wrap;margin-top:4px}
+.ad-pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.ad-pic{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:#0B1730;display:flex;flex-direction:column}
+.ad-pic-img{aspect-ratio:1;display:grid;place-items:center;background:#060E22}
+.ad-pic-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ad-pic-b{padding:12px;display:grid;gap:8px}
+.ad-age{font:500 12px/1.3 var(--mono);color:var(--muted-2)}
+.ad-age.soon{color:var(--amber)}
+.ad-age.over{color:var(--pink)}
+.ad-cur{display:flex;align-items:center;gap:8px}
+@media (max-width:560px){
+  .ad-phead{gap:12px}
+  .ad-ava.lg{width:56px;height:56px;font-size:20px}
+  .ad-pics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -219,7 +260,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
 
 <script>window.TZ_SUPABASE_URL = "https://uwojmyggmacoxrdolstb.supabase.co"; window.TZ_SUPABASE_KEY = "sb_publishable_HhQl-E4KZFnwuSSA_J_JXQ_cIQbilr-";</script>
 <script>
-/* Tournza Admin Control Centre — Phase 1 (read-only views + admin users).
+/* Tournza Admin Control Centre — Phase 1 (views + admin users) + Phase 2 (actions: admin-ops.js).
    Security lives in the database: every admin_* function checks the caller's admin role and the second
    login step (aal2). This file only decides what to show; it never holds a secret (the key below is the
    site's public key, the same one every Tournza page uses). */
@@ -328,9 +369,12 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function start(){
     $('#ad-boot').hidden = true; $('#ad-app').hidden = false;
     const nav = [['overview','Overview'], ['tournaments','Tournaments']];
+    if(can('players.view')) nav.push(['players','Players']);
+    if(can('payments.view')) nav.push(['payments','Payments']);
+    if(can('pictures.review')) nav.push(['pictures','Pictures']);
     if(can('audit.view')) nav.push(['audit','Audit log']);
     if(can('admins.manage')) nav.push(['admins','Admin users']);
-    const soon = ['Matches','Players','Disputes','Payments','Growth'];
+    const soon = ['Matches','Disputes','Growth','Affiliates'];
     $('#ad-nav').innerHTML = nav.map(([k,l]) => `<a href="#${k}" data-nav="${k}">${l}<span class="n" id="ad-n-${k}" hidden></span></a>`).join('')
       + soon.map(l => `<a class="dis" aria-disabled="true">${l}<span class="soon">Soon</span></a>`).join('');
     $('#ad-me').innerHTML = `<b>${esc(A.me.name)}</b><span class="role">${esc(A.me.label)}</span><div class="ad-row"><a class="ad-btn ghost sm" href="/">Site</a><button class="ad-btn ghost sm" data-ad-signout>Sign out</button></div>`;
@@ -341,11 +385,14 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function route(){
     const h = decodeURIComponent(location.hash.replace(/^#/, '')) || 'overview';
     const [v, arg] = h.split(':');
-    A.view = ['overview','tournaments','tournament','audit','admins'].includes(v) ? v : 'overview';
+    A.view = ['overview','tournaments','tournament','audit','admins','players','player','payments','pictures'].includes(v) ? v : 'overview';
     if(A.view === 'audit' && !can('audit.view')) A.view = 'overview';
+    if((A.view === 'players' || A.view === 'player') && !can('players.view')) A.view = 'overview';
+    if(A.view === 'payments' && !can('payments.view')) A.view = 'overview';
+    if(A.view === 'pictures' && !can('pictures.review')) A.view = 'overview';
     if(A.view === 'admins' && !can('admins.manage')) A.view = 'overview';
     A.arg = arg || null;
-    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view)));
+    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view === 'player' ? 'players' : A.view)));
     render();
   }
   async function render(quiet){
@@ -357,6 +404,10 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       else if(A.view === 'tournament') box.innerHTML = await viewTournament(A.arg);
       else if(A.view === 'audit') box.innerHTML = await viewAudit();
       else if(A.view === 'admins') box.innerHTML = await viewAdmins();
+      else if(A.view === 'players') box.innerHTML = await viewPlayers();
+      else if(A.view === 'player') box.innerHTML = await viewPlayer(A.arg);
+      else if(A.view === 'payments') box.innerHTML = await viewPayments();
+      else if(A.view === 'pictures'){ box.innerHTML = await viewPictures(); hydratePictures(); }
       $('#ad-upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
       if(!quiet) $('#ad-main').focus({ preventScroll:true });
     }catch(e){ box.innerHTML = `<div class="ad-banner">${esc(friendly(e))}</div>`; }
@@ -372,12 +423,15 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     let h = `<h1 class="ad-h1">Control Centre</h1><p class="ad-sub">${esc(day(o.today))} · everything that needs you is at the top.</p>`;
     h += `<section class="ad-sec" aria-labelledby="ad-ac-h"><h2 id="ad-ac-h">Action Centre <span class="c">${acts.length ? acts.length + ' item' + (acts.length === 1 ? '' : 's') : ''}</span></h2>`;
     h += acts.length ? `<div class="ad-actions">${acts.map(a => {
-        const href = a.link && a.link.type === 'tournament' ? '#tournament:' + a.link.id : a.link && a.link.type === 'payments' ? '#overview' : a.link && a.link.type === 'system' ? '#overview' : null;
+        const href = a.link && a.link.type === 'tournament' ? '#tournament:' + a.link.id
+          : a.link && a.link.type === 'payments' ? (can('payments.view') ? '#payments' : '#overview')
+          : a.link && a.link.type === 'pictures' ? (can('pictures.review') ? '#pictures' : '#overview')
+          : a.link && a.link.type === 'system' ? '#overview' : null;
         const sev = { high:'Urgent', medium:'To do', low:'Check', info:'Note' }[a.severity] || a.severity;
         const inner = `<span class="sev">${esc(sev)}</span><span><b>${esc(a.title)}</b><small>${esc(a.detail || '')}</small></span><span class="go">${href && href !== '#overview' ? 'Open →' : ''}</span>`;
         return href && href !== '#overview' ? `<a class="ad-act ${esc(a.severity)}" href="${href}" data-kind="${esc(a.kind)}">${inner}</a>` : `<div class="ad-act ${esc(a.severity)}" data-kind="${esc(a.kind)}">${inner}</div>`;
       }).join('')}</div>` : `<div class="ad-clear">Nothing needs attention right now.</div>`;
-    h += `<p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">Resolving these from the dashboard comes in Phase 2 — for now this shows what needs doing and where.</p></section>`;
+    h += `</section>`;
     h += `<div class="ad-tiles">
       ${tile(t.length, 'Tournaments tonight')}
       ${tile(o.live.fixtures, 'Tournament matches on')}
@@ -395,7 +449,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(o.payments) h += `<section class="ad-sec" id="ad-payments"><h2>Payments</h2><div class="ad-tiles" style="margin:0">
         ${tile(o.payments.refunds_due, 'Refunds due', o.payments.refunds_due > 0)}${tile(money(o.payments.refunds_due_pence), 'To refund')}
         ${tile(o.payments.exceptions, 'Payment problems', o.payments.exceptions > 0)}${tile(money(o.payments.exceptions_pence), 'Problem payments')}</div>
-        <p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">Refunds are still made in Stripe; refunding from here comes in Phase 3.</p></section>`;
+        <p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">Refund in Stripe, then mark it refunded under <a href="#payments">Payments</a>.</p></section>`;
     h += `<section class="ad-sec" id="ad-system"><h2>Scheduled jobs</h2>${(o.jobs || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Job</th><th>Runs</th><th>State</th><th class="hide-s">Last run</th></tr></thead><tbody>
       ${o.jobs.map(j => `<tr class="${j.last_status === 'failed' ? 'warn' : ''}"><td class="mono">${esc(j.name)}</td><td class="mono sm">${esc(j.schedule)}</td>
         <td>${j.active ? badge('ok','On') : badge('cancelled','Paused')} ${j.last_status ? badge(j.last_status === 'succeeded' ? 'ok' : j.last_status, j.last_status) : ''}</td>
@@ -415,7 +469,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     const list = await rpc('admin_tournaments', { p_filter: A.q ? 'all' : A.filter, p_limit: 500 });
     const q = A.q.toLowerCase();
     const rows = q ? list.filter(t => (t.name + ' ' + t.region + ' ' + t.date + ' ' + day(t.date)).toLowerCase().includes(q)) : list;
-    let h = `<h1 class="ad-h1">Tournaments</h1><p class="ad-sub">Read-only for now. Open one for entries, groups, fixtures, results${can('payments.view') ? ' and payments' : ''}.</p>`;
+    let h = `<h1 class="ad-h1">Tournaments</h1><p class="ad-sub">Open one for entries, groups, fixtures, results${can('payments.view') ? ', payments' : ''}${can('tournaments.resolve') ? ' and decisions' : ''}.</p>`;
     h += `<div class="ad-tabs" role="group" aria-label="Show">${FILTERS.map(([k,l]) => `<button type="button" data-filter="${k}" class="${!A.q && A.filter === k ? 'on' : ''}" aria-pressed="${!A.q && A.filter === k}">${l}</button>`).join('')}</div>`;
     if(A.q) h += `<div class="ad-banner info">Search: “${esc(A.q)}” — ${rows.length} result${rows.length === 1 ? '' : 's'} <button type="button" class="ad-btn ghost sm" data-clear-q style="margin-left:8px">Clear</button></div>`;
     h += rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Date</th><th>Tournament</th><th>Phase</th><th class="num">Paid</th><th class="num hide-s">Checked in</th><th class="num hide-s">Fixtures</th><th class="hide-s">Winner</th></tr></thead><tbody>
@@ -428,13 +482,16 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   }
   async function viewTournament(id){
     const d = await rpc('admin_tournament', { p_id: Number(id) });
+    A.tdata = d;
     if(!d) return `<a class="ad-back" href="#tournaments">← Tournaments</a><div class="ad-clear">That tournament doesn’t exist.</div>`;
     const t = d.tournament, fx = d.fixtures || [];
     const need = fx.filter(f => f.needs_decision), ties = (d.groups || []).filter(g => g.tie_flag && !g.completed_at);
     let h = `<a class="ad-back" href="#tournaments">← Tournaments</a><h1 class="ad-h1">${esc(t.name)}</h1>
       <p class="ad-sub">${esc(t.region)} · ${esc(day(t.date))} · ${badge(t.phase)}${t.cancel_reason ? ' · ' + esc(t.cancel_reason) : ''}</p>
       <div class="ad-links"><a class="ad-btn ghost sm" href="/#event:${t.id}" target="_blank" rel="noopener">Event page ↗</a><a class="ad-btn ghost sm" href="/#tournament:${t.id}" target="_blank" rel="noopener">Tournament page ↗</a></div>`;
-    if(d.you_are_entered) h += `<div class="ad-banner">You’re entered in this tournament. Any action on it will need another admin (from Phase 2).</div>`;
+    const can2 = d.can || {}, mine = d.you_are_entered, live = ['open','groups','knockout'].includes(t.phase);
+    if(mine) h += `<div class="ad-banner">You’re entered in this tournament, so you can’t make decisions on it — another admin has to.</div>`;
+    if(live && can2.cancel && !mine) h += `<div class="ad-links"><button type="button" class="ad-btn danger sm" data-cancel-t>Cancel tournament</button></div>`;
     const paid = (d.entries || []).filter(e => e.payment_status === 'paid');
     h += `<div class="ad-tiles">
       <div class="ad-tile"><b>${paid.length}</b><span>Paid entries</span></div>
@@ -443,9 +500,9 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       <div class="ad-tile"><b>${fx.length ? fx.filter(f => ['completed','void'].includes(f.status)).length + ' / ' + fx.length : '—'}</b><span>Fixtures done</span></div>
       <div class="ad-tile${need.length + ties.length ? ' alert' : ''}"><b>${need.length + ties.length}</b><span>Need a decision</span></div></div>`;
     if(need.length || ties.length) h += `<section class="ad-sec"><h2>Needs a decision</h2><div class="ad-actions">
-      ${ties.map(g => `<div class="ad-act high"><span class="sev">Urgent</span><span><b>Group ${esc(g.label)} tie</b><small>Still level after every tiebreak — a bull-off result is needed</small></span><span></span></div>`).join('')}
-      ${need.map(f => `<div class="ad-act high"><span class="sev">Urgent</span><span><b>${esc(STAGE[f.stage] || f.stage)}${f.group ? ' ' + esc(f.group) : ''}: ${esc(f.p1 || f.source_p1 || 'TBC')} v ${esc(f.p2 || f.source_p2 || 'TBC')}</b><small>${esc(f.flag || '')}</small></span><span></span></div>`).join('')}
-      </div><p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">The buttons to resolve these arrive in Phase 2 (with the same rules the server uses today).</p></section>`;
+      ${ties.map(g => `<div class="ad-act high"><span class="sev">Urgent</span><span><b>Group ${esc(g.label)} tie</b><small>Still level after every tiebreak — a bull-off result is needed</small></span><span>${can2.resolve && !mine ? `<button type="button" class="ad-btn sm" data-tie="${g.id}">Resolve</button>` : ''}</span></div>`).join('')}
+      ${need.map(f => `<div class="ad-act high"><span class="sev">Urgent</span><span><b>${esc(STAGE[f.stage] || f.stage)}${f.group ? ' ' + esc(f.group) : ''}: ${esc(f.p1 || f.source_p1 || 'TBC')} v ${esc(f.p2 || f.source_p2 || 'TBC')}</b><small>${esc(f.flag || '')}</small></span><span>${can2.resolve && !mine ? `<button type="button" class="ad-btn sm" data-decide="${f.id}">Decide</button>` : ''}</span></div>`).join('')}
+      </div></section>`;
     if((d.groups || []).length) h += `<section class="ad-sec"><h2>Groups</h2><div class="ad-grid2">${d.groups.map(g => `<div class="ad-group"><h3>Group ${esc(g.label)} ${g.completed_at ? badge('completed','done') : g.tie_flag ? badge('refund_due','tie') : ''}</h3>
       <div class="ad-tw"><table class="ad-t"><thead><tr><th>#</th><th>Player</th><th class="num">P</th><th class="num">W</th><th class="num">Pts</th><th class="num">LD</th><th class="num hide-s">Avg</th></tr></thead><tbody>
       ${(g.table || []).map(r => `<tr><td>${r.position || '—'}${r.tied ? '*' : ''}</td><td>${esc(r.name)}</td><td class="num">${r.played}</td><td class="num">${r.won}</td><td class="num"><b>${r.points}</b></td><td class="num">${r.leg_diff > 0 ? '+' : ''}${r.leg_diff}</td><td class="num hide-s">${r.average == null ? '—' : Number(r.average).toFixed(2)}</td></tr>`).join('')}
@@ -472,7 +529,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   // ---------------- Audit log ----------------
   async function viewAudit(){
     const rows = await rpc('admin_audit_recent', { p_limit: 200 });
-    let h = `<h1 class="ad-h1">Audit log</h1><p class="ad-sub">Every admin change, newest first. Nobody can edit or delete these entries.</p>`;
+    let h = `<h1 class="ad-h1">Audit log</h1><p class="ad-sub">Every admin change, newest first. Entries can’t be edited or deleted from the dashboard or the website.</p>`;
     h += rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Outcome</th><th>Reason & change</th></tr></thead><tbody>
       ${rows.map(r => `<tr><td class="sm">${esc(when(r.at))}</td><td>${esc(r.who)}<div class="sm">${esc(r.role || '')}</div></td><td class="mono sm">${esc(r.action)}<div>${esc(r.target_type || '')}</div></td><td>${badge(r.outcome)}</td>
         <td><div>${esc(r.reason || '')}</div>${r.before || r.after ? `<details class="ad-d"><summary>Before → after</summary><pre>${esc(JSON.stringify(r.before))} → ${esc(JSON.stringify(r.after))}</pre></details>` : ''}<div class="sm mono">ref ${esc(String(r.ref).slice(0,8))}</div></td></tr>`).join('')}
@@ -526,10 +583,310 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   }
   function closeModal(){ $('#ad-modal').hidden = true; $('#ad-modal-b').innerHTML = ''; }
 
+
+  // =====================================================================
+  // Phase 2 — actions. Every button calls one admin_* database function, which checks the permission, the
+  // second login step, the reason and the "you're involved" rule itself, and writes the audit row. The page
+  // only collects the choice + the reason and shows the answer.
+  // =====================================================================
+  const AVATAR_BASE = SUPABASE_URL + '/storage/v1/object/public/avatars/';
+  const avatarUrl = p => AVATAR_BASE + String(p).split('/').map(encodeURIComponent).join('/');
+  const initials = n => String(n || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+  const ava = (path, name, cls) => `<span class="ad-ava${cls ? ' ' + cls : ''}">${path ? `<img src="${esc(avatarUrl(path))}" alt="">` : esc(initials(name))}</span>`;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+
+  // one modal for every action: fields + a reason; one submit at a time; the server's answer is shown as-is
+  function actionModal({ title, intro, fields = '', reasonLabel = 'Reason (kept in the audit log)', reasonValue = '', confirm, submit = 'Confirm', danger, run, done }){
+    $('#ad-modal-b').innerHTML = `<h2 id="ad-modal-h">${esc(title)}</h2>${intro ? `<div class="ad-modal-intro">${intro}</div>` : ''}
+      <form class="ad-form" id="ad-act-form" novalidate>${fields}
+        ${reasonLabel ? `<div><label class="ad-lab" for="ax-reason">${esc(reasonLabel)}</label><input id="ax-reason" required minlength="3" maxlength="300" autocomplete="off" value="${esc(reasonValue)}"></div>` : ''}
+        ${confirm ? `<label class="ad-check"><input type="checkbox" id="ax-confirm" required> <span>${confirm}</span></label>` : ''}
+        <p class="ad-err" id="ax-err" role="alert"></p>
+        <div class="ad-row"><button type="submit" class="ad-btn${danger ? ' danger' : ''}">${esc(submit)}</button><button type="button" class="ad-btn ghost" data-close>Cancel</button></div>
+      </form>`;
+    $('#ad-modal').hidden = false;
+    const first = $('#ad-act-form input:not([type=hidden]), #ad-act-form select, #ad-act-form textarea'); if(first) first.focus();
+    $('#ad-act-form').onsubmit = async ev => {
+      ev.preventDefault();
+      const f = ev.target, btn = f.querySelector('[type=submit]'); if(btn.disabled) return;
+      const reason = $('#ax-reason') ? $('#ax-reason').value.trim() : '';
+      if($('#ax-reason') && reason.length < 3){ $('#ax-err').textContent = 'Give a reason (at least a few words).'; return; }
+      if(confirm && !$('#ax-confirm').checked){ $('#ax-err').textContent = 'Tick the box to confirm.'; return; }
+      btn.disabled = true; $('#ax-err').textContent = '';
+      try{
+        const r = await run(f, reason);
+        if(!r || !r.ok){ $('#ax-err').textContent = (r && r.error) || 'That didn’t work.'; btn.disabled = false; return; }
+        closeModal(); toast((done && done(r)) || 'Done — recorded in the audit log'); render(true);
+      }catch(e){ $('#ax-err').textContent = friendly(e); btn.disabled = false; }
+    };
+  }
+
+  // ---------- tournaments: tie / decide / cancel ----------
+  function tieModal(gid){
+    const g = (A.tdata.groups || []).find(x => String(x.id) === String(gid)); if(!g) return;
+    const tied = (g.table || []).filter(r => r.tied && r.position <= 2);
+    const top = Math.min(...tied.map(r => r.position));
+    const block = tied.filter(r => r.position === top);
+    actionModal({
+      title: `Group ${g.label} tie`,
+      intro: `<p class="ad-muted">Still level after every tiebreak. Put the tied players in finishing order (from the bull-off). Places ${top}–${top + block.length - 1} are decided by this.</p>`,
+      fields: `<ol class="ad-order" id="ax-order">${block.map(r => `<li data-id="${esc(r.player_id)}"><span>${esc(r.name)}</span>
+        <span class="ad-row"><button type="button" class="ad-btn ghost sm" data-up aria-label="Move ${esc(r.name)} up">↑</button><button type="button" class="ad-btn ghost sm" data-down aria-label="Move ${esc(r.name)} down">↓</button></span></li>`).join('')}</ol>`,
+      reasonLabel: 'Reason (e.g. the bull-off result)', submit: 'Confirm order',
+      run: (f, reason) => rpc('admin_resolve_tie', { p_group: g.id, p_order: [...f.querySelectorAll('#ax-order li')].map(li => li.dataset.id), p_reason: reason }),
+      done: () => `Group ${g.label} decided — recorded in the audit log`,
+    });
+  }
+  function decideModal(fid){
+    const f = (A.tdata.fixtures || []).find(x => String(x.id) === String(fid)); if(!f) return;
+    const kind = f.status === 'void' ? 'Knockout double no-show — neither player turned up. Choose who goes through.' : 'Stalled match — no activity for 5 minutes after play began. Choose who wins (the other player forfeits).';
+    actionModal({
+      title: `${STAGE[f.stage] || f.stage}${f.group ? ' ' + f.group : ''}: decide`,
+      intro: `<p class="ad-muted">${esc(kind)}</p>`,
+      fields: `<fieldset class="ad-pick"><legend class="ad-lab">Goes through</legend>
+        ${[[f.p1_id, f.p1], [f.p2_id, f.p2]].filter(x => x[0]).map(([id, n], i) => `<label><input type="radio" name="ax-win" value="${esc(id)}" ${i ? '' : 'required'}> ${esc(n)}</label>`).join('')}</fieldset>`,
+      submit: 'Confirm',
+      run: (form, reason) => {
+        const w = form.querySelector('input[name=ax-win]:checked');
+        if(!w) return { ok:false, error:'Choose who goes through.' };
+        return rpc('admin_resolve_fixture', { p_fixture: f.id, p_winner: w.value, p_reason: reason });
+      },
+    });
+  }
+  function cancelModal(){
+    const t = A.tdata.tournament;
+    const paid = (A.tdata.payments || []).filter(p => p.status === 'paid').length;
+    actionModal({
+      title: 'Cancel tournament', danger: true, submit: 'Cancel tournament',
+      intro: `<p><b>${esc(t.name)}</b> · ${esc(day(t.date))}</p><p class="ad-muted">It stops for everyone. Matches not yet played are voided. ${paid ? `<b>${plural(paid, 'paid place')}</b> will need refunding — they'll appear under Payments → Refunds due.` : 'No paid places to refund.'} This can't be undone from here.</p>`,
+      reasonLabel: 'Reason (shown to players and kept in the audit log)',
+      confirm: 'I understand this cancels the tournament for everyone',
+      run: (f, reason) => rpc('admin_cancel_tournament', { p_id: t.id, p_reason: reason }),
+      done: r => 'Tournament cancelled' + (r.refunds_due ? ` — ${plural(r.refunds_due, 'refund')} due (Payments)` : ''),
+    });
+  }
+
+  // ---------- payments: refunds due ----------
+  async function viewPayments(){
+    const rows = await rpc('admin_refunds');
+    A.refunds = rows;
+    const total = rows.reduce((s, r) => s + Number(r.amount_pence || 0), 0);
+    let h = `<h1 class="ad-h1">Payments</h1><p class="ad-sub">Refunds due. Refund the payment in Stripe first, then mark it refunded here.</p>
+      <div class="ad-tiles"><div class="ad-tile${rows.length ? ' alert' : ''}"><b>${rows.length}</b><span>Refunds due</span></div><div class="ad-tile"><b>${money(total)}</b><span>To refund</span></div></div>`;
+    h += rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>Tournament</th><th class="num">Amount</th><th class="hide-s">Why</th><th class="hide-s">Stripe ref</th><th></th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td>${r.player_id ? `<a href="#player:${esc(r.player_id)}">${esc(r.name || 'Player')}</a>` : '<span class="ad-muted">Unknown</span>'}<div class="sm">${esc(when(r.at))}</div></td>
+        <td>${r.tournament_id ? `<a href="#tournament:${esc(r.tournament_id)}">${esc(r.tournament || '')}</a>` : '—'}<div class="sm">${esc(day(r.date))}</div></td>
+        <td class="num"><b>${money(r.amount_pence)}</b></td><td class="sm hide-s">${esc(r.reason || '')}</td><td class="mono sm hide-s">…${esc(r.ref)}</td>
+        <td>${can('payments.refund') ? `<button type="button" class="ad-btn ghost sm" data-refund="${esc(r.id)}">Mark refunded</button>` : ''}</td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="ad-clear">No refunds due.</div>`;
+    return h;
+  }
+  function refundModal(id){
+    const r = (A.refunds || []).find(x => String(x.id) === String(id)); if(!r) return;
+    actionModal({
+      title: 'Mark refunded',
+      intro: `<p><b>${money(r.amount_pence)}</b> to ${esc(r.name || 'the player')} · ${esc(r.tournament || '')}</p>
+        ${r.stripe_session_id ? `<p class="ad-muted sm">Stripe checkout: <span class="mono ad-sel">${esc(r.stripe_session_id)}</span></p>` : ''}
+        <p class="ad-muted">This only records the refund — make it in Stripe first.</p>`,
+      reasonValue: 'Refunded in Stripe', confirm: 'I’ve refunded this payment in Stripe', submit: 'Mark refunded',
+      run: (f, reason) => rpc('admin_mark_refunded', { p_id: r.id, p_reason: reason }),
+      done: () => 'Marked refunded — recorded in the audit log',
+    });
+  }
+
+  // ---------- players ----------
+  async function viewPlayers(){
+    const filter = A.arg === 'suspended' ? 'suspended' : 'all';
+    const list = await rpc('admin_players', { p_q: A.pq || '', p_filter: filter });
+    let h = `<h1 class="ad-h1">Players</h1><p class="ad-sub">Find a player by name${can('players.contact') ? ' or email' : ''}. Open one for their record${can('players.notes') ? ', notes' : ''}${can('players.suspend') ? ' and actions' : ''}.</p>
+      <form class="ad-psearch" id="ad-psearch" role="search"><label class="sr" for="ad-pq">Search players</label>
+        <input id="ad-pq" type="search" placeholder="Name${can('players.contact') ? ' or email' : ''}" value="${esc(A.pq || '')}" autocomplete="off"><button class="ad-btn sm" type="submit">Search</button></form>
+      <div class="ad-tabs" role="group" aria-label="Show"><button type="button" data-pfilter="all" class="${filter === 'all' ? 'on' : ''}" aria-pressed="${filter === 'all'}">All</button><button type="button" data-pfilter="suspended" class="${filter === 'suspended' ? 'on' : ''}" aria-pressed="${filter === 'suspended'}">Suspended</button></div>`;
+    h += list.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th class="hide-s">Region</th><th class="num hide-s">Events</th><th>Status</th></tr></thead><tbody>
+      ${list.map(p => `<tr class="clk" data-go="#player:${esc(p.id)}" tabindex="0"><td><span class="ad-prow">${ava(p.avatar_path, p.name, 'sm')}<span><b>${esc(p.name)}</b>${p.email ? `<div class="sm">${esc(p.email)}</div>` : ''}</span></span></td>
+        <td class="hide-s">${esc(p.region || '—')}</td><td class="num hide-s">${p.events}</td>
+        <td>${p.suspended ? badge('refused', 'Suspended') : badge('ok', 'Active')}${p.picture_pending ? ' ' + badge('open', 'Picture') : ''}</td></tr>`).join('')}
+      </tbody></table></div>${list.length >= 60 ? '<p class="ad-muted sm">Showing the first 60 — search to narrow it down.</p>' : ''}` : `<div class="ad-clear">${A.pq ? 'No players match “' + esc(A.pq) + '”.' : 'No players.'}</div>`;
+    return h;
+  }
+  async function viewPlayer(id){
+    const p = await rpc('admin_player', { p_id: id });
+    A.pdata = p;
+    if(!p) return `<a class="ad-back" href="#players">← Players</a><div class="ad-clear">That player doesn’t exist.</div>`;
+    const acts = [];
+    if(!p.you){
+      if(can('players.suspend') && !p.is_admin) acts.push(p.suspension ? `<button type="button" class="ad-btn sm" data-reinstate>Reinstate</button>` : `<button type="button" class="ad-btn danger sm" data-suspend>Suspend</button>`);
+      if(can('players.region')) acts.push(`<button type="button" class="ad-btn ghost sm" data-region>Change region</button>`);
+    }
+    let h = `<a class="ad-back" href="#players">← Players</a>
+      <div class="ad-phead">${ava(p.avatar_path, p.name, 'lg')}<div><h1 class="ad-h1">${esc(p.name)}</h1>
+        <p class="ad-sub">${p.suspension ? badge('refused', 'Suspended') + ' ' : ''}${p.is_admin ? badge('open', 'Admin') + ' ' : ''}${p.you ? badge('ok', 'You') + ' ' : ''}${esc(p.region || 'No region')}${p.region_since ? ' since ' + esc(day(p.region_since)) : ''} · ${p.membership ? esc(p.membership) + ' member' : 'not a member'}</p>
+        ${p.email ? `<p class="ad-muted sm mono" style="margin:-8px 0 0">${esc(p.email)}</p>` : ''}</div></div>`;
+    if(p.you) h += `<div class="ad-banner info">This is your own record — another admin has to take any action on it.</div>`;
+    if(p.is_admin && !p.you) h += `<div class="ad-banner info">This player is an admin. To suspend them, an owner removes their admin access first.</div>`;
+    if(acts.length) h += `<div class="ad-links">${acts.join('')}</div>`;
+    if(p.suspension) h += `<div class="ad-banner"><b>Suspended</b> ${esc(when(p.suspension.at))}${p.suspension.by ? ' by ' + esc(p.suspension.by) : ''} — ${esc(p.suspension.reason)}. They can’t enter, check in or play Friendlies, and they’re hidden from the public rankings and player pages.</div>`;
+    if(p.upcoming_paid && p.upcoming_paid.length) h += `<div class="ad-banner${p.suspension ? '' : ' info'}"><b>Paid places in upcoming tournaments:</b> ${p.upcoming_paid.map(e => `<a href="#tournament:${e.tournament_id}">${esc(e.name)} (${esc(day(e.date))})</a>`).join(', ')}${p.suspension ? '. Decide whether to refund them (in Stripe), and cancel or leave the place.' : ''}</div>`;
+    const tile = (v, k) => `<div class="ad-tile"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    const pts = (p.results || []).reduce((s, r) => s + Number(r.points || 0), 0);
+    h += `<div class="ad-tiles">${tile((p.results || []).length, 'Tournaments')}${tile(pts, 'Ranking points')}${tile(p.friendlies ? p.friendlies.played : 0, 'Friendlies played')}${tile(p.friendlies ? p.friendlies.won : 0, 'Friendlies won')}${p.stats && p.stats.avg != null ? tile(Number(p.stats.avg).toFixed(2), '3-dart average') : ''}</div>`;
+    if(p.picture) h += `<section class="ad-sec"><h2>Profile picture</h2><p class="ad-muted">Latest: ${badge(p.picture.status === 'pending' ? 'open' : p.picture.status === 'approved' ? 'ok' : 'refused', p.picture.status)} sent ${esc(when(p.picture.submitted_at))}${p.picture.reason ? ' — ' + esc(p.picture.reason) : ''}${p.picture.status === 'pending' && can('pictures.review') ? ' · <a href="#pictures">Review →</a>' : ''}</p></section>`;
+    if(p.notes) h += `<section class="ad-sec"><h2>Admin notes <span class="c">${p.notes.length || ''}</span></h2><p class="ad-muted sm">Private to admins. Notes can’t be edited or deleted.</p>
+      ${p.you ? '' : `<form class="ad-form ad-note" id="ad-note-form"><label class="sr" for="ad-note">New note</label><textarea id="ad-note" rows="3" maxlength="2000" placeholder="Add a note…" required></textarea><p class="ad-err" id="ad-note-err"></p><div><button type="submit" class="ad-btn sm">Add note</button></div></form>`}
+      ${p.notes.length ? `<ul class="ad-notes">${p.notes.map(n => `<li><div class="sm ad-muted">${esc(when(n.at))} · ${esc(n.by || '—')}</div><div class="ad-note-b">${esc(n.body)}</div></li>`).join('')}</ul>` : ''}</section>`;
+    h += `<section class="ad-sec"><h2>Results <span class="c">${(p.results || []).length || ''}</span></h2>${(p.results || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Date</th><th>Tournament</th><th>Finish</th><th class="num">Points</th></tr></thead><tbody>
+      ${p.results.map(r => `<tr class="clk" data-go="#tournament:${r.tournament_id}" tabindex="0"><td class="sm">${esc(day(r.date))}</td><td>${esc(r.name)}<div class="sm">${esc(r.region || '')}</div></td><td>${esc(OUTCOME[r.outcome] || r.outcome)}</td><td class="num"><b>${r.points == null ? '—' : r.points}</b></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="ad-clear">No tournament results yet.</div>'}</section>`;
+    h += `<section class="ad-sec"><h2>Entries</h2>${(p.entries || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Date</th><th>Tournament</th><th>Payment</th><th class="hide-s">Checked in</th></tr></thead><tbody>
+      ${p.entries.map(e => `<tr class="clk" data-go="#tournament:${e.tournament_id}" tabindex="0"><td class="sm">${esc(day(e.date))}</td><td>${esc(e.name)} ${badge(e.phase)}</td><td>${badge(e.payment_status)}</td><td class="hide-s">${e.checked_in ? 'Yes' : 'No'}</td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="ad-clear">No entries.</div>'}</section>`;
+    if(p.history) h += `<section class="ad-sec"><h2>Admin history</h2>${p.history.length ? `<div class="ad-tw"><table class="ad-t"><tbody>${p.history.map(a => `<tr><td class="sm">${esc(when(a.at))}</td><td>${esc(a.who)}</td><td class="mono sm">${esc(a.action)}</td><td>${badge(a.outcome)}</td><td class="sm">${esc(a.reason || '')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No admin actions on this player.</div>'}</section>`;
+    h += `<p class="ad-muted sm">Account created ${esc(when(p.signed_up))} · id <span class="mono">${esc(p.id)}</span></p>`;
+    return h;
+  }
+  function suspendModal(){
+    const p = A.pdata;
+    actionModal({
+      title: 'Suspend player', danger: true, submit: 'Suspend',
+      intro: `<p><b>${esc(p.name)}</b></p><p class="ad-muted">They won’t be able to enter or pay for tournaments, check in, or play Friendlies, and they’ll be hidden from the public rankings and player pages. Their points are kept. They’ll see: “Your account is suspended — contact admin@tournza.co.uk”.</p>`,
+      reasonLabel: 'Reason (kept in the audit log — not shown to the player)',
+      run: (f, reason) => rpc('admin_suspend', { p_player: p.id, p_reason: reason }),
+      done: r => 'Suspended' + (r.upcoming_paid && r.upcoming_paid.length ? ` — ${plural(r.upcoming_paid.length, 'paid place')} to decide on` : ''),
+    });
+  }
+  function reinstateModal(){
+    const p = A.pdata;
+    actionModal({
+      title: 'Reinstate player', submit: 'Reinstate',
+      intro: `<p><b>${esc(p.name)}</b> — suspended: ${esc(p.suspension ? p.suspension.reason : '')}</p><p class="ad-muted">Everything comes back, including their points on the rankings.</p>`,
+      run: (f, reason) => rpc('admin_reinstate', { p_player: p.id, p_reason: reason }),
+    });
+  }
+  async function regionModal(){
+    const p = A.pdata;
+    let regions = [];
+    try{ const r = await A.sb.rpc('uk_regions_list'); regions = r.data || []; }catch(_){}
+    if(!regions.length) regions = ['Midlands','North West','Northern Ireland','Wales','South West','South East & London','East of England','Yorkshire & Humber','North East','Scotland'];
+    actionModal({
+      title: 'Change region', submit: 'Move player',
+      intro: `<p><b>${esc(p.name)}</b> · now ${esc(p.region || 'not set')}</p><p class="ad-muted">National points stay. Their regional table starts again in the new region from today. Not possible while they’re entered in an upcoming or live tournament.</p>`,
+      fields: `<div><label class="ad-lab" for="ax-region">New region</label><select id="ax-region" required><option value="">Choose…</option>${regions.filter(r => r !== p.region).map(r => `<option>${esc(r)}</option>`).join('')}</select></div>`,
+      run: (f, reason) => { const r = $('#ax-region').value; if(!r) return { ok:false, error:'Choose the new region.' }; return rpc('admin_change_region', { p_player: p.id, p_region: r, p_reason: reason }); },
+      done: () => 'Region changed — recorded in the audit log',
+    });
+  }
+
+  // ---------- profile pictures ----------
+  async function viewPictures(){
+    const tab = A.arg === 'decided' ? 'decided' : 'pending';
+    const rows = await rpc('admin_pictures', { p_status: tab });
+    A.pics = rows;
+    const over = rows.filter(r => tab === 'pending' && r.hours_waiting >= 72).length;
+    const n = $('#ad-n-pictures'); if(n && tab === 'pending'){ n.hidden = !rows.length; n.textContent = rows.length; }
+    let h = `<h1 class="ad-h1">Profile pictures</h1><p class="ad-sub">Review within 72 hours. Approve only if it’s the player or darts-related — no offensive content, nudity, other people, logos they don’t own, or contact details.</p>
+      <div class="ad-tabs" role="group" aria-label="Show"><button type="button" data-ptab="pending" class="${tab === 'pending' ? 'on' : ''}" aria-pressed="${tab === 'pending'}">Waiting${tab === 'pending' && rows.length ? ' (' + rows.length + ')' : ''}</button><button type="button" data-ptab="decided" class="${tab === 'decided' ? 'on' : ''}" aria-pressed="${tab === 'decided'}">Decided</button></div>`;
+    if(over) h += `<div class="ad-banner">${plural(over, 'picture')} waiting over 72 hours.</div>`;
+    if(!rows.length) return h + `<div class="ad-clear">${tab === 'pending' ? 'Nothing waiting.' : 'No decisions yet.'}</div>`;
+    h += `<div class="ad-pics">${rows.map(r => {
+      const age = r.hours_waiting >= 72 ? 'over' : r.hours_waiting >= 48 ? 'soon' : '';
+      return `<article class="ad-pic" data-pic="${esc(r.id)}">
+        <div class="ad-pic-img" data-pic-img="${esc(tab === 'pending' ? r.path : '')}" data-pic-pub="${esc(r.status === 'approved' && r.current_path ? r.current_path : '')}"><span class="ad-muted sm">${tab === 'pending' ? 'Loading…' : r.status === 'approved' ? '' : 'Removed'}</span></div>
+        <div class="ad-pic-b"><b><a href="#player:${esc(r.player_id)}">${esc(r.name)}</a></b>
+          <div class="sm ad-muted">Sent ${esc(when(r.submitted_at))}</div>
+          ${tab === 'pending' ? `<div class="ad-age ${age}">${r.hours_waiting < 1 ? 'Under an hour' : Math.floor(r.hours_waiting) + 'h'} waiting${age === 'over' ? ' — overdue' : ''}</div>
+            ${r.current_path ? `<div class="sm ad-muted ad-cur">Current: ${ava(r.current_path, r.name, 'sm')}</div>` : ''}
+            ${r.you ? '<div class="sm ad-muted">Your own picture — another admin reviews it.</div>' : `<div class="ad-row"><button type="button" class="ad-btn sm" data-approve="${esc(r.id)}">Approve</button><button type="button" class="ad-btn ghost sm" data-reject="${esc(r.id)}">Reject</button></div>`}`
+          : `<div>${badge(r.status === 'approved' ? 'ok' : 'refused', r.status)}</div><div class="sm ad-muted">${esc(r.decided_by || '')} · ${esc(when(r.decided_at))}</div>${r.reason ? `<div class="sm">${esc(r.reason)}</div>` : ''}`}
+        </div></article>`; }).join('')}</div>`;
+    return h;
+  }
+  // pictures waiting are private: show them through short-lived signed links (reviewing admins only)
+  async function hydratePictures(){
+    for(const el of document.querySelectorAll('[data-pic-img], [data-pic-pub]')){
+      const path = el.dataset.picImg, pub = el.dataset.picPub;
+      if(pub){ el.innerHTML = `<img src="${esc(avatarUrl(pub))}" alt="">`; continue; }
+      if(!path) continue;
+      try{
+        const { data, error } = await A.sb.storage.from('avatars-pending').createSignedUrl(path, 900);
+        if(error || !data) throw error || new Error('no link');
+        el.innerHTML = `<img src="${esc(data.signedUrl)}" alt="Picture waiting for review">`;
+      }catch(_){ el.innerHTML = '<span class="ad-muted sm">Couldn’t load the picture</span>'; }
+    }
+  }
+  async function approvePicture(id, btn){
+    const r = (A.pics || []).find(x => String(x.id) === String(id)); if(!r) return;
+    btn.disabled = true; btn.textContent = 'Approving…';
+    try{
+      const ext = (r.path.match(/\.[a-z]+$/) || ['.webp'])[0];
+      const dest = `${r.player_id}/${r.id}${ext}`;
+      const dl = await A.sb.storage.from('avatars-pending').download(r.path);
+      if(dl.error) throw dl.error;
+      const up = await A.sb.storage.from('avatars').upload(dest, dl.data, { contentType: dl.data.type || (ext === '.webp' ? 'image/webp' : ext === '.png' ? 'image/png' : 'image/jpeg'), upsert: false });
+      if(up.error && !/exist|duplicate/i.test(up.error.message || '')) throw up.error;
+      const res = await rpc('admin_picture_decide', { p_id: r.id, p_approve: true, p_reason: null });
+      if(!res || !res.ok) throw new Error((res && res.error) || 'Couldn’t approve it');
+      A.sb.storage.from('avatars-pending').remove([r.path]).catch(() => {});      // tidy up the private copy
+      toast('Approved — it’s now on their profile'); render(true);
+    }catch(e){ btn.disabled = false; btn.textContent = 'Approve'; toast(friendly(e), true); }
+  }
+  function rejectModal(id){
+    const r = (A.pics || []).find(x => String(x.id) === String(id)); if(!r) return;
+    actionModal({
+      title: 'Reject picture', submit: 'Reject',
+      intro: `<p><b>${esc(r.name)}</b></p><p class="ad-muted">Their current picture stays. They’ll see your reason on their account page.</p>`,
+      reasonLabel: 'Reason (shown to the player)',
+      fields: `<div class="ad-row">${['Shows another person','Not you or darts-related','Offensive or unsuitable','Contains a logo or contact details'].map(t => `<button type="button" class="ad-btn ghost sm" data-reason-chip="${esc(t)}">${esc(t)}</button>`).join('')}</div>`,
+      run: async (f, reason) => {
+        const res = await rpc('admin_picture_decide', { p_id: r.id, p_approve: false, p_reason: reason });
+        if(res && res.ok) A.sb.storage.from('avatars-pending').remove([r.path]).catch(() => {});
+        return res;
+      },
+      done: () => 'Rejected — the player will see why',
+    });
+  }
+
+  function opsClick(t){
+    if(t.matches('[data-tie]')){ tieModal(t.dataset.tie); return true; }
+    if(t.matches('[data-decide]')){ decideModal(t.dataset.decide); return true; }
+    if(t.matches('[data-cancel-t]')){ cancelModal(); return true; }
+    if(t.matches('[data-refund]')){ refundModal(t.dataset.refund); return true; }
+    if(t.matches('[data-suspend]')){ suspendModal(); return true; }
+    if(t.matches('[data-reinstate]')){ reinstateModal(); return true; }
+    if(t.matches('[data-region]')){ regionModal(); return true; }
+    if(t.matches('[data-approve]')){ approvePicture(t.dataset.approve, t); return true; }
+    if(t.matches('[data-reject]')){ rejectModal(t.dataset.reject); return true; }
+    if(t.matches('[data-reason-chip]')){ $('#ax-reason').value = t.dataset.reasonChip; return true; }
+    if(t.matches('[data-pfilter]')){ location.hash = '#players' + (t.dataset.pfilter === 'suspended' ? ':suspended' : ''); return true; }
+    if(t.matches('[data-ptab]')){ location.hash = '#pictures' + (t.dataset.ptab === 'decided' ? ':decided' : ''); return true; }
+    if(t.matches('[data-up], [data-down]')){
+      const li = t.closest('li'), up = t.matches('[data-up]');
+      const sib = up ? li.previousElementSibling : li.nextElementSibling;
+      if(sib){ up ? li.parentNode.insertBefore(li, sib) : li.parentNode.insertBefore(sib, li); t.focus(); }
+      return true;
+    }
+    return false;
+  }
+  document.addEventListener('submit', async e => {
+    if(e.target.id === 'ad-psearch'){ e.preventDefault(); A.pq = $('#ad-pq').value.trim(); render(); return; }
+    if(e.target.id === 'ad-note-form'){
+      e.preventDefault();
+      const btn = e.target.querySelector('[type=submit]'); if(btn.disabled) return;
+      const body = $('#ad-note').value.trim(); if(!body) return;
+      btn.disabled = true;
+      try{
+        const r = await rpc('admin_add_note', { p_player: A.pdata.id, p_body: body });
+        if(!r || !r.ok){ $('#ad-note-err').textContent = (r && r.error) || 'That didn’t work.'; btn.disabled = false; return; }
+        toast('Note added'); render(true);
+      }catch(err){ $('#ad-note-err').textContent = friendly(err); btn.disabled = false; }
+    }
+  });
+
+
   // ---------------- events ----------------
   document.addEventListener('click', async e => {
     const t = e.target.closest('button, tr[data-go], a');
     if(!t) return;
+    if(opsClick(t)) return;
     if(t.matches('[data-ad-signout]')){ await A.sb.auth.signOut(); location.href = '/'; return; }
     if(t.matches('tr[data-go]')){ location.hash = t.dataset.go; return; }
     if(t.matches('[data-filter]')){ A.filter = t.dataset.filter; A.q = ''; $('#ad-q').value = ''; location.hash = '#tournaments:' + A.filter; if(A.view === 'tournaments') render(); return; }
