@@ -3372,6 +3372,7 @@ function go(target){
   }else{
     history.replaceState(null,'',url);
   }
+  if(window.tzTrackView) window.tzTrackView();   // cookie-free page count (admin Growth page)
 }
 
 // The Back button popping to that anchor entry doesn't rerender anything on
@@ -5189,6 +5190,39 @@ function tzMoveNote(){
     if(e.target && e.target.id === 'acct-pic-file' && e.target.files && e.target.files[0]) upload(e.target.files[0]);
   });
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+
+/* ---------------- cookie-free visit counts (admin Phase 3, 2026-10) ----------------
+   Counts page views for the admin Growth page. No cookies, nothing stored on this device, no account linked:
+   the database keeps only the page (route name, never ids), the site you came from (host only), campaign tags
+   from the link, and a visitor code that changes every day and can't be traced back. Respects Do Not Track /
+   Global Privacy Control. Never runs in the match room (play.html doesn't include this). */
+(function(){
+  if(window.__tzVisits) return; window.__tzVisits = true;
+  try{ if(navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.globalPrivacyControl) return; }catch(_){}
+  if(typeof supabase === 'undefined' || typeof SUPABASE_URL === 'undefined') return;
+  let sb = null, first = true, last = '';
+  const client = () => (sb = sb || supabase.createClient(SUPABASE_URL, SUPABASE_KEY));
+  const send = (kind, path, extra) => { try{ client().rpc('tz_track', Object.assign({ p_kind: kind, p_path: path }, extra || {})).then(()=>{}, ()=>{}); }catch(_){} };
+  const route = () => { const h = (location.hash || '').replace(/^#/, '').split(':')[0].replace(/[^a-z0-9_-]/gi, ''); return '/' + (h ? '#' + h : ''); };
+  function view(){
+    const p = route(); if(p === last) return; last = p;
+    let extra = null;
+    if(first){
+      first = false;
+      const q = new URLSearchParams(location.search);
+      extra = { p_ref: document.referrer || null, p_utm_source: q.get('utm_source'), p_utm_medium: q.get('utm_medium'), p_utm_campaign: q.get('utm_campaign') };
+    }
+    send('view', p, extra);
+  }
+  window.tzTrackView = () => setTimeout(view, 30);              // the site's own navigation (go()) calls this
+  window.addEventListener('hashchange', () => setTimeout(view, 50));
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="login.html#signup"], #membership-buy-btn');
+    if(!a) return;
+    send(a.id === 'membership-buy-btn' ? 'join_click' : 'signup_click', route());
+  }, true);
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', view); else view();
 })();
 
 renderHome(); renderHeroSide(); renderEvents(); buildTicker();   // loading state until the load resolves

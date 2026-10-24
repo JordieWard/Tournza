@@ -220,6 +220,31 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   .ad-ava.lg{width:56px;height:56px;font-size:20px}
   .ad-pics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 }
+
+/* ---- Phase 3: charts, funnel, settings, scoring log ---- */
+.ad-chart{position:relative;margin:6px 0 14px;padding:14px 16px 10px;border:1px solid var(--line);border-radius:12px;background:#0B1730}
+.ad-chart figcaption{font-weight:700;margin:0 0 10px}
+.ad-chart svg{display:block;width:100%;height:150px;overflow:visible}
+.ad-chart .grid{stroke:rgba(152,167,207,.16);stroke-width:1;vector-effect:non-scaling-stroke}
+.ad-chart .base{stroke:rgba(152,167,207,.4);stroke-width:1;vector-effect:non-scaling-stroke}
+.ad-chart .ad-bar path{fill:var(--blue-2)}
+.ad-chart .ad-bar.on path{fill:var(--cyan)}
+.ad-chart-x{display:flex;justify-content:space-between;margin-top:6px}
+.ad-tip{position:absolute;top:8px;z-index:3;min-width:120px;padding:6px 10px;border-radius:8px;background:#13244A;border:1px solid var(--line-2);font-size:13px;pointer-events:none;white-space:nowrap}
+.ad-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.ad-step{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#0B1730;display:grid;gap:4px}
+.ad-step b{font:900 26px/1 var(--display)}
+.ad-step span{font:500 10.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
+.ad-step i{font-style:normal;font-size:12.5px;color:var(--muted-2)}
+.ad-setting{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#0B1730}
+.ad-setting p{margin:4px 0 0}
+.ad-tabsep{width:1px;align-self:stretch;background:var(--line-2);margin:0 4px}
+.ad-log{max-height:560px;overflow:auto}
+.ad-det{max-width:380px;word-break:break-all;color:var(--muted-2)}
+.ad-err-t{color:var(--red);margin-bottom:6px}
+@media (max-width:560px){ .ad-setting{flex-direction:column;align-items:flex-start} .ad-chart svg{height:120px} }
+.show-s{display:none}
+@media (max-width:560px){ .show-s{display:block;color:var(--muted-2)} }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -369,12 +394,15 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function start(){
     $('#ad-boot').hidden = true; $('#ad-app').hidden = false;
     const nav = [['overview','Overview'], ['tournaments','Tournaments']];
+    if(can('matches.view')) nav.push(['matches','Matches']);
     if(can('players.view')) nav.push(['players','Players']);
     if(can('payments.view')) nav.push(['payments','Payments']);
     if(can('pictures.review')) nav.push(['pictures','Pictures']);
+    if(can('growth.view')) nav.push(['growth','Growth']);
     if(can('audit.view')) nav.push(['audit','Audit log']);
     if(can('admins.manage')) nav.push(['admins','Admin users']);
-    const soon = ['Matches','Disputes','Growth','Affiliates'];
+    if(can('settings.manage')) nav.push(['settings','Settings']);
+    const soon = ['Disputes','Affiliates'];
     $('#ad-nav').innerHTML = nav.map(([k,l]) => `<a href="#${k}" data-nav="${k}">${l}<span class="n" id="ad-n-${k}" hidden></span></a>`).join('')
       + soon.map(l => `<a class="dis" aria-disabled="true">${l}<span class="soon">Soon</span></a>`).join('');
     $('#ad-me').innerHTML = `<b>${esc(A.me.name)}</b><span class="role">${esc(A.me.label)}</span><div class="ad-row"><a class="ad-btn ghost sm" href="/">Site</a><button class="ad-btn ghost sm" data-ad-signout>Sign out</button></div>`;
@@ -385,14 +413,17 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function route(){
     const h = decodeURIComponent(location.hash.replace(/^#/, '')) || 'overview';
     const [v, arg] = h.split(':');
-    A.view = ['overview','tournaments','tournament','audit','admins','players','player','payments','pictures'].includes(v) ? v : 'overview';
+    A.view = ['overview','tournaments','tournament','audit','admins','players','player','payments','pictures','matches','match','growth','settings'].includes(v) ? v : 'overview';
     if(A.view === 'audit' && !can('audit.view')) A.view = 'overview';
     if((A.view === 'players' || A.view === 'player') && !can('players.view')) A.view = 'overview';
     if(A.view === 'payments' && !can('payments.view')) A.view = 'overview';
     if(A.view === 'pictures' && !can('pictures.review')) A.view = 'overview';
+    if((A.view === 'matches' || A.view === 'match') && !can('matches.view')) A.view = 'overview';
+    if(A.view === 'growth' && !can('growth.view')) A.view = 'overview';
+    if(A.view === 'settings' && !can('settings.manage')) A.view = 'overview';
     if(A.view === 'admins' && !can('admins.manage')) A.view = 'overview';
     A.arg = arg || null;
-    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view === 'player' ? 'players' : A.view)));
+    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view === 'player' ? 'players' : A.view === 'match' ? 'matches' : A.view)));
     render();
   }
   async function render(quiet){
@@ -406,7 +437,11 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       else if(A.view === 'admins') box.innerHTML = await viewAdmins();
       else if(A.view === 'players') box.innerHTML = await viewPlayers();
       else if(A.view === 'player') box.innerHTML = await viewPlayer(A.arg);
-      else if(A.view === 'payments') box.innerHTML = await viewPayments();
+      else if(A.view === 'payments') box.innerHTML = await viewPayments3();
+      else if(A.view === 'matches') box.innerHTML = await viewMatches();
+      else if(A.view === 'match') box.innerHTML = await viewMatch(A.arg);
+      else if(A.view === 'growth') box.innerHTML = await viewGrowth();
+      else if(A.view === 'settings') box.innerHTML = await viewSettings();
       else if(A.view === 'pictures'){ box.innerHTML = await viewPictures(); hydratePictures(); }
       $('#ad-upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
       if(!quiet) $('#ad-main').focus({ preventScroll:true });
@@ -449,7 +484,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(o.payments) h += `<section class="ad-sec" id="ad-payments"><h2>Payments</h2><div class="ad-tiles" style="margin:0">
         ${tile(o.payments.refunds_due, 'Refunds due', o.payments.refunds_due > 0)}${tile(money(o.payments.refunds_due_pence), 'To refund')}
         ${tile(o.payments.exceptions, 'Payment problems', o.payments.exceptions > 0)}${tile(money(o.payments.exceptions_pence), 'Problem payments')}</div>
-        <p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">Refund in Stripe, then mark it refunded under <a href="#payments">Payments</a>.</p></section>`;
+        <p class="ad-muted" style="font-size:12.5px;margin:10px 0 0">Refund them under <a href="#payments">Payments</a>.</p></section>`;
     h += `<section class="ad-sec" id="ad-system"><h2>Scheduled jobs</h2>${(o.jobs || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Job</th><th>Runs</th><th>State</th><th class="hide-s">Last run</th></tr></thead><tbody>
       ${o.jobs.map(j => `<tr class="${j.last_status === 'failed' ? 'warn' : ''}"><td class="mono">${esc(j.name)}</td><td class="mono sm">${esc(j.schedule)}</td>
         <td>${j.active ? badge('ok','On') : badge('cancelled','Paused')} ${j.last_status ? badge(j.last_status === 'succeeded' ? 'ok' : j.last_status, j.last_status) : ''}</td>
@@ -882,11 +917,237 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   });
 
 
+  // =====================================================================
+  // Phase 3 — refunds through Stripe, finance, memberships, matches, growth, settings.
+  // Refunds go through the admin-refund server function (the Stripe key never reaches this page); every other
+  // number comes from an admin_* database function that checks the permission + second login step itself.
+  // =====================================================================
+  const pounds = p => '£' + (Number(p || 0) / 100).toFixed(2);
+
+  // one series of bars over days (hover a column for the exact figure); single series → no legend, the title names it
+  function dayBars(rows, key, fmt, label){
+    if(!rows || !rows.length) return '';
+    const W = 640, H = 150, pad = 22, n = rows.length, gap = 2;
+    const max = Math.max(1, ...rows.map(r => Number(r[key] || 0)));
+    const bw = Math.max(2, (W - gap * (n - 1)) / n);
+    const bars = rows.map((r, i) => {
+      const v = Number(r[key] || 0), h = v ? Math.max(2, Math.round((H - pad) * v / max)) : 0, x = i * (bw + gap), y = H - h;
+      const rad = Math.min(4, bw / 2, h);
+      const path = h ? `M${x},${H} V${y + rad} Q${x},${y} ${x + rad},${y} H${x + bw - rad} Q${x + bw},${y} ${x + bw},${y + rad} V${H} Z` : '';
+      const tip = `${day(r.day)}: ${fmt(v)}`;
+      return `<g class="ad-bar" data-tip="${esc(tip)}"><rect x="${x}" y="0" width="${bw + gap}" height="${H}" fill="transparent"/>${path ? `<path d="${path}"/>` : ''}</g>`;
+    }).join('');
+    return `<figure class="ad-chart"><figcaption>${esc(label)} <span class="ad-muted sm">· most ${esc(fmt(max))}</span></figcaption>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(label)} by day">
+        <line x1="0" y1="${H - (H - pad)}" x2="${W}" y2="${H - (H - pad)}" class="grid"/><line x1="0" y1="${H}" x2="${W}" y2="${H}" class="base"/>${bars}</svg>
+      <div class="ad-chart-x sm ad-muted"><span>${esc(day(rows[0].day))}</span><span>${esc(day(rows[rows.length - 1].day))}</span></div>
+      <div class="ad-tip" hidden></div></figure>`;
+  }
+  document.addEventListener('pointermove', e => {
+    const g = e.target.closest && e.target.closest('.ad-bar'), fig = e.target.closest && e.target.closest('.ad-chart');
+    document.querySelectorAll('.ad-chart .ad-tip').forEach(t => { if(!fig || t.parentNode !== fig) t.hidden = true; });
+    if(!g || !fig) return;
+    const t = fig.querySelector('.ad-tip'), r = fig.getBoundingClientRect();
+    t.textContent = g.dataset.tip; t.hidden = false;
+    t.style.left = Math.min(Math.max(0, e.clientX - r.left - 60), r.width - 130) + 'px';
+    fig.querySelectorAll('.ad-bar.on').forEach(x => x.classList.remove('on')); g.classList.add('on');
+  });
+  const csv = (rows, cols) => [cols.join(','), ...rows.map(r => cols.map(c => JSON.stringify(r[c] == null ? '' : r[c])).join(','))].join('\n');
+  function download(name, text){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type:'text/csv' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+
+  // ---------- Payments: refunds due (refund through Stripe), refund history, finance, memberships ----------
+  const PAYTABS = [['due','Refunds due'], ['history','Refund history'], ['finance','Money'], ['members','Memberships']];
+  async function viewPayments3(){
+    const tab = PAYTABS.some(t => t[0] === A.arg) ? A.arg : 'due';
+    let h = `<h1 class="ad-h1">Payments</h1><div class="ad-tabs" role="group" aria-label="Show">${PAYTABS.map(([k,l]) => `<button type="button" data-paytab="${k}" class="${tab === k ? 'on' : ''}" aria-pressed="${tab === k}">${l}</button>`).join('')}</div>`;
+    if(tab === 'due') return h + await paymentsDue();
+    if(tab === 'history') return h + await paymentsHistory();
+    if(tab === 'finance') return h + await paymentsFinance();
+    return h + await paymentsMembers();
+  }
+  async function paymentsDue(){
+    const rows = await rpc('admin_refunds'); A.refunds = rows;
+    const total = rows.reduce((s, r) => s + Number(r.amount_pence || 0), 0);
+    let h = `<p class="ad-sub">Refund straight from here — the money goes back through Stripe to the card that paid, and it’s marked refunded only once Stripe confirms. Already refunded by hand in Stripe? Use “Mark refunded”.</p>
+      <div class="ad-tiles"><div class="ad-tile${rows.length ? ' alert' : ''}"><b>${rows.length}</b><span>Refunds due</span></div><div class="ad-tile"><b>${pounds(total)}</b><span>To refund</span></div></div>`;
+    if(!rows.length) return h + `<div class="ad-clear">No refunds due.</div>`;
+    return h + `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>Tournament</th><th class="num">Amount</th><th class="hide-s">Why</th><th>Refund</th></tr></thead><tbody>
+      ${rows.map(r => { const q = r.request, st = q && q.status;
+        const state = st === 'pending' ? `${badge('open','Processing')} <button type="button" class="ad-btn ghost sm" data-refcheck="${esc(q.id)}">Check status</button>`
+          : st === 'requested' ? `${badge('refund_due','Not confirmed')} <button type="button" class="ad-btn sm" data-refund-stripe="${esc(r.id)}">Retry</button>`
+          : `${st === 'failed' ? `<div class="sm ad-err-t">Stripe refused: ${esc(q.error || '')}</div>` : ''}${can('payments.refund') ? `<button type="button" class="ad-btn sm" data-refund-stripe="${esc(r.id)}">Refund ${pounds(r.amount_pence)}</button> <button type="button" class="ad-btn ghost sm" data-refund="${esc(r.id)}">Mark refunded</button>` : ''}`;
+        return `<tr><td>${r.player_id ? `<a href="#player:${esc(r.player_id)}">${esc(r.name || 'Player')}</a>` : '<span class="ad-muted">Unknown</span>'}<div class="sm">${esc(when(r.at))}</div></td>
+          <td>${r.tournament_id ? `<a href="#tournament:${esc(r.tournament_id)}">${esc(r.tournament || '')}</a>` : '—'}<div class="sm">${esc(day(r.date))}</div></td>
+          <td class="num"><b>${pounds(r.amount_pence)}</b></td><td class="sm hide-s">${esc(r.reason || '')}<div class="mono">…${esc(r.ref)}</div></td><td>${state}</td></tr>`; }).join('')}
+      </tbody></table></div>`;
+  }
+  function refundStripeModal(id){
+    const r = (A.refunds || []).find(x => String(x.id) === String(id)); if(!r) return;
+    actionModal({
+      title: 'Refund through Stripe', submit: `Refund ${pounds(r.amount_pence)}`, danger: true,
+      intro: `<p><b>${pounds(r.amount_pence)}</b> back to ${esc(r.name || 'the player')} · ${esc(r.tournament || '')}</p><p class="ad-muted">Sent now through Stripe to the card that paid (it can take 5–10 days to reach them). It can only ever be refunded once.</p>`,
+      reasonValue: r.reason ? String(r.reason).slice(0, 120) : '', confirm: `Send ${pounds(r.amount_pence)} back to ${esc(r.name || 'this player')}`,
+      run: async (f, reason) => {
+        const { data, error } = await A.sb.functions.invoke('admin-refund', { body: { action: 'refund', id: r.id, reason } });
+        if(error){ let msg = error.message; try{ const j = await error.context.json(); msg = j.error || msg; }catch(_){} return { ok:false, error: msg }; }
+        return data && data.ok ? data : { ok:false, error: (data && data.error) || 'Refund didn’t go through' };
+      },
+      done: d => d.status === 'succeeded' ? `Refunded ${pounds(r.amount_pence)} — confirmed by Stripe` : 'Sent to Stripe — still processing (check status later)',
+    });
+  }
+  async function refundCheck(reqId, btn){
+    btn.disabled = true;
+    try{
+      const { data, error } = await A.sb.functions.invoke('admin-refund', { body: { action: 'check', request: reqId } });
+      if(error) throw error;
+      toast(data.status === 'succeeded' ? 'Stripe confirmed — marked refunded' : data.status === 'pending' ? 'Still processing at Stripe' : 'Stripe: ' + data.status, data.status === 'failed');
+      render(true);
+    }catch(e){ btn.disabled = false; toast(friendly(e), true); }
+  }
+  async function paymentsHistory(){
+    const rows = await rpc('admin_refund_history', { p_limit: 200 });
+    if(!rows.length) return `<div class="ad-clear">No refunds sent from the dashboard yet.</div>`;
+    return `<div class="ad-tw"><table class="ad-t"><thead><tr><th>When</th><th class="num">Amount</th><th>Result</th><th class="hide-s">By</th><th class="hide-s">Reason</th></tr></thead><tbody>
+      ${rows.map(q => `<tr><td class="sm">${esc(when(q.requested_at))}<div class="mono">…${esc(q.ref)}</div><div class="show-s">${esc(q.by || '')}</div></td><td class="num">${pounds(q.amount_pence)}</td>
+        <td>${badge(q.status === 'succeeded' ? 'ok' : q.status === 'failed' ? 'refused' : 'open', q.status === 'succeeded' ? 'Refunded' : q.status)}${q.error ? `<div class="sm">${esc(q.error)}</div>` : ''}</td>
+        <td class="sm hide-s">${esc(q.by || '')}</td><td class="sm hide-s">${esc(q.reason || '')}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  async function paymentsFinance(){
+    const days = A.fdays || 30;
+    const f = await rpc('admin_finance', { p_days: days });
+    const m = f.memberships || {}, bs = m.by_status || {};
+    const tile = (v, k, alert) => `<div class="ad-tile${alert ? ' alert' : ''}"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    return `<div class="ad-tabs" role="group" aria-label="Period">${[7,30,90,365].map(d => `<button type="button" data-fdays="${d}" class="${d === days ? 'on' : ''}" aria-pressed="${d === days}">${d === 365 ? '12 months' : d + ' days'}</button>`).join('')}</div>
+      <section class="ad-sec"><h2>Tournament entries — last ${days === 365 ? '12 months' : days + ' days'}</h2><div class="ad-tiles">
+        ${tile(pounds(f.entries.pence), f.entries.count + ' paid entries')}${tile(pounds(f.refunded.pence), f.refunded.count + ' refunded')}
+        ${tile(pounds(f.entries.pence - f.refunded.pence), 'Kept')}${tile(pounds(f.refunds_due.pence), f.refunds_due.count + ' refunds due', f.refunds_due.count > 0)}
+        ${tile(f.requests.pending, 'Refunds processing')}${tile(f.requests.failed, 'Refunds refused', f.requests.failed > 0)}</div>
+        ${dayBars(f.by_day, 'paid_pence', pounds, 'Entry money in')}
+        <div class="ad-row"><button type="button" class="ad-btn ghost sm" data-csv="finance">Download CSV</button></div></section>
+      <section class="ad-sec"><h2>Memberships</h2><div class="ad-tiles">
+        ${tile(bs.active || 0, 'Active')}${tile(m.renewing_30d || 0, 'Renewing in 30 days')}${tile(m.ending_30d || 0, 'Ending in 30 days (auto-renew off)', (m.ending_30d || 0) > 0)}
+        ${Object.keys(bs).filter(k => k !== 'active' && k !== 'none').map(k => tile(bs[k], k)).join('')}</div>
+        <p class="ad-muted sm">Membership payments, renewals and refunds are handled in Stripe; this shows who is a member and when they renew.</p></section>`;
+  }
+  async function paymentsMembers(){
+    const filter = A.mfilter || 'active';
+    const rows = await rpc('admin_memberships', { p_filter: filter, p_q: A.mq || '' });
+    return `<div class="ad-tabs" role="group" aria-label="Show">${[['active','Active'], ['ending','Ending (auto-renew off)'], ['inactive','Not active'], ['all','All']].map(([k,l]) => `<button type="button" data-mfilter="${k}" class="${filter === k ? 'on' : ''}" aria-pressed="${filter === k}">${l}</button>`).join('')}</div>
+      ${rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Member</th><th>Status</th><th>Renews / ends</th><th class="hide-s">Auto-renew</th></tr></thead><tbody>
+      ${rows.map(r => `<tr class="clk" data-go="#player:${esc(r.id)}" tabindex="0"><td><b>${esc(r.name)}</b>${r.email ? `<div class="sm">${esc(r.email)}</div>` : ''}</td><td>${badge(String(r.status).toLowerCase() === 'active' ? 'ok' : 'cancelled', r.status)}</td>
+        <td class="sm">${r.period_end ? esc(day(r.period_end)) : '—'}${r.auto_renew ? '' : '<div class="show-s">Auto-renew off</div>'}</td><td class="hide-s">${r.auto_renew ? 'On' : '<b>Off</b>'}</td></tr>`).join('')}</tbody></table></div>
+      <p class="ad-muted sm">${rows.length} shown.</p>` : `<div class="ad-clear">No memberships here.</div>`}`;
+  }
+
+  // ---------- Matches ----------
+  async function viewMatches(){
+    const f = ['live','recent','disputed','all'].includes(A.arg) ? A.arg : 'live', type = A.mtype || 'all';
+    const rows = await rpc('admin_matches', { p_filter: f, p_type: type, p_q: A.matchq || '' });
+    let h = `<h1 class="ad-h1">Matches</h1><p class="ad-sub">Tournament matches and Friendlies. Open one for its full scoring log (every action, timed by the server) and connection history.</p>
+      <form class="ad-psearch" id="ad-msearch" role="search"><label class="sr" for="ad-mq">Search matches</label><input id="ad-mq" type="search" placeholder="Match code or player name" value="${esc(A.matchq || '')}" autocomplete="off"><button class="ad-btn sm" type="submit">Search</button></form>
+      <div class="ad-tabs" role="group" aria-label="Show">${[['live','Live'], ['recent','Last 14 days'], ['disputed','Friendly disagreements'], ['all','All']].map(([k,l]) => `<button type="button" data-mfil="${k}" class="${f === k ? 'on' : ''}" aria-pressed="${f === k}">${l}</button>`).join('')}
+        <span class="ad-tabsep"></span>${[['all','All types'], ['tournament','Tournament'], ['friendly','Friendlies']].map(([k,l]) => `<button type="button" data-mtype="${k}" class="${type === k ? 'on' : ''}" aria-pressed="${type === k}">${l}</button>`).join('')}</div>`;
+    return h + (rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>When</th><th>Match</th><th>Status</th><th class="num">Score</th><th class="hide-s">Type</th></tr></thead><tbody>
+      ${rows.map(m => `<tr class="clk" data-go="#match:${esc(m.id)}" tabindex="0"><td class="sm">${esc(when(m.completed_at || m.started_at || m.created_at))}<div class="mono">${esc(m.code)}</div></td>
+        <td><b>${esc(m.p1 || '—')}</b> <span class="ad-muted">v</span> <b>${esc(m.p2 || '—')}</b>${m.winner ? `<div class="sm">Won by ${esc(m.winner)}</div>` : ''}</td>
+        <td>${badge(m.status === 'completed' ? 'ok' : m.status === 'disputed' ? 'refund_due' : m.status === 'abandoned' ? 'cancelled' : 'live', m.status.replace('_',' '))}</td>
+        <td class="num">${m.legs_p1 == null ? '—' : m.legs_p1 + '–' + m.legs_p2}</td><td class="sm hide-s">${m.type === 'friendly' ? 'Friendly' : esc((m.tournament || 'Tournament') + (m.stage ? ' · ' + (STAGE[m.stage] || m.stage) : ''))}</td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="ad-clear">No matches here.</div>`);
+  }
+  async function viewMatch(id){
+    const d = await rpc('admin_match', { p_id: id }); A.mdata = d;
+    if(!d) return `<a class="ad-back" href="#matches">← Matches</a><div class="ad-clear">That match doesn’t exist.</div>`;
+    const m = d.match, ev = d.events || [];
+    const t0 = ev.length ? new Date(ev[0].at).getTime() : null;
+    const rel = iso => { if(!t0) return ''; const s = Math.round((new Date(iso).getTime() - t0) / 1000); return (s >= 0 ? '+' : '−') + Math.floor(Math.abs(s) / 60) + ':' + String(Math.abs(s) % 60).padStart(2, '0'); };
+    const who = seat => seat === 'p1' ? (m.player1_name || 'Player 1') : seat === 'p2' ? (m.player2_name || 'Player 2') : 'server';
+    const detail = a => { const x = Object.assign({}, a); delete x.type; const s = JSON.stringify(x); return s === '{}' ? '' : s; };
+    let h = `<a class="ad-back" href="#matches">← Matches</a><h1 class="ad-h1">${esc(m.player1_name || '—')} v ${esc(m.player2_name || '—')}</h1>
+      <p class="ad-sub">${d.type === 'friendly' ? 'Friendly' : 'Tournament match'} · code <span class="mono">${esc(m.code)}</span> · best of ${esc(m.best_of)} · ${badge(m.status === 'completed' ? 'ok' : m.status, m.status)}${d.tournament ? ` · <a href="#tournament:${d.tournament.id}">${esc(d.tournament.name)}</a>` : ''}</p>`;
+    if(m.status === 'in_progress' || m.status === 'ready') h += `<div class="ad-links"><a class="ad-btn ghost sm" href="/watch.html?match=${encodeURIComponent(m.id)}" target="_blank" rel="noopener">Watch ↗</a></div>`;
+    const tile = (v, k) => `<div class="ad-tile"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    h += `<div class="ad-tiles">${tile(m.legs_p1 == null ? '—' : m.legs_p1 + '–' + m.legs_p2, 'Legs')}${tile(ev.length, 'Logged actions')}${tile(m.started_at ? when(m.started_at) : '—', 'Started')}${tile(m.completed_at ? when(m.completed_at) : '—', 'Finished')}</div>`;
+    h += `<section class="ad-sec"><h2>Connections</h2><div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>First opened the room</th><th>Last seen (device heartbeat)</th></tr></thead><tbody>
+      <tr><td>${esc(m.player1_name || '—')}</td><td class="sm">${esc(when(m.p1_joined_at))}</td><td class="sm">${esc(when(m.p1_seen_at))}</td></tr>
+      <tr><td>${esc(m.player2_name || '—')}</td><td class="sm">${esc(when(m.p2_joined_at))}</td><td class="sm">${esc(when(m.p2_seen_at))}</td></tr></tbody></table></div>
+      ${d.fixture ? `<p class="ad-muted sm">Fixture: ${esc(STAGE[d.fixture.stage] || d.fixture.stage)} · ${esc(d.fixture.status)}${d.fixture.result_type ? ' · ' + esc(d.fixture.result_type) : ''}${d.fixture.flag ? ' · ' + esc(d.fixture.flag) : ''}</p>` : ''}</section>`;
+    h += `<section class="ad-sec"><h2>Scoring log <span class="c">${ev.length}</span></h2><p class="ad-muted sm">Every action in order, with the server’s time. This is what the result was worked out from.</p>
+      <div class="ad-row" style="margin-bottom:10px"><button type="button" class="ad-btn ghost sm" data-csv="matchlog">Download log (CSV)</button></div>
+      ${ev.length ? `<div class="ad-tw ad-log"><table class="ad-t"><thead><tr><th class="num">#</th><th>Time</th><th>Who</th><th>Action</th><th class="hide-s">Details</th></tr></thead><tbody>
+      ${ev.map(e => `<tr><td class="num mono sm">${e.seq}</td><td class="sm mono">${esc(new Date(e.at).toLocaleTimeString('en-GB'))}<div class="ad-muted">${esc(rel(e.at))}</div></td><td class="sm">${esc(who(e.seat))}</td>
+        <td class="mono sm">${esc(e.type || '')}</td><td class="mono sm hide-s ad-det">${esc(detail(e.action || {}))}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No actions logged.</div>'}</section>`;
+    return h;
+  }
+
+  // ---------- Growth ----------
+  async function viewGrowth(){
+    const days = A.gdays || 30;
+    const g = await rpc('admin_growth', { p_days: days }); A.gdata = g;
+    const t = g.totals, tile = (v, k) => `<div class="ad-tile"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    const step = (n, k, of) => `<div class="ad-step"><b>${esc(n)}</b><span>${esc(k)}</span>${of ? `<i>${of ? Math.round(100 * n / Math.max(1, of)) + '% of the step before' : ''}</i>` : ''}</div>`;
+    const list = (rows, a, b, h1, h2) => rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>${h1}</th><th class="num">${h2}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[a])}</td><td class="num">${esc(r[b])}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">Nothing yet.</div>';
+    return `<h1 class="ad-h1">Growth</h1><p class="ad-sub">Visits are counted without cookies: no personal data, nothing stored on visitors’ devices, Do Not Track respected. A “visit” is one visitor on one day.</p>
+      <div class="ad-tabs" role="group" aria-label="Period">${[7,30,90,365].map(d => `<button type="button" data-gdays="${d}" class="${d === days ? 'on' : ''}" aria-pressed="${d === days}">${d === 365 ? '12 months' : d + ' days'}</button>`).join('')}</div>
+      <div class="ad-tiles">${tile(t.visits, 'Visits')}${tile(t.views, 'Page views')}${tile(t.signups, 'New accounts')}${tile(t.first_entries, 'First-time entrants')}${tile(t.paid_entries, 'Paid entries')}${tile(t.active_members, 'Active members now')}</div>
+      <section class="ad-sec"><h2>From visit to entry</h2><div class="ad-funnel">${step(t.visits, 'Visits')}${step(t.signup_clicks, 'Clicked sign up', t.visits)}${step(t.signups, 'Created an account', t.signup_clicks)}${step(t.first_entries, 'Entered a first tournament', t.signups)}</div>
+        <p class="ad-muted sm">Membership “Join” clicks: ${esc(t.join_clicks)}.</p></section>
+      <section class="ad-sec"><h2>Over time</h2>${dayBars(g.by_day, 'visitors', v => v + (v === 1 ? ' visit' : ' visits'), 'Visits per day')}${dayBars(g.by_day, 'signups', v => v + (v === 1 ? ' new account' : ' new accounts'), 'New accounts per day')}
+        <div class="ad-row"><button type="button" class="ad-btn ghost sm" data-csv="growth">Download CSV</button></div></section>
+      <div class="ad-grid2"><section class="ad-sec"><h2>Where visits come from</h2>${list(g.sources, 'source', 'visits', 'Source', 'Visits')}</section>
+        <section class="ad-sec"><h2>Most viewed pages</h2>${list(g.pages, 'path', 'views', 'Page', 'Views')}</section></div>
+      <section class="ad-sec"><h2>Campaigns</h2>${g.campaigns.length ? list(g.campaigns.map(c => Object.assign({}, c, { name: c.campaign + (c.source ? ' · ' + c.source : '') + (c.medium ? ' · ' + c.medium : '') })), 'name', 'visits', 'Campaign · source · medium', 'Visits')
+        : '<div class="ad-clear">No campaign links used yet. Add <span class="mono">?utm_source=tiktok&amp;utm_campaign=launch</span> to a link you share and it shows here.</div>'}</section>`;
+  }
+
+  // ---------- Settings (owners) ----------
+  async function viewSettings(){
+    const [s, o] = await Promise.all([rpc('admin_settings'), rpc('admin_overview')]);
+    return `<h1 class="ad-h1">Settings</h1><p class="ad-sub">Owners only. Every change needs a reason and is recorded in the audit log.</p>
+      <section class="ad-sec"><h2>Friendlies</h2><div class="ad-setting"><div><b>Friendlies for members only</b><p class="ad-muted sm">On: only players with an active membership can play Friendlies. Off: any signed-in player can.</p></div>
+        <div>${s.friendlies_require_membership ? badge('ok','On') : badge('cancelled','Off')} <button type="button" class="ad-btn ghost sm" data-setting="friendlies_require_membership" data-value="${!s.friendlies_require_membership}">Turn ${s.friendlies_require_membership ? 'off' : 'on'}</button></div></div></section>
+      <section class="ad-sec"><h2>Admin security</h2><div class="ad-setting"><div><b>6-digit code for admin pages</b><p class="ad-muted sm">Always required. It can’t be switched off from the dashboard.</p></div><div>${badge('ok', s.admin_require_mfa ? 'Always on' : 'Off')}</div></div></section>
+      <section class="ad-sec"><h2>Scheduled jobs</h2>${(o.jobs || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Job</th><th>Runs</th><th>State</th></tr></thead><tbody>
+        ${o.jobs.map(j => `<tr><td class="mono">${esc(j.name)}</td><td class="mono sm">${esc(j.schedule)}</td><td>${j.active ? badge('ok','On') : badge('cancelled','Paused')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No scheduled jobs found.</div>'}
+        <p class="ad-muted sm">Switching the tournament jobs on is done once, on launch day, as a checked database step — not from here.</p></section>`;
+  }
+  function settingModal(key, value){
+    actionModal({
+      title: (value ? 'Turn on' : 'Turn off') + ': Friendlies for members only', submit: value ? 'Turn on' : 'Turn off',
+      intro: `<p class="ad-muted">${value ? 'Players without an active membership won’t be able to start or accept Friendlies.' : 'Any signed-in player will be able to play Friendlies.'}</p>`,
+      run: (f, reason) => rpc('admin_set_setting', { p_key: key, p_value: value, p_reason: reason }),
+      done: () => 'Setting changed — recorded in the audit log',
+    });
+  }
+
+  function ops3Click(t){
+    if(t.matches('[data-refund-stripe]')){ refundStripeModal(t.dataset.refundStripe); return true; }
+    if(t.matches('[data-refcheck]')){ refundCheck(t.dataset.refcheck, t); return true; }
+    if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
+    if(t.matches('[data-fdays]')){ A.fdays = Number(t.dataset.fdays); render(); return true; }
+    if(t.matches('[data-gdays]')){ A.gdays = Number(t.dataset.gdays); render(); return true; }
+    if(t.matches('[data-mfilter]')){ A.mfilter = t.dataset.mfilter; render(); return true; }
+    if(t.matches('[data-mfil]')){ location.hash = '#matches:' + t.dataset.mfil; return true; }
+    if(t.matches('[data-mtype]')){ A.mtype = t.dataset.mtype; render(); return true; }
+    if(t.matches('[data-setting]')){ settingModal(t.dataset.setting, t.dataset.value === 'true'); return true; }
+    if(t.matches('[data-csv]')){
+      const k = t.dataset.csv;
+      if(k === 'growth' && A.gdata) download('tournza-growth.csv', csv(A.gdata.by_day, ['day','views','visitors','signups','paid_entries']));
+      if(k === 'finance') rpc('admin_finance', { p_days: A.fdays || 30 }).then(f => download('tournza-money.csv', csv(f.by_day.map(r => ({ day: r.day, paid_gbp: (r.paid_pence / 100).toFixed(2), refunded_gbp: (r.refunded_pence / 100).toFixed(2) })), ['day','paid_gbp','refunded_gbp'])));
+      if(k === 'matchlog' && A.mdata) download(`match-${A.mdata.match.code}-log.csv`, csv(A.mdata.events.map(e => ({ seq: e.seq, at: e.at, seat: e.seat, type: e.type, action: JSON.stringify(e.action) })), ['seq','at','seat','type','action']));
+      return true;
+    }
+    return false;
+  }
+  document.addEventListener('submit', e => {
+    if(e.target.id === 'ad-msearch'){ e.preventDefault(); A.matchq = $('#ad-mq').value.trim(); render(); }
+  });
+
+
   // ---------------- events ----------------
   document.addEventListener('click', async e => {
     const t = e.target.closest('button, tr[data-go], a');
     if(!t) return;
-    if(opsClick(t)) return;
+    if(opsClick(t) || ops3Click(t)) return;
     if(t.matches('[data-ad-signout]')){ await A.sb.auth.signOut(); location.href = '/'; return; }
     if(t.matches('tr[data-go]')){ location.hash = t.dataset.go; return; }
     if(t.matches('[data-filter]')){ A.filter = t.dataset.filter; A.q = ''; $('#ad-q').value = ''; location.hash = '#tournaments:' + A.filter; if(A.view === 'tournaments') render(); return; }
