@@ -2703,7 +2703,7 @@ function evCard(e){
       ${e.region?`<span class="pill">${e.region}</span>`:''}
       ${e.live?'<span class="pill live"><span class="dot live"></span>Live</span>':''}
     </div>
-    <h3>${e.title}</h3>
+    <h3>${pfEsc(e.title)}</h3>
     <div class="ev-meta">${e.date} · ${e.time} · 32-player round robin → knockout</div>
     <div class="progress"><i style="width:${capPct(e)}%"></i></div>
     <div class="cap-line"><span>${e.reg} / ${e.cap} entered</span><span>${capPct(e)}%</span></div>
@@ -2773,7 +2773,7 @@ function renderHeroSide(){
         ${feat.live?'<span class="pill live"><span class="dot live"></span>LIVE</span>':''}
         <span class="pill fmt">${feat.fmt}</span>
       </div>
-      <h3>${feat.title}</h3>
+      <h3>${pfEsc(feat.title)}</h3>
       <p class="mono" style="color:var(--muted-2);font-size:13px;margin:8px 0 2px">${feat.region?feat.region+' · ':''}${feat.date} ${feat.time}</p>
       <p class="mono" style="color:var(--muted-2);font-size:13px;margin:0 0 16px">${feat.cap} players · £${feat.entry.toFixed(2)} buy-in</p>
       <div class="progress"><i style="width:${capPct(feat)}%"></i></div>
@@ -2782,7 +2782,7 @@ function renderHeroSide(){
   }
   if(t){
     t.innerHTML = tonight.slice(0,3).map(e=>
-      `<div class="stat-line"><span>${e.title}</span><span class="mono" style="color:var(--muted-2)">${e.reg} / ${e.cap}</span></div>`
+      `<div class="stat-line"><span>${pfEsc(e.title)}</span><span class="mono" style="color:var(--muted-2)">${e.reg} / ${e.cap}</span></div>`
     ).join('');
   }
 }
@@ -2965,7 +2965,7 @@ function renderRankings(){
       body.innerHTML = list.length ? list.map(p=>`
         <tr class="clk" data-link="player:${p.id}">
           <td class="rank ${p.rank===1?'top':''}"><span class="rk-n">${p.rank}</span>${tzMove(window.TZ_BASE && window.TZ_BASE.nat[p.id], p.rank)}</td>
-          <td class="rk-name"><strong>${p.name}</strong><span class="rk-reg">${p.region}</span></td>
+          <td class="rk-name"><strong>${pfEsc(p.name)}</strong><span class="rk-reg">${pfEsc(p.region)}</span></td>
           <td class="rk-region" style="color:var(--muted-2)">${p.region}</td>
           <td class="num pts">${p.points}</td>
           <td class="num" style="color:var(--muted-2)">${p.wins}</td>
@@ -2984,7 +2984,7 @@ function renderRankings(){
       feed.innerHTML = winnersList.length ? winnersList.slice(0,8).map(w=>`
         <div class="reg-row" ${w.id?`data-link="player:${w.id}" style="cursor:pointer"`:''}>
           <span class="dot live"></span>
-          <span>${w.region}<br><span class="mono" style="color:var(--muted);font-size:11px">${w.name} · winner</span></span>
+          <span>${pfEsc(w.region)}<br><span class="mono" style="color:var(--muted);font-size:11px">${pfEsc(w.name)} · winner</span></span>
         </div>`).join('') : stateMsg('No results in '+region+' yet.');
     }
   }
@@ -2994,7 +2994,7 @@ function playerCard(p){
   return `<article class="card clk player-card" data-link="player:${p.id}">
     <div class="top">
       <div class="ava">${p.avatar ? `<img src="${p.avatar}" alt="" loading="lazy">` : p.initials}</div>
-      <div><h3 style="font-size:19px">${p.name}</h3>
+      <div><h3 style="font-size:19px">${pfEsc(p.name)}</h3>
         <div class="mono" style="font-size:12.5px;color:var(--muted-2)">${p.region} · #${p.rank}</div></div>
     </div>
     <div class="pc-stats">
