@@ -2384,7 +2384,7 @@
       <p>Payments are processed securely by Stripe. Except where required by law or stated above, membership fees and event entries are non-refundable once an event has started.</p>
 
       <h3>7. Prizes</h3>
-      <p>Prizes are paid to winners via <strong>Stripe</strong>, on the day of winning or within 24 hours. Winners are responsible for any tax on prizes.</p>
+      <p>Prizes are paid to winners directly by Tournza once a result is final: after the 24-hour dispute window has closed with no open dispute. We’ll confirm the payment method before paid tournaments open. Winners are responsible for any tax on prizes.</p>
 
       <h3>8. Liability</h3>
       <p>Tournza is provided "as is". We don't exclude liability for anything that can't be excluded by law, but to the extent permitted we aren't liable for indirect losses or for issues caused by your equipment or connection.</p>
@@ -2438,12 +2438,12 @@
       <h3>5. Integrity &amp; anti-cheating</h3>
       <ul>
         <li>No score manipulation, editing the feed, or misrepresenting throws.</li>
-        <li>We run random checks. Suspected breaches are reviewed against the match recording.</li>
+        <li>We run random checks. Suspected breaches are reviewed using the match’s scoring log, timestamps and both players’ accounts.</li>
         <li>Confirmed cheating can mean disqualification, forfeiting your buy-in and any prize, and suspension or a ban.</li>
       </ul>
 
       <h3>6. Disputes</h3>
-      <p>Raise an issue with the official during the match, or email <strong>admin@tournza.co.uk</strong> afterwards with your event and the time of the incident. We review the recording where available; the official's final decision stands.</p>
+      <p>Raise an issue with the official during the match, or email <strong>admin@tournza.co.uk</strong> afterwards with your event and the time of the incident. We review the match’s scoring log, timestamps and both players’ accounts. Tournza does not currently record match video. The official's final decision stands.</p>
 
       <h3>7. Eligibility</h3>
       <p>Events are for members aged 18 or over. See our <a data-link="terms" style="color:var(--blue-2)">Terms</a> and <a data-link="privacy" style="color:var(--blue-2)">Privacy Policy</a>.</p>
@@ -2680,7 +2680,7 @@ const FAQ = [
   ['What does the £12 membership cover?','Membership gives you a player profile, ranking eligibility and the ability to enter events for a full year. Each event then has a £6 buy-in, paid when you register.'],
   ['What format are events?','Every region runs one tournament each evening, capped at 32 players: a group round robin followed by a knockout to the final, 501 double-out.'],
   ['When does check-in close?','Check in on the event page between 19:00 and 19:20 on the night (entries close at 19:15). No check-in, no place, and the buy-in isn’t refunded. The draw is at 19:30.'],
-  ['How are prizes paid?','Prizes are paid to winners via Stripe, on the day of winning or within 24 hours.'],
+  ['How are prizes paid?','Directly by Tournza once a result is final — after the 24-hour dispute window closes with no open dispute. We’ll confirm the payment method before paid tournaments open.'],
 ];
 
 /* ---------------- renderers ---------------- */
@@ -2895,7 +2895,7 @@ function renderEventDetail(id){
             ${row('checkin','Entries close · check-in', `${EV_ENTRIES} · 19:00–${e.checkin}`)}
             ${row('prize','Prize pool', `£${pot} now · up to £${full} · <span class="evd-split">1st £${prize[0][1]} · 2nd £${prize[1][1]} · 3rd £${prize[2][1]}</span>`)}
           </div>
-          <p class="form-note evd-fine">Prize pool 50% · 30% · 20%, paid via Stripe on the day. <button type="button" class="evd-lnk" data-evd-go="rules">Rules &amp; eligibility</button></p>
+          <p class="form-note evd-fine">Prize pool 50% · 30% · 20%, paid once results are final. <button type="button" class="evd-lnk" data-evd-go="rules">Rules &amp; eligibility</button></p>
         </div>
       </div>
       <div class="evd-ov-r">
