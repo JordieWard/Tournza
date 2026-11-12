@@ -3444,11 +3444,16 @@ document.addEventListener('click',e=>{
       try{
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const { data, error } = await sb.functions.invoke('create-membership-checkout', { body: {} });
-        if(error || !data || !data.url) throw error || new Error('No checkout URL returned');
+        if(error){
+          let why = '';
+          try{ why = ((await error.context.json()) || {}).error || ''; }catch(_){}
+          const e2 = new Error(why || error.message || 'Checkout refused'); e2.why = why; throw e2;
+        }
+        if(!data || !data.url) throw new Error('No checkout URL returned');
         window.location.href = data.url;
       }catch(err){
         console.error('Could not start checkout:', err);
-        notify('Could not start checkout — please try again in a moment.','warn');
+        notify(err && err.why ? err.why : 'Could not start checkout — please try again in a moment.','warn');
         t.disabled = false; t.textContent = label;
       }
     })();
