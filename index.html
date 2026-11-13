@@ -2316,7 +2316,7 @@
       <div class="admin">This policy reflects how Tournza handles your data. Please keep it up to date if your practices change; it is provided as a general policy and not as legal advice.</div>
 
       <h3>1. Who we are</h3>
-      <p>Tournza ("we", "us") runs online regional darts events for players in the United Kingdom. Tournza is operated by <strong>Jordan Ward</strong>, who is the data controller responsible for your personal data. For any privacy question or to exercise your rights, contact <strong>admin@tournza.co.uk</strong>. We are based in the United Kingdom.</p>
+      <p>Tournza ("we", "us") runs online regional darts events for players in the United Kingdom. Tournza is operated by <strong>Sophie Keeling</strong>, who is the data controller responsible for your personal data. For any privacy question or to exercise your rights, contact <strong>admin@tournza.co.uk</strong>. We are based in the United Kingdom.</p>
 
       <h3>2. What we collect</h3>
       <ul>
@@ -2380,7 +2380,7 @@
       <div class="admin">These terms set out how Tournza events and membership work. Please keep them up to date if anything changes; they are provided as general terms and not as legal advice. Note in particular the position on entry fees and prizes below.</div>
 
       <h3>1. About these terms</h3>
-      <p>These terms govern your use of Tournza and entry to our events. By creating a profile, joining, or registering for an event you agree to them. Tournza is operated by <strong>Jordan Ward</strong>, based in the UK. Contact: <strong>admin@tournza.co.uk</strong>.</p>
+      <p>These terms govern your use of Tournza and entry to our events. By creating a profile, joining, or registering for an event you agree to them. Tournza is operated by <strong>Sophie Keeling</strong>, based in the UK. Contact: <strong>admin@tournza.co.uk</strong>.</p>
 
       <h3>2. Eligibility</h3>
       <p>You must be 18 or over and provide accurate information. You're responsible for keeping your login and profile details secure.</p>
@@ -2398,6 +2398,7 @@
       <p>Payments are processed securely by Stripe. Except where required by law or stated above, membership fees and event entries are non-refundable once an event has started.</p>
 
       <h3>7. Prizes</h3>
+      <p>Each event's prize pool is split: winner 50%, runner-up 30% and each losing semi-finalist 10%. A semi-finalist prize is only paid when it is at least the £8 entry fee (from 16 players); otherwise, and when only 4–5 players take part, there is no 3rd prize and it's winner 60% and runner-up 40%. Prizes are worked out to the penny; any leftover penny goes to the winner. If a prize place can't be awarded (for example, the final isn't played), that money is held and Tournza decides, with a recorded reason, how it is paid out or refunded — it is never simply kept.</p>
       <p>Prizes are paid to winners directly by Tournza once a result is final: after the 24-hour dispute window has closed with no open dispute. We’ll confirm the payment method before paid tournaments open. Winners are responsible for any tax on prizes.</p>
 
       <h3>8. Liability</h3>
@@ -2541,6 +2542,16 @@ const FORMAT = "Group round robin → knockout to final";
 // fee", so it stays right whatever entry_fee the database holds.
 const PRICE_MONTHLY = 8, PRICE_ANNUAL = 80, PRICE_ENTRY = 8;
 const PRIZE_PER_ENTRY = 5;
+// Same rule the database records prizes with (PAY-05): pence, shares rounded down, leftover pennies to the winner.
+// 50% / 30% / 20% shared by the two semi-finalists — but only when 6+ play AND each semi-finalist's share is at least
+// the entry fee (from 16 players at £8). Otherwise no 3rd prize: 60% / 40%.
+function prizeSplit(players){
+  const pool = Math.max(players, 0) * PRIZE_PER_ENTRY * 100;
+  const semis = players >= 6 && Math.floor(Math.floor(pool * 20 / 100) / 2) >= PRICE_ENTRY * 100 ? 2 : 0;
+  const ru = Math.floor(pool * (semis ? 30 : 40) / 100), third = semis ? Math.floor(Math.floor(pool * 20 / 100) / semis) : 0;
+  return { pool, winner: pool - ru - third * semis, runnerUp: ru, third, semis };
+}
+const penceGBP = p => '£' + (p % 100 ? (p / 100).toFixed(2) : String(p / 100));
 
 // Every event starts at the same UK time, and check-in closes 10 minutes
 // before. tournament_date is a DATE (no time), so these supply the time half.
@@ -2874,9 +2885,7 @@ function renderEventDetail(id){
   const e=EVENTS.find(x=>String(x.id)===String(id));
   if(!e){ $('#event-detail').innerHTML = stateMsg('That tournament isn’t available right now. It may have finished or been removed.'); return; }
   if(String(EVD_TAB.id) !== String(e.id)) EVD_TAB = { id:e.id, tab:'overview' };
-  const prizePerEntry = PRIZE_PER_ENTRY;
-  const pot=e.reg*prizePerEntry, full=e.cap*prizePerEntry;
-  const prize=[['1st',Math.round(pot*0.5)],['2nd',Math.round(pot*0.3)],['3rd',Math.round(pot*0.2)]];
+  const ps = prizeSplit(e.reg), full = prizeSplit(e.cap).pool;
   const entered=eventPlayers(e), extra=Math.max(e.reg-entered.length,0);
   const alreadyIn = !!(authState.user && entered.some(p=>String(p.id)===String(authState.user.id)));
   const row = (ic, k, v) => `<div class="evd-row">${evdIcon(ic)}<div><div class="k">${k}</div><div class="v">${v}</div></div></div>`;
@@ -2909,9 +2918,9 @@ function renderEventDetail(id){
             ${row('time','Start time', `${evEsc(e.date)} · ${evEsc(e.time)} — draw, then first matches`)}
             ${row('region','Region', `${evEsc(e.region || '—')} · players from this region only`)}
             ${row('checkin','Entries close · check-in', `${EV_ENTRIES} · 19:00–${e.checkin}`)}
-            ${row('prize','Prize pool', `£${pot} now · up to £${full} · <span class="evd-split">1st £${prize[0][1]} · 2nd £${prize[1][1]} · 3rd £${prize[2][1]}</span>`)}
+            ${row('prize','Prize pool', `${penceGBP(ps.pool)} now · up to ${penceGBP(full)} · <span class="evd-split">1st ${penceGBP(ps.winner)} · 2nd ${penceGBP(ps.runnerUp)}${ps.semis ? ` · 3rd ${penceGBP(ps.third)} each (2 semi-finalists)` : ''}</span>`)}
           </div>
-          <p class="form-note evd-fine">Prize pool 50% · 30% · 20%, paid once results are final. <button type="button" class="evd-lnk" data-evd-go="rules">Rules &amp; eligibility</button></p>
+          <p class="form-note evd-fine">£5 of every entry goes into the prize pool: winner 50%, runner-up 30%, semi-finalists 10% each — or winner 60%, runner-up 40% when a semi-finalist's share would be less than the £8 entry (under 16 players). Paid after the 24-hour dispute window. <button type="button" class="evd-lnk" data-evd-go="rules">Rules &amp; eligibility</button></p>
         </div>
       </div>
       <div class="evd-ov-r">
