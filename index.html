@@ -1312,6 +1312,14 @@
   .mem-btn{width:100%;margin-top:26px;justify-content:center;text-align:center}
   .mem-pro{border-color:var(--cyan-line);box-shadow:0 0 0 1px rgba(25,211,243,.25),0 0 70px -24px rgba(25,211,243,.7)}
   .mem-flag{position:absolute;top:30px;right:24px;padding:6px 12px;border-radius:999px;background:var(--btn-blue);color:#fff;font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;box-shadow:var(--glow-blue);z-index:1}
+  .mem-plan{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:18px 0 4px;padding:5px;border-radius:14px;border:1px solid var(--line);background:rgba(7,16,31,.55)}
+  .mem-plan input{position:absolute;opacity:0;pointer-events:none}
+  .mem-plan label{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:700;font-size:14px;line-height:1.2;text-align:center}
+  .mem-plan label small{font-weight:500;font-size:12px;color:var(--muted-2)}
+  .mem-plan input:checked + label{background:var(--btn-blue);color:#fff;box-shadow:var(--glow-blue)}
+  .mem-plan input:checked + label small{color:rgba(255,255,255,.85)}
+  .mem-plan input:focus-visible + label{outline:2px solid var(--cyan-line);outline-offset:2px}
+  .mem-save{color:var(--green-bright,#1fc97a);font-weight:700}
   .mem-foot{text-align:center;color:var(--muted-2);font-size:14px;margin:22px auto 0;max-width:640px}
   @media (max-width:720px){
     .mem-cards{grid-template-columns:1fr;gap:28px;margin-top:30px}
@@ -2170,10 +2178,16 @@
       <div class="mem-card plan mem-pro">
         <span class="mem-flag">Enter tournaments</span>
         <span class="pill green">Tournza Membership</span>
-        <div class="amt">£8<span> / month</span></div>
-        <p class="mem-note">Or £80 a year. Renews automatically until you cancel.</p>
+        <div class="mem-plan" role="radiogroup" aria-label="Billing">
+          <input type="radio" name="mem-plan" id="mem-plan-monthly" value="monthly" checked>
+          <label for="mem-plan-monthly">Monthly<small>£8 a month</small></label>
+          <input type="radio" name="mem-plan" id="mem-plan-annual" value="annual">
+          <label for="mem-plan-annual">Yearly<small>£80 a year</small></label>
+        </div>
+        <div class="amt" id="mem-amt">£8<span> / month</span></div>
+        <p class="mem-note" id="mem-plan-note">Billed monthly. Renews automatically until you cancel.</p>
         <ul class="incl" id="incl"></ul>
-        <button class="btn btn-primary mem-btn" id="membership-buy-btn" data-checkout="1">Join from £8 a month</button>
+        <button class="btn btn-primary mem-btn" id="membership-buy-btn" data-checkout="1" data-plan="monthly">Join monthly · £8 a month</button>
       </div>
     </div>
     <p class="mem-foot">Each tournament has an <strong>£8 entry</strong>, paid separately when you enter — £5 of it goes into that night’s prize pool.</p>
@@ -3445,7 +3459,7 @@ document.addEventListener('click',e=>{
       t.disabled = true; const label = t.textContent; t.textContent = 'Starting checkout…';
       try{
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data, error } = await sb.functions.invoke('create-membership-checkout', { body: {} });
+        const { data, error } = await sb.functions.invoke('create-membership-checkout', { body: { plan: t.dataset.plan === 'annual' ? 'annual' : 'monthly' } });
         if(error){
           let why = '';
           try{ why = ((await error.context.json()) || {}).error || ''; }catch(_){}
@@ -5299,6 +5313,19 @@ go((location.hash||'#home').slice(1)||'home');
       return !!data;
     }catch(e){ console.warn('tournament_entries read failed:', e); return false; }
   }
+  // Monthly / yearly choice on the membership card (prices from PRICE_MONTHLY / PRICE_ANNUAL)
+  function memPlan(){ const r = document.querySelector('input[name="mem-plan"]:checked'); return r && r.value === 'annual' ? 'annual' : 'monthly'; }
+  function memJoinLabel(){ return memPlan() === 'annual' ? `Join yearly · £${PRICE_ANNUAL} a year` : `Join monthly · £${PRICE_MONTHLY} a month`; }
+  function renderMemPlan(){
+    const annual = memPlan() === 'annual';
+    const amt = $('#mem-amt'), note = $('#mem-plan-note'), buy = $('#membership-buy-btn');
+    if(amt) amt.innerHTML = annual ? `£${PRICE_ANNUAL}<span> / year</span>` : `£${PRICE_MONTHLY}<span> / month</span>`;
+    if(note) note.innerHTML = annual
+      ? `Billed once a year. <span class="mem-save">Save £${PRICE_MONTHLY * 12 - PRICE_ANNUAL}</span> — 2 months free. Renews automatically until you cancel.`
+      : 'Billed monthly. Renews automatically until you cancel.';
+    if(buy){ buy.dataset.plan = annual ? 'annual' : 'monthly'; if(!authState.membershipActive) buy.textContent = memJoinLabel(); }
+  }
+  document.querySelectorAll('input[name="mem-plan"]').forEach(r => r.addEventListener('change', renderMemPlan));
   function applyMembership(active){
     authState.membershipActive = !!active;
     const badge = $('#user-menu-membership');
@@ -5307,7 +5334,7 @@ go((location.hash||'#home').slice(1)||'home');
     if(pill){ pill.textContent = active?'Active':'Inactive'; pill.className = 'pill '+(active?'green':''); }
     const buy = $('#membership-buy-btn');
     if(buy){
-      buy.textContent = active ? 'Membership active ✓' : 'Join from £8 a month';
+      buy.textContent = active ? 'Membership active ✓' : memJoinLabel();
       buy.classList.toggle('is-active', !!active);
     }
   }
