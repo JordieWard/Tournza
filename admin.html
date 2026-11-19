@@ -956,12 +956,13 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function download(name, text){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type:'text/csv' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
 
   // ---------- Payments: refunds due (refund through Stripe), refund history, finance, memberships ----------
-  const PAYTABS = [['due','Refunds due'], ['history','Refund history'], ['finance','Money'], ['members','Memberships']];
+  const PAYTABS = [['due','Refunds due'], ['history','Refund history'], ['prizes','Prizes'], ['finance','Money'], ['members','Memberships']];
   async function viewPayments3(){
     const tab = PAYTABS.some(t => t[0] === A.arg) ? A.arg : 'due';
     let h = `<h1 class="ad-h1">Payments</h1><div class="ad-tabs" role="group" aria-label="Show">${PAYTABS.map(([k,l]) => `<button type="button" data-paytab="${k}" class="${tab === k ? 'on' : ''}" aria-pressed="${tab === k}">${l}</button>`).join('')}</div>`;
     if(tab === 'due') return h + await paymentsDue();
     if(tab === 'history') return h + await paymentsHistory();
+    if(tab === 'prizes') return h + await paymentsPrizes();
     if(tab === 'finance') return h + await paymentsFinance();
     return h + await paymentsMembers();
   }
@@ -1037,6 +1038,113 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       ${rows.map(r => `<tr class="clk" data-go="#player:${esc(r.id)}" tabindex="0"><td><b>${esc(r.name)}</b>${r.email ? `<div class="sm">${esc(r.email)}</div>` : ''}</td><td>${badge(String(r.status).toLowerCase() === 'active' ? 'ok' : 'cancelled', r.status)}</td>
         <td class="sm">${r.period_end ? esc(day(r.period_end)) : '—'}${r.auto_renew ? '' : '<div class="show-s">Auto-renew off</div>'}</td><td class="hide-s">${r.auto_renew ? 'On' : '<b>Off</b>'}</td></tr>`).join('')}</tbody></table></div>
       <p class="ad-muted sm">${rows.length} shown.</p>` : `<div class="ad-clear">No memberships here.</div>`}`;
+  }
+
+  // ---------- Payments: prizes (PAY-05/06). One admin requests a payout, a DIFFERENT admin approves it, and
+  // approving sends it through the payment provider (admin-payout function). The database enforces every rule. ----------
+  const PLACE = { winner:'1st', runner_up:'2nd', third:'3rd', unawarded:'No winner' };
+  function prizeState(p){
+    const s = p.state, po = p.payout;
+    if(s === 'paid') return badge('ok', 'Paid');
+    if(s === 'in_dispute_window') return badge('open', 'Dispute window') + `<div class="sm">Payable from ${esc(when(p.eligible_at))}</div>`;
+    if(s === 'dispute_open') return badge('refund_due', 'Dispute open');
+    if(s === 'dispute_check_failed') return badge('refused', 'Can’t check disputes');
+    if(s === 'withheld') return badge('cancelled', 'On hold') + (p.hold_reason ? `<div class="sm">${esc(p.hold_reason)}</div>` : '');
+    if(s === 'needs_decision') return badge('refund_due', 'Needs decision') + `<div class="sm">${esc(p.hold_reason || '')}</div>`;
+    if(s === 'resolved') return badge('ok', 'Decided') + `<div class="sm">${esc(p.hold_reason || '')}</div>`;
+    if(po && po.status === 'awaiting_approval') return badge('open', 'Waiting for 2nd admin') + `<div class="sm">Requested by ${esc(po.requested_by || '')}</div>`;
+    if(po && po.status === 'sending') return badge('open', po.auto ? 'Paying automatically' : 'Sending');
+    if(po && po.status === 'failed') return badge('refund_due', 'Payout refused') + `<div class="sm ad-err-t">${esc(po.failure_reason || '')}</div><div class="sm">Needs two-admin approval</div>`;
+    if(A.pz && A.pz.auto_enabled){
+      if(Number(p.amount_pence) > Number(A.pz.auto_max_pence)) return badge('refund_due', 'Over automatic limit') + '<div class="sm">Needs two-admin approval</div>';
+      if(s === 'payable') return badge('ok', 'Pays automatically') + '<div class="sm">Within 15 minutes, unless the daily limit is reached</div>';
+    }
+    return badge('ok', 'Ready to pay');
+  }
+  function prizeActions(p){
+    if(!can('payments.refund')) return '';
+    if(p.conflict) return '<span class="sm ad-muted">You played that night — another admin must handle this</span>';
+    const po = p.payout, id = esc(p.id);
+    if(p.state === 'needs_decision') return `<button type="button" class="ad-btn sm" data-prz-set="resolve" data-id="${id}">Record decision</button>`;
+    if(p.state === 'withheld') return `<button type="button" class="ad-btn ghost sm" data-prz-set="release" data-id="${id}">Release hold</button>`;
+    if(p.state === 'paid' || p.state === 'resolved') return '';
+    if(po && po.status === 'awaiting_approval') return po.mine
+      ? `<span class="sm ad-muted">Waiting for another admin</span> <button type="button" class="ad-btn ghost sm" data-prz-cancel="${esc(po.id)}">Cancel</button>`
+      : `<button type="button" class="ad-btn sm" data-prz-appr="${esc(po.id)}" data-id="${id}">Approve &amp; pay ${pounds(p.amount_pence)}</button>`;
+    if(po && po.status === 'sending') return po.auto ? '' : `<button type="button" class="ad-btn ghost sm" data-prz-appr="${esc(po.id)}" data-id="${id}">Retry</button>`;
+    const autoPays = A.pz && A.pz.auto_enabled && Number(p.amount_pence) <= Number(A.pz.auto_max_pence) && !(po && po.status === 'failed');
+    if(p.state === 'payable' && autoPays) return `<button type="button" class="ad-btn ghost sm" data-prz-set="hold" data-id="${id}">Hold</button>`;
+    const hold = `<button type="button" class="ad-btn ghost sm" data-prz-set="hold" data-id="${id}">Hold</button>`;
+    return p.state === 'payable' ? `<button type="button" class="ad-btn sm" data-prz-req="${id}">Request payout</button> ${hold}` : hold;
+  }
+  async function paymentsPrizes(){
+    const d = await rpc('admin_payouts'); A.pz = d;
+    const PORDER = { winner: 0, runner_up: 1, third: 2, unawarded: 3 };   // newest night first, then 1st, 2nd, 3rd
+    A.prizes = (d.prizes || []).slice().sort((a, b) => String(b.completed_at).localeCompare(String(a.completed_at))
+      || String(a.tournament_id).localeCompare(String(b.tournament_id)) || (PORDER[a.place] ?? 9) - (PORDER[b.place] ?? 9));
+    const sum = (f) => A.prizes.filter(f).reduce((s, p) => s + Number(p.amount_pence || 0), 0);
+    const n = (f) => A.prizes.filter(f).length;
+    const autoPay = p => d.enabled && d.auto_enabled && Number(p.amount_pence) <= Number(d.auto_max_pence) && !(p.payout && p.payout.status === 'failed')
+      && (p.state === 'payable' || p.state === 'in_dispute_window') && !(p.payout && p.payout.status === 'awaiting_approval');
+    const ready = p => p.state === 'payable' && !autoPay(p) && !(p.payout && ['awaiting_approval','sending'].includes(p.payout.status));
+    const waiting = p => p.payout && p.payout.status === 'awaiting_approval' && p.state === 'payable';
+    const tile = (v, k, alert) => `<div class="ad-tile${alert ? ' alert' : ''}"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    let h = `<p class="ad-sub">Prizes are worked out automatically when a tournament finishes. One admin requests a payout and a different admin approves it — approving sends it. Nobody can handle a prize from a night they played in.</p>`;
+    if(!d.enabled) h += `<div class="ad-clear">Prize payouts are switched off here. They stay off until a payment provider and the solicitor have approved them.</div>`;
+    else h += `<p class="ad-muted sm"><b>Automatic payouts: ${d.auto_enabled ? 'on' : 'off'}.</b> ${d.auto_enabled
+      ? `Prizes up to ${pounds(d.auto_max_pence)} pay themselves once the 24-hour window closes with no dispute or hold (up to ${pounds(d.auto_daily_pence)} a day). Anything else needs two admins.`
+      : 'Every payout needs two admins: one requests, another approves.'}</p>`;
+    h += `<div class="ad-tiles">${d.auto_enabled ? `${tile(n(autoPay), 'Paying automatically')}${tile(pounds(sum(autoPay)), 'Total paying automatically')}` : ''}
+      ${tile(n(ready), d.auto_enabled ? 'Need two admins' : 'Prizes ready to pay', n(ready) > 0)}${d.auto_enabled ? '' : tile(pounds(sum(ready)), 'Total ready to pay')}${tile(n(waiting), 'Waiting for 2nd admin', n(waiting) > 0)}
+      ${tile(n(p => p.state === 'in_dispute_window'), 'In dispute window')}${tile(n(p => ['withheld','dispute_open','needs_decision','dispute_check_failed'].includes(p.state)), 'On hold / to decide', n(p => p.state === 'needs_decision') > 0)}</div>`;
+    h += A.prizes.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Night</th><th>Place</th><th>Player</th><th class="num">Prize</th><th>State</th><th></th></tr></thead><tbody>
+      ${A.prizes.map(p => `<tr><td>${p.tournament_id ? `<a href="#tournament:${esc(p.tournament_id)}">${esc(p.tournament || '')}</a>` : '—'}<div class="sm">${esc(day(p.date))}</div></td>
+        <td>${esc(PLACE[p.place] || p.place)}</td><td>${p.player_id ? `<a href="#player:${esc(p.player_id)}">${esc(p.player)}</a>` : '<span class="ad-muted">—</span>'}</td>
+        <td class="num"><b>${pounds(p.amount_pence)}</b></td><td>${prizeState(p)}</td><td>${prizeActions(p)}</td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="ad-clear">No prizes yet — they appear here when a tournament finishes.</div>`;
+    const hist = d.history || [];
+    if(hist.length) h += `<section class="ad-sec"><h2>Payout history</h2><div class="ad-tw"><table class="ad-t"><thead><tr><th>Requested</th><th>Player</th><th class="num">Amount</th><th>Result</th><th class="hide-s">Requested / approved by</th></tr></thead><tbody>
+      ${hist.map(q => `<tr><td class="sm">${esc(when(q.requested_at))}<div>${esc(q.tournament || '')}</div></td><td>${esc(q.player)}</td><td class="num">${pounds(q.amount_pence)}</td>
+        <td>${badge(q.status === 'paid' ? 'ok' : q.status === 'failed' ? 'refused' : q.status === 'cancelled' ? 'cancelled' : 'open', q.status.replace('_', ' '))}${q.failure_reason ? `<div class="sm">${esc(q.failure_reason)}</div>` : ''}${q.provider_ref ? `<div class="mono sm">…${esc(q.provider_ref)}</div>` : ''}</td>
+        <td class="sm hide-s">${esc(q.requested_by || '—')} / ${esc(q.approved_by || '—')}</td></tr>`).join('')}</tbody></table></div></section>`;
+    return h;
+  }
+  const prizeById = id => (A.prizes || []).find(x => String(x.id) === String(id));
+  function prizeRequestModal(id){
+    const p = prizeById(id); if(!p) return;
+    actionModal({
+      title: 'Request prize payout', submit: 'Request payout',
+      intro: `<p><b>${pounds(p.amount_pence)}</b> to ${esc(p.player)} · ${esc(PLACE[p.place] || p.place)} · ${esc(p.tournament || '')}</p><p class="ad-muted">Nothing is sent yet. A different admin has to approve it, and approving sends it.</p>`,
+      run: (f, reason) => rpc('admin_payout_request', { p_award: p.id, p_reason: reason }),
+      done: () => 'Payout requested — waiting for another admin to approve',
+    });
+  }
+  function prizeApproveModal(payoutId, id){
+    const p = prizeById(id); if(!p) return;
+    actionModal({
+      title: 'Approve and pay prize', submit: `Pay ${pounds(p.amount_pence)}`, danger: true,
+      intro: `<p><b>${pounds(p.amount_pence)}</b> to ${esc(p.player)} · ${esc(PLACE[p.place] || p.place)} · ${esc(p.tournament || '')}</p><p class="ad-muted">Requested by ${esc((p.payout && p.payout.requested_by) || 'another admin')}. Approving sends it now through the payment provider. It can only ever be paid once.</p>`,
+      confirm: `I’ve checked the result and want to pay ${esc(p.player)} ${pounds(p.amount_pence)}`,
+      run: async (f, reason) => {
+        const { data, error } = await A.sb.functions.invoke('admin-payout', { body: { action: 'approve', payout: payoutId, reason } });
+        if(error){ let msg = error.message; try{ const j = await error.context.json(); msg = j.error || msg; }catch(_){} return { ok:false, error: msg }; }
+        return data && data.ok ? data : { ok:false, error: (data && data.error) || 'Payout didn’t go through' };
+      },
+      done: d => d.status === 'paid' ? `Paid ${pounds(p.amount_pence)} — confirmed by the payment provider` : 'Sent — still processing',
+    });
+  }
+  function prizeSetModal(action, id){
+    const p = prizeById(id); if(!p) return;
+    const t = { hold: ['Put prize on hold', 'Hold', 'It can’t be paid until the hold is released (e.g. while a fair play report is checked).'],
+                release: ['Release hold', 'Release', 'The prize can be paid again once its dispute window is over.'],
+                resolve: ['Record decision', 'Record decision', 'This money couldn’t be awarded automatically (e.g. no champion). Write down what will happen to it — for example “split equally between the two finalists” or “refunded to entrants”. Pay it by hand afterwards.'] }[action];
+    actionModal({ title: t[0], submit: t[1], intro: `<p><b>${pounds(p.amount_pence)}</b> · ${esc(PLACE[p.place] || p.place)} · ${esc(p.tournament || '')}</p><p class="ad-muted">${t[2]}</p>`,
+      reasonLabel: action === 'resolve' ? 'Decision (kept in the audit log)' : 'Reason (kept in the audit log)',
+      run: (f, reason) => rpc('admin_prize_set', { p_id: p.id, p_action: action, p_reason: reason }) });
+  }
+  function prizeCancelModal(payoutId){
+    actionModal({ title: 'Cancel payout request', submit: 'Cancel request', intro: '<p class="ad-muted">The prize stays unpaid and can be requested again.</p>',
+      run: (f, reason) => rpc('admin_payout_cancel', { p_payout: payoutId, p_reason: reason }) });
   }
 
   // ---------- Matches ----------
@@ -1123,6 +1231,10 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(t.matches('[data-refund-stripe]')){ refundStripeModal(t.dataset.refundStripe); return true; }
     if(t.matches('[data-refcheck]')){ refundCheck(t.dataset.refcheck, t); return true; }
     if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
+    if(t.matches('[data-prz-req]')){ prizeRequestModal(t.dataset.przReq); return true; }
+    if(t.matches('[data-prz-appr]')){ prizeApproveModal(t.dataset.przAppr, t.dataset.id); return true; }
+    if(t.matches('[data-prz-set]')){ prizeSetModal(t.dataset.przSet, t.dataset.id); return true; }
+    if(t.matches('[data-prz-cancel]')){ prizeCancelModal(t.dataset.przCancel); return true; }
     if(t.matches('[data-fdays]')){ A.fdays = Number(t.dataset.fdays); render(); return true; }
     if(t.matches('[data-gdays]')){ A.gdays = Number(t.dataset.gdays); render(); return true; }
     if(t.matches('[data-mfilter]')){ A.mfilter = t.dataset.mfilter; render(); return true; }
