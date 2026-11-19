@@ -5486,7 +5486,7 @@ go((location.hash||'#home').slice(1)||'home');
           ${o.reported ? '<span class="dsp-status">Reported</span>' : `<button type="button" class="btn btn-ghost btn-sm" data-dsp-open="${pfEsc(o.match_id)}">Report a problem</button>`}</div><div data-dsp-slot="${pfEsc(o.match_id)}"></div>`).join('')
         : '<div class="dsp-row" style="color:var(--muted)"><span>No tournament matches you can report right now.</span></div>';
       mine.innerHTML = (reps || []).length ? reps.map(r => `<div class="dsp-row"><span><b>${pfEsc(r.ref)}</b> · ${pfEsc(DSP_CAT[r.category] || r.category)}
-          <span class="sub">${pfEsc(r.tournament || '')}${r.stage ? ' · ' + pfEsc(DSP_STAGE[r.stage] || r.stage) : ''} v ${pfEsc(r.opponent)} · ${new Date(r.raised_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${r.outcome === 'result_upheld' ? ' · Result stands' + (r.resolution ? ': ' + pfEsc(r.resolution) : '') : ''}</span></span>
+          <span class="sub">${pfEsc(r.tournament || '')}${r.stage ? ' · ' + pfEsc(DSP_STAGE[r.stage] || r.stage) : ''} v ${pfEsc(r.opponent)} · ${new Date(r.raised_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${r.outcome === 'result_upheld' ? ' · Result stands' + (r.resolution ? ': ' + pfEsc(r.resolution) : '') : r.outcome === 'result_corrected' ? ' · Result corrected' + (r.resolution ? ': ' + pfEsc(r.resolution) : '') : ''}</span></span>
           <span class="dsp-status">${pfEsc(DSP_STATUS[r.status] || r.status)}</span></div>`).join('')
         : '<div class="dsp-row" style="color:var(--muted)"><span>You haven\'t reported anything.</span></div>';
     }catch(err){

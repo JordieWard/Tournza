@@ -185,6 +185,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
 .ad-modal-intro p{margin:0 0 10px}
 .ad-check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ivory-dim);cursor:pointer}
 .ad-check input{width:auto;min-height:0;margin-top:3px;accent-color:var(--blue)}
+.ad-dq{border:1px solid var(--line,rgba(255,255,255,.12));border-radius:10px;padding:10px 12px;display:grid;gap:6px;max-height:220px;overflow:auto;margin:0}
 .ad-order{list-style:decimal inside;margin:0;padding:0;display:grid;gap:6px}
 .ad-order li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line-2);border-radius:9px;background:#0A1530}
 .ad-order li span:first-child{font-weight:700}
@@ -539,6 +540,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     const can2 = d.can || {}, mine = d.you_are_entered, live = ['open','groups','knockout'].includes(t.phase);
     if(mine) h += `<div class="ad-banner">You’re entered in this tournament, so you can’t make decisions on it — another admin has to.</div>`;
     if(live && can2.cancel && !mine) h += `<div class="ad-links"><button type="button" class="ad-btn danger sm" data-cancel-t>Cancel tournament</button></div>`;
+    if(t.phase === 'completed' && can('disputes.manage') && !mine) h += `<div class="ad-links"><button type="button" class="ad-btn ghost sm" data-night="${esc(t.id)}">Change placings / disqualify…</button></div>`;
     const paid = (d.entries || []).filter(e => e.payment_status === 'paid');
     h += `<div class="ad-tiles">
       <div class="ad-tile"><b>${paid.length}</b><span>Paid entries</span></div>
@@ -1058,6 +1060,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function prizeState(p){
     const s = p.state, po = p.payout;
     if(s === 'paid') return badge('ok', 'Paid');
+    if(s === 'void') return badge('cancelled', 'Replaced');
     if(s === 'in_dispute_window') return badge('open', 'Dispute window') + `<div class="sm">Payable from ${esc(when(p.eligible_at))}</div>`;
     if(s === 'dispute_open') return badge('refund_due', 'Dispute open');
     if(s === 'dispute_check_failed') return badge('refused', 'Can’t check disputes');
@@ -1092,7 +1095,8 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   async function paymentsPrizes(){
     const d = await rpc('admin_payouts'); A.pz = d;
     const PORDER = { winner: 0, runner_up: 1, third: 2, unawarded: 3 };   // newest night first, then 1st, 2nd, 3rd
-    A.prizes = (d.prizes || []).slice().sort((a, b) => String(b.completed_at).localeCompare(String(a.completed_at))
+    const replaced = (d.prizes || []).filter(p => p.status === 'void' || p.state === 'void').length;
+    A.prizes = (d.prizes || []).filter(p => p.status !== 'void' && p.state !== 'void').sort((a, b) => String(b.completed_at).localeCompare(String(a.completed_at))
       || String(a.tournament_id).localeCompare(String(b.tournament_id)) || (PORDER[a.place] ?? 9) - (PORDER[b.place] ?? 9));
     const sum = (f) => A.prizes.filter(f).reduce((s, p) => s + Number(p.amount_pence || 0), 0);
     const n = (f) => A.prizes.filter(f).length;
@@ -1114,6 +1118,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
         <td>${esc(PLACE[p.place] || p.place)}</td><td>${p.player_id ? `<a href="#player:${esc(p.player_id)}">${esc(p.player)}</a>` : '<span class="ad-muted">—</span>'}</td>
         <td class="num"><b>${pounds(p.amount_pence)}</b></td><td>${prizeState(p)}</td><td>${prizeActions(p)}</td></tr>`).join('')}
       </tbody></table></div>` : `<div class="ad-clear">No prizes yet — they appear here when a tournament finishes.</div>`;
+    if(replaced) h += `<p class="ad-muted sm">${replaced} prize${replaced === 1 ? '' : 's'} replaced by a result correction ${replaced === 1 ? 'is' : 'are'} not shown (kept permanently in the record).</p>`;
     const hist = d.history || [];
     if(hist.length) h += `<section class="ad-sec"><h2>Payout history</h2><div class="ad-tw"><table class="ad-t"><thead><tr><th>Requested</th><th>Player</th><th class="num">Amount</th><th>Result</th><th class="hide-s">Requested / approved by</th></tr></thead><tbody>
       ${hist.map(q => `<tr><td class="sm">${esc(when(q.requested_at))}<div>${esc(q.tournament || '')}</div></td><td>${esc(q.player)}</td><td class="num">${pounds(q.amount_pence)}</td>
@@ -1195,9 +1200,15 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     h += `<section class="ad-sec"><h2>Scoring log <span class="c">${ev.length}</span></h2><p class="ad-muted sm">Every action in order with the server's time. The report was made after action ${esc(sn.last_seq ?? '—')}.</p>
       ${ev.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th class="num">#</th><th>Time</th><th>Who</th><th>Action</th></tr></thead><tbody>${ev.map(e => `<tr${sn.last_seq != null && e.seq > sn.last_seq ? ' class="ad-muted"' : ''}><td class="num">${esc(e.seq)}</td><td class="sm">${esc(rel(e.at))}</td><td class="sm">${esc(who(e.seat))}</td><td class="sm">${act(e.action || {})}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No scoring actions recorded.</div>'}</section>`;
     if((x.history || []).length) h += `<section class="ad-sec"><h2>History</h2>${x.history.map(a => `<p class="sm">${esc(when(a.at))} · ${esc(a.action.replace('dispute.', ''))} · ${esc(a.by || 'player')}${a.outcome !== 'ok' ? ' · ' + esc(a.outcome) : ''}${a.reason ? ' — ' + esc(a.reason) : ''}</p>`).join('')}</section>`;
-    if(d.status === 'resolved') h += `<div class="ad-clear">Resolved by ${esc(d.resolved_by || '')} ${esc(when(d.resolved_at))}: result stands. ${esc(d.resolution_reason || '')}</div>`;
-    else if(can('disputes.manage') && !x.mine) h += `<div class="ad-row">${d.status === 'open' ? `<button type="button" class="ad-btn ghost" data-dact="review">Mark under review</button>` : ''}<button type="button" class="ad-btn" data-dact="uphold">Uphold result (result stands)</button></div>
-      <p class="ad-muted sm">Changing, replaying or voiding a result isn't available yet — if the result is genuinely wrong, note it here and contact the owners.</p>`;
+    if(d.raiser_id || d.opponent_id) h += `<p class="ad-muted sm">To suspend a player (e.g. for cheating or conduct), open their page: ${d.raiser_id ? `<a href="#player:${esc(d.raiser_id)}">${esc(d.raiser || 'reporter')}</a>` : ''}${d.opponent_id ? ` · <a href="#player:${esc(d.opponent_id)}">${esc(d.opponent || 'opponent')}</a>` : ''}</p>`;
+    if(d.status === 'resolved') h += `<div class="ad-clear">Resolved by ${esc(d.resolved_by || '')} ${esc(when(d.resolved_at))}: ${d.outcome === 'result_corrected' ? `result corrected${d.correction ? ' (' + esc(d.correction) + ')' : ''} — places, ranking points and unpaid prizes were worked out again.` : 'result stands.'} ${esc(d.resolution_reason || '')}</div>`;
+    else if(can('disputes.manage') && !x.mine){
+      const tid = x.tournament && x.tournament.id, isFinal = x.fixture && x.fixture.stage === 'final';
+      h += `<div class="ad-row">${d.status === 'open' ? `<button type="button" class="ad-btn ghost" data-dact="review">Mark under review</button>` : ''}<button type="button" class="ad-btn" data-dact="uphold">Uphold result (result stands)</button>
+        ${tid && !x.night_block && isFinal ? `<button type="button" class="ad-btn" data-night="${esc(tid)}" data-night-d="${esc(d.id)}" data-night-final="1">Correct the final</button>` : ''}
+        ${tid && !x.night_block ? `<button type="button" class="ad-btn ghost" data-night="${esc(tid)}" data-night-d="${esc(d.id)}">Change placings / disqualify…</button>` : ''}</div>
+      <p class="ad-muted sm">${x.night_block ? 'Correcting the result: ' + esc(x.night_block) + '.' : 'Correcting works out places, ranking points and unpaid prizes for the whole night again. Earlier rounds aren’t replayed — if a mid-night result was wrong, set the final placings by hand or let the result stand.'}</p>`;
+    }
     return h;
   }
   function disputeModal(action){
@@ -1210,6 +1221,51 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       run: (f, reason) => rpc('admin_dispute_set', { p_id: d.id, p_action: action, p_reason: reason }),
       done: () => action === 'review' ? 'Marked under review' : 'Resolved — result stands',
     });
+  }
+
+  // ---------- DIS-02: correct a finished night (final the wrong way round, disqualification, placings by hand).
+  // Always previews first; the database refuses once any prize from the night has been paid. ----------
+  async function nightModal(tid, did, final){
+    const n = await rpc('admin_night', { p_tournament: Number(tid) });
+    if(!n){ toast('Tournament not found'); return; }
+    if(n.block || n.mine){ toast(n.mine ? 'You played in this tournament — another admin must handle it' : n.block); return; }
+    const pl = n.players || [], byO = o => pl.filter(p => p.outcome === o).map(p => p.id);
+    let w = byO('winner')[0] || '', ru = byO('runner_up')[0] || '';
+    const semis = byO('sf');
+    if(final && n.final && n.final.winner_id){ const other = n.final.winner_id === n.final.player1_id ? n.final.player2_id : n.final.player1_id; ru = n.final.winner_id; w = other; }
+    const OUT = { winner:'Winner', runner_up:'Runner-up', sf:'Semi-final', qf:'Quarter-final', r16:'Last 16', group:'Group' };
+    const opts = sel => `<option value="">— nobody —</option>` + pl.map(p => `<option value="${esc(p.id)}"${p.id === sel ? ' selected' : ''}>${esc(p.name)} (${esc(OUT[p.outcome] || p.outcome || '—')})</option>`).join('');
+    const field = (id, label, sel) => `<div><label class="ad-lab" for="${id}">${label}</label><select id="${id}">${opts(sel)}</select></div>`;
+    const fields = field('nx-w', 'Winner', w) + field('nx-r', 'Runner-up', ru) + semis.map((s, i) => field('nx-s' + i, 'Semi-finalist (joint 3rd) ' + (i + 1), s)).join('')
+      + `<fieldset class="ad-dq"><legend class="ad-lab">Disqualify (0 ranking points, no prize)</legend>${pl.map(p => `<label class="ad-check"><input type="checkbox" class="nx-dq" value="${esc(p.id)}"> <span>${esc(p.name)}</span></label>`).join('')}</fieldset>
+        <button type="button" class="ad-btn ghost sm" id="nx-prev">Preview changes</button><div id="nx-out" aria-live="polite"></div>`;
+    const args = () => ({ p_tournament: Number(tid), p_winner: $('#nx-w').value || null, p_runner_up: $('#nx-r').value || null,
+      p_semis: semis.map((_, i) => $('#nx-s' + i).value).filter(Boolean), p_disqualify: [...document.querySelectorAll('.nx-dq:checked')].map(c => c.value), p_dispute: did || null });
+    let shown = null;
+    const preview = async () => {
+      const a = args(), r = await rpc('admin_night_correct', Object.assign({}, a, { p_reason: null, p_apply: false }));
+      if(!r || !r.ok){ $('#nx-out').innerHTML = `<p class="ad-err">${esc((r && r.error) || 'That didn’t work.')}</p>`; shown = null; return false; }
+      const ch = r.players.filter(p => p.old_outcome !== p.new_outcome || p.disqualified || p.old_prize_pence !== p.new_prize_pence || p.old_points !== p.new_points);
+      $('#nx-out').innerHTML = `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>Place</th><th class="num">Points</th><th class="num">Prize</th></tr></thead><tbody>
+        ${ch.map(p => `<tr><td>${esc(p.name)}${p.disqualified ? ' <b class="ad-err-t">disqualified</b>' : ''}</td><td class="sm">${esc(OUT[p.old_outcome] || p.old_outcome || '—')} → <b>${esc(p.disqualified ? 'Disqualified' : (OUT[p.new_outcome] || p.new_outcome))}</b></td>
+          <td class="num">${esc(p.old_points ?? '—')} → <b>${esc(p.new_points)}</b></td><td class="num">${pounds(p.old_prize_pence)} → <b>${pounds(p.new_prize_pence)}</b></td></tr>`).join('')}</tbody></table></div>
+        ${r.unawarded_pence ? `<p class="sm">${pounds(r.unawarded_pence)} has no one to receive it and will be held for an owner’s decision.</p>` : ''}
+        <p class="ad-muted sm">${r.kind === 'final_corrected' ? 'The final’s recorded winner will be changed and flagged.' : 'Match records stay as played; the correction is recorded against the night.'} Only changed players are shown. Total prize money stays ${pounds(r.pool_pence)}.</p>`;
+      shown = JSON.stringify(a); return true;
+    };
+    actionModal({
+      title: final ? `Correct the final — ${n.tournament.name}` : `Change placings — ${n.tournament.name}`, submit: 'Confirm correction', danger: true,
+      intro: `<p class="ad-muted">${final ? 'Swaps the final’s winner and runner-up.' : 'Choose the new prize places. Anyone who loses a place must be disqualified.'} Places, ranking points and unpaid prizes for the night are worked out again. Prizes already paid can’t be changed — if any are, this is refused.</p>`,
+      fields, reasonLabel: did ? 'Reason (the player who reported sees this)' : 'Reason (kept in the audit log)',
+      confirm: 'I’ve checked the preview',
+      run: async (f, reason) => {
+        if(shown !== JSON.stringify(args())){ const ok = await preview(); return { ok: false, error: ok ? 'Check the preview above, then press Confirm correction again.' : 'Fix the problem shown above.' }; }
+        return rpc('admin_night_correct', Object.assign(args(), { p_reason: reason, p_apply: true }));
+      },
+      done: r => `Corrected (${r.ref}) — recorded in the audit log`,
+    });
+    $('#nx-prev').onclick = preview;
+    $('#ad-act-form').addEventListener('change', e => { if(!e.target.matches('#ax-confirm')){ shown = null; $('#nx-out').innerHTML = ''; } });
   }
 
   // ---------- Matches ----------
@@ -1298,6 +1354,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
     if(t.matches('[data-dfil]')){ location.hash = '#disputes:' + t.dataset.dfil; return true; }
     if(t.matches('[data-dact]')){ disputeModal(t.dataset.dact); return true; }
+    if(t.matches('[data-night]')){ nightModal(t.dataset.night, t.dataset.nightD, !!t.dataset.nightFinal); return true; }
     if(t.matches('[data-prz-req]')){ prizeRequestModal(t.dataset.przReq); return true; }
     if(t.matches('[data-prz-appr]')){ prizeApproveModal(t.dataset.przAppr, t.dataset.id); return true; }
     if(t.matches('[data-prz-set]')){ prizeSetModal(t.dataset.przSet, t.dataset.id); return true; }
