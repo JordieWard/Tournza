@@ -401,5 +401,67 @@ jspdf/dist/jspdf.es.min.js:
    *)
 */
 </script>
+<!-- DIS-01: "Report a problem" for tournament matches. Self-contained: only reads the match id from the address,
+     never touches scoring, camera or video, and records nothing. The server enforces every rule (tz_raise_dispute). -->
+<style>
+#tz-dsp-btn{position:fixed;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:2147483000;font:600 12px/1 system-ui,sans-serif;letter-spacing:.02em;color:#edf2ff;background:rgba(15,27,52,.86);border:1px solid rgba(120,160,235,.35);border-radius:999px;padding:8px 12px;cursor:pointer;backdrop-filter:blur(6px)}
+#tz-dsp-btn[hidden],#tz-dsp[hidden]{display:none!important}
+#tz-dsp{position:fixed;inset:0;z-index:2147483001;background:rgba(4,8,18,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+#tz-dsp form{width:100%;max-width:420px;max-height:calc(100vh - 32px);overflow:auto;background:#0f1b34;color:#edf2ff;border:1px solid #22325a;border-radius:16px;padding:20px;font:15px/1.5 system-ui,sans-serif;display:grid;gap:12px}
+#tz-dsp h2{margin:0;font-size:18px}#tz-dsp p{margin:0;font-size:13px;color:#b9c8ef}
+#tz-dsp label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#b9c8ef;display:grid;gap:6px}
+#tz-dsp select,#tz-dsp textarea{font:inherit;font-size:16px;color:#edf2ff;background:#0b1528;border:1px solid rgba(120,160,235,.26);border-radius:10px;padding:10px}
+#tz-dsp textarea{min-height:90px;resize:vertical}
+#tz-dsp .opt{display:flex;gap:16px;text-transform:none;letter-spacing:0;font-size:14px;color:#edf2ff}
+#tz-dsp .row{display:flex;gap:10px;flex-wrap:wrap}
+#tz-dsp button{font:600 14px system-ui,sans-serif;border-radius:10px;padding:11px 14px;cursor:pointer;border:1px solid rgba(120,160,235,.35);background:transparent;color:#edf2ff}
+#tz-dsp button.go{background:#1fc97a;border-color:#1fc97a;color:#04210f}
+#tz-dsp .msg{min-height:1.2em;color:#ff9aa0}#tz-dsp .msg.ok{color:#1fc97a}
+</style>
+<button type="button" id="tz-dsp-btn" hidden>⚑ Report a problem</button>
+<div id="tz-dsp" hidden role="dialog" aria-modal="true" aria-labelledby="tz-dsp-h">
+  <form novalidate>
+    <h2 id="tz-dsp-h">Report a problem</h2>
+    <p>The match carries on as normal — this doesn't pause or change anything. An admin will look at your report. You don't need any video.</p>
+    <label>What's the problem?<select name="cat"><option value="">Choose…</option><option value="score_wrong">A score was entered wrong</option><option value="result_wrong">The wrong result was recorded</option><option value="conduct">Opponent conduct</option><option value="technical">Technical problem</option><option value="other">Something else</option></select></label>
+    <label>What happened? (10–1,000 characters)<textarea name="why" maxlength="1000" placeholder="e.g. Leg 2: I threw 41 but 140 was entered for me. No personal details or links, please."></textarea></label>
+    <label>Did you keep your own recording? (optional)<span class="opt"><span><input type="radio" name="foot" value="yes"> Yes</span><span><input type="radio" name="foot" value="no"> No</span></span></label>
+    <p>Tournza doesn't record, collect or store any video. If you want extra peace of mind you can record on your own device.</p>
+    <p class="msg" role="status" aria-live="polite"></p>
+    <div class="row"><button type="submit" class="go">Send report</button><button type="button" data-close>Close</button></div>
+  </form>
+</div>
+<script>
+(function(){
+  var match = null; try{ match = new URLSearchParams(location.search).get('match'); }catch(e){}
+  if(!match || !/^[0-9a-f-]{36}$/i.test(match) || !window.supabase) return;
+  var sb = window.supabase.createClient('https://uwojmyggmacoxrdolstb.supabase.co', 'sb_publishable_HhQl-E4KZFnwuSSA_J_JXQ_cIQbilr-');
+  var btn = document.getElementById('tz-dsp-btn'), box = document.getElementById('tz-dsp'), f = box.querySelector('form'), msg = box.querySelector('.msg');
+  function check(){
+    sb.rpc('my_dispute_options').then(function(r){
+      var o = (r.data || []).filter(function(x){ return x.match_id === match; })[0];
+      btn.hidden = !o;
+      if(o){ btn.textContent = o.reported ? '⚑ Reported' : '⚑ Report a problem'; btn.disabled = !!o.reported; }
+    }, function(){});
+  }
+  check(); setInterval(check, 60000);
+  btn.addEventListener('click', function(){ box.hidden = false; msg.textContent = ''; msg.className = 'msg'; f.cat.focus(); });
+  box.addEventListener('click', function(e){ if(e.target === box || e.target.hasAttribute('data-close')) box.hidden = true; });
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var go = f.querySelector('.go'); if(go.disabled) return;
+    var why = f.why.value.trim(), foot = (f.querySelector('input[name=foot]:checked') || {}).value;
+    if(!f.cat.value){ msg.textContent = 'Choose what the problem is.'; return; }
+    if(why.length < 10){ msg.textContent = 'Describe what happened in at least 10 characters.'; return; }
+    go.disabled = true; msg.textContent = 'Sending…';
+    sb.rpc('tz_raise_dispute', { p_match: match, p_category: f.cat.value, p_reason: why, p_has_own_footage: foot === 'yes' ? true : foot === 'no' ? false : null }).then(function(r){
+      var d = r.data;
+      if(r.error || !d || !d.ok){ msg.textContent = (d && d.error) || 'Couldn’t send that — please try again.'; go.disabled = false; return; }
+      msg.className = 'msg ok'; msg.textContent = (d.already ? 'Already reported' : 'Report sent') + ' — reference ' + d.ref + '. Carry on playing.';
+      f.why.value = ''; go.disabled = false; check();
+    }, function(){ msg.textContent = 'Couldn’t send that — please try again.'; go.disabled = false; });
+  });
+})();
+</script>
 </body>
 </html>

@@ -1350,6 +1350,17 @@
   #acct-pw-form{display:flex;flex-direction:column;gap:14px;max-width:420px}
   #acct-pw-form input{width:100%}
   .acct-msg{min-height:1.2em;margin:0;font-size:13.5px}
+  /* DIS-01: report a problem with a tournament match */
+  .dsp{margin-top:30px;padding-top:22px;border-top:1px solid var(--line-soft)}
+  .dsp h4{font-size:16px;margin:0 0 8px}
+  .dsp p.dsp-note{font-size:13.5px;color:var(--muted);margin:0 0 12px;line-height:1.55}
+  .dsp-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px;flex-wrap:wrap}
+  .dsp-row .sub{display:block;font-size:12.5px;color:var(--muted)}
+  .dsp-form{display:grid;gap:12px;margin:14px 0 6px;padding:16px;border:1px solid var(--line);border-radius:14px}
+  .dsp-form textarea{min-height:96px;resize:vertical}
+  .dsp-fopt{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+  .dsp-fopt label{display:flex;gap:6px;align-items:center}
+  .dsp-status{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--line)}
   .acct-msg.ok{color:#5BE3A6}
   .acct-msg.bad{color:#FF8FA9}
   @media (max-width:720px){
@@ -2288,6 +2299,13 @@
           <h3>Your events</h3>
           <div id="acct-entries"><div class="stat-line" style="color:var(--muted)"><span>Loading…</span><span></span></div></div>
           <button class="btn btn-ghost btn-sm acct-btn" data-link="events">Find tonight's events</button>
+          <div class="dsp" id="acct-disputes">
+            <h4>Report a problem with a tournament match</h4>
+            <p class="dsp-note">You can report a problem during a tournament match or up to 24 hours after it finishes. No-shows, walkovers and stalled matches are decided automatically and can't be reported. You don't need any video. If you'd like extra peace of mind you can record your matches on your own device and keep the footage — Tournza doesn't record, collect or store it. While a report is open, prizes for that night are held.</p>
+            <div id="acct-dsp-list"><div class="dsp-row" style="color:var(--muted)"><span>Loading…</span></div></div>
+            <h4 style="margin-top:22px">Your reports</h4>
+            <div id="acct-dsp-mine"><div class="dsp-row" style="color:var(--muted)"><span>Loading…</span></div></div>
+          </div>
         </div>
         <div class="panel acct-pane" data-acct-pane="password" id="acct-pane-password" role="tabpanel" aria-labelledby="acct-tab-password" hidden>
           <h3>Change password</h3>
@@ -5442,8 +5460,67 @@ go((location.hash||'#home').slice(1)||'home');
     if($('#route-account')?.classList.contains('active')) renderAccountDashboard();
   }
 
+  // ---- DIS-01: report a problem with a tournament match (server enforces every rule: tz_raise_dispute) ----
+  const DSP_CAT = { score_wrong:'A score was entered wrong', result_wrong:'The wrong result was recorded', conduct:'Opponent conduct', technical:'Technical problem', other:'Something else' };
+  const DSP_STAGE = { group:'Group', r16:'Last 16', qf:'Quarter-final', sf:'Semi-final', final:'Final' };
+  const DSP_STATUS = { open:'Open', under_review:'Being reviewed', resolved:'Resolved' };
+  function dspForm(matchId){
+    return `<form class="dsp-form" data-dsp-form="${pfEsc(matchId)}" novalidate>
+      <div class="field"><label class="flab" for="dsp-cat-${pfEsc(matchId)}">What's the problem?</label>
+        <select id="dsp-cat-${pfEsc(matchId)}" name="cat" required><option value="">Choose…</option>${Object.entries(DSP_CAT).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
+      <div class="field"><label class="flab" for="dsp-why-${pfEsc(matchId)}">What happened? (10–1,000 characters)</label>
+        <textarea id="dsp-why-${pfEsc(matchId)}" name="why" maxlength="1000" placeholder="e.g. Leg 2: I threw 41 but 140 was entered for me. Please don't include personal details or links."></textarea></div>
+      <div class="field"><span class="flab">Did you keep your own recording? (optional)</span>
+        <div class="dsp-fopt"><label><input type="radio" name="foot" value="yes"> Yes</label><label><input type="radio" name="foot" value="no"> No</label></div></div>
+      <p class="acct-msg" role="status" aria-live="polite"></p>
+      <div><button type="submit" class="btn btn-primary btn-sm">Send report</button> <button type="button" class="btn btn-ghost btn-sm" data-dsp-cancel>Cancel</button></div>
+    </form>`;
+  }
+  async function renderDisputes(){
+    const list = $('#acct-dsp-list'), mine = $('#acct-dsp-mine'); if(!list || !mine || !sb) return;
+    try{
+      const [{ data: opts, error: e1 }, { data: reps, error: e2 }] = await Promise.all([sb.rpc('my_dispute_options'), sb.rpc('my_disputes')]);
+      if(e1 || e2) throw e1 || e2;
+      list.innerHTML = (opts || []).length ? opts.map(o => `<div class="dsp-row"><span>${pfEsc(o.tournament || 'Tournament')} · ${pfEsc(DSP_STAGE[o.stage] || o.stage || '')} v ${pfEsc(o.opponent)}
+          <span class="sub">${o.status === 'in_progress' ? 'In play now' : `Finished ${pfEsc(o.legs_me)}–${pfEsc(o.legs_them)} · report by ${new Date(o.report_until).toLocaleString('en-GB',{weekday:'short',hour:'2-digit',minute:'2-digit'})}`}</span></span>
+          ${o.reported ? '<span class="dsp-status">Reported</span>' : `<button type="button" class="btn btn-ghost btn-sm" data-dsp-open="${pfEsc(o.match_id)}">Report a problem</button>`}</div><div data-dsp-slot="${pfEsc(o.match_id)}"></div>`).join('')
+        : '<div class="dsp-row" style="color:var(--muted)"><span>No tournament matches you can report right now.</span></div>';
+      mine.innerHTML = (reps || []).length ? reps.map(r => `<div class="dsp-row"><span><b>${pfEsc(r.ref)}</b> · ${pfEsc(DSP_CAT[r.category] || r.category)}
+          <span class="sub">${pfEsc(r.tournament || '')}${r.stage ? ' · ' + pfEsc(DSP_STAGE[r.stage] || r.stage) : ''} v ${pfEsc(r.opponent)} · ${new Date(r.raised_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${r.outcome === 'result_upheld' ? ' · Result stands' + (r.resolution ? ': ' + pfEsc(r.resolution) : '') : ''}</span></span>
+          <span class="dsp-status">${pfEsc(DSP_STATUS[r.status] || r.status)}</span></div>`).join('')
+        : '<div class="dsp-row" style="color:var(--muted)"><span>You haven\'t reported anything.</span></div>';
+    }catch(err){
+      console.warn('Could not load match reports:', err);
+      list.innerHTML = '<div class="dsp-row" style="color:var(--muted)"><span>Couldn\'t load this just now — try again shortly.</span></div>';
+      mine.innerHTML = '';
+    }
+  }
+  document.addEventListener('click', e => {
+    const open = e.target.closest && e.target.closest('[data-dsp-open]');
+    if(open){ const slot = document.querySelector(`[data-dsp-slot="${CSS.escape(open.dataset.dspOpen)}"]`); if(slot){ slot.innerHTML = dspForm(open.dataset.dspOpen); open.hidden = true; slot.querySelector('select').focus(); } return; }
+    const cancel = e.target.closest && e.target.closest('[data-dsp-cancel]');
+    if(cancel){ renderDisputes(); }
+  });
+  document.addEventListener('submit', async e => {
+    const f = e.target.closest && e.target.closest('[data-dsp-form]'); if(!f) return;
+    e.preventDefault();
+    const btn = f.querySelector('[type=submit]'), msg = f.querySelector('.acct-msg'); if(btn.disabled) return;
+    const cat = f.cat.value, why = f.why.value.trim(), foot = (f.querySelector('input[name=foot]:checked') || {}).value;
+    if(!cat){ msg.textContent = 'Choose what the problem is.'; return; }
+    if(why.length < 10){ msg.textContent = 'Describe what happened in at least 10 characters.'; return; }
+    btn.disabled = true; msg.textContent = 'Sending…';
+    try{
+      const { data, error } = await sb.rpc('tz_raise_dispute', { p_match: f.dataset.dspForm, p_category: cat, p_reason: why, p_has_own_footage: foot === 'yes' ? true : foot === 'no' ? false : null });
+      if(error) throw error;
+      if(!data || !data.ok){ msg.textContent = (data && data.error) || 'That didn\'t go through.'; btn.disabled = false; return; }
+      notify(data.already ? `Already reported — reference ${data.ref}` : `Report sent — reference ${data.ref}. An admin will look at it.`);
+      renderDisputes();
+    }catch(err){ console.warn('Report failed:', err); msg.textContent = 'Couldn\'t send that — please try again.'; btn.disabled = false; }
+  });
+
   function renderAccountDashboard(){
     if(!acctData) return; // still loading — the static "Loading…" placeholder stays as-is
+    renderDisputes();
     const { profile, entries, hasPlayerProfile } = acctData;
 
     const lede = $('#acct-lede');

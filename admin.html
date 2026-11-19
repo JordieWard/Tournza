@@ -395,6 +395,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     $('#ad-boot').hidden = true; $('#ad-app').hidden = false;
     const nav = [['overview','Overview'], ['tournaments','Tournaments']];
     if(can('matches.view')) nav.push(['matches','Matches']);
+    if(can('disputes.view')) nav.push(['disputes','Disputes']);
     if(can('players.view')) nav.push(['players','Players']);
     if(can('payments.view')) nav.push(['payments','Payments']);
     if(can('pictures.review')) nav.push(['pictures','Pictures']);
@@ -402,7 +403,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(can('audit.view')) nav.push(['audit','Audit log']);
     if(can('admins.manage')) nav.push(['admins','Admin users']);
     if(can('settings.manage')) nav.push(['settings','Settings']);
-    const soon = ['Disputes','Affiliates'];
+    const soon = ['Affiliates'];
     $('#ad-nav').innerHTML = nav.map(([k,l]) => `<a href="#${k}" data-nav="${k}">${l}<span class="n" id="ad-n-${k}" hidden></span></a>`).join('')
       + soon.map(l => `<a class="dis" aria-disabled="true">${l}<span class="soon">Soon</span></a>`).join('');
     $('#ad-me').innerHTML = `<b>${esc(A.me.name)}</b><span class="role">${esc(A.me.label)}</span><div class="ad-row"><a class="ad-btn ghost sm" href="/">Site</a><button class="ad-btn ghost sm" data-ad-signout>Sign out</button></div>`;
@@ -413,7 +414,8 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function route(){
     const h = decodeURIComponent(location.hash.replace(/^#/, '')) || 'overview';
     const [v, arg] = h.split(':');
-    A.view = ['overview','tournaments','tournament','audit','admins','players','player','payments','pictures','matches','match','growth','settings'].includes(v) ? v : 'overview';
+    A.view = ['overview','tournaments','tournament','audit','admins','players','player','payments','pictures','matches','match','growth','settings','disputes','dispute'].includes(v) ? v : 'overview';
+    if((A.view === 'disputes' || A.view === 'dispute') && !can('disputes.view')) A.view = 'overview';
     if(A.view === 'audit' && !can('audit.view')) A.view = 'overview';
     if((A.view === 'players' || A.view === 'player') && !can('players.view')) A.view = 'overview';
     if(A.view === 'payments' && !can('payments.view')) A.view = 'overview';
@@ -423,7 +425,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(A.view === 'settings' && !can('settings.manage')) A.view = 'overview';
     if(A.view === 'admins' && !can('admins.manage')) A.view = 'overview';
     A.arg = arg || null;
-    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view === 'player' ? 'players' : A.view === 'match' ? 'matches' : A.view)));
+    document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (A.view === 'tournament' ? 'tournaments' : A.view === 'player' ? 'players' : A.view === 'match' ? 'matches' : A.view === 'dispute' ? 'disputes' : A.view)));
     render();
   }
   async function render(quiet){
@@ -440,6 +442,8 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       else if(A.view === 'payments') box.innerHTML = await viewPayments3();
       else if(A.view === 'matches') box.innerHTML = await viewMatches();
       else if(A.view === 'match') box.innerHTML = await viewMatch(A.arg);
+      else if(A.view === 'disputes') box.innerHTML = await viewDisputes();
+      else if(A.view === 'dispute') box.innerHTML = await viewDispute(A.arg);
       else if(A.view === 'growth') box.innerHTML = await viewGrowth();
       else if(A.view === 'settings') box.innerHTML = await viewSettings();
       else if(A.view === 'pictures'){ box.innerHTML = await viewPictures(); hydratePictures(); }
@@ -456,6 +460,14 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     const tile = (v, k, alert) => `<div class="ad-tile${alert ? ' alert' : ''}"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
     const t = o.tonight || [];
     let h = `<h1 class="ad-h1">Control Centre</h1><p class="ad-sub">${esc(day(o.today))} · everything that needs you is at the top.</p>`;
+    if(can('disputes.view')){
+      try{
+        const ds = await rpc('admin_disputes', { p_status: 'open' });
+        const n2 = $('#ad-n-disputes'); if(n2){ n2.hidden = !ds.length; n2.textContent = ds.length; }
+        if(ds.length){ const old = ds.filter(d => d.hours_open >= 12).length;
+          h += `<a class="ad-banner${old ? '' : ' info'}" href="#disputes" style="display:block;text-decoration:none">${ds.length} tournament dispute${ds.length === 1 ? '' : 's'} waiting${old ? ` — ${old} open for over 12 hours` : ''}. Prizes for those nights are held until they're resolved. →</a>`; }
+      }catch(_){}
+    }
     h += `<section class="ad-sec" aria-labelledby="ad-ac-h"><h2 id="ad-ac-h">Action Centre <span class="c">${acts.length ? acts.length + ' item' + (acts.length === 1 ? '' : 's') : ''}</span></h2>`;
     h += acts.length ? `<div class="ad-actions">${acts.map(a => {
         const href = a.link && a.link.type === 'tournament' ? '#tournament:' + a.link.id
@@ -1147,6 +1159,59 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       run: (f, reason) => rpc('admin_payout_cancel', { p_payout: payoutId, p_reason: reason }) });
   }
 
+  // ---------- Disputes (DIS-01): review queue. Nothing here changes a result or money; prizes for a night are held
+  // automatically while any dispute on it is open. The database enforces permissions, reasons and the own-match rule. ----------
+  const DCAT = { score_wrong:'Score entered wrong', result_wrong:'Wrong result recorded', conduct:'Opponent conduct', technical:'Technical problem', other:'Other' };
+  const DSTAT = { open:'Open', under_review:'Under review', resolved:'Resolved' };
+  async function viewDisputes(){
+    const f = ['open','resolved','all'].includes(A.arg) ? A.arg : 'open';
+    const rows = await rpc('admin_disputes', { p_status: f });
+    let h = `<h1 class="ad-h1">Disputes</h1><p class="ad-sub">Problems players reported with tournament matches (during play or within 24 hours). While one is open, prizes for that night aren't paid. Upholding means the result stands.</p>
+      <div class="ad-tabs" role="group" aria-label="Show">${[['open','Open'], ['resolved','Resolved'], ['all','All']].map(([k,l]) => `<button type="button" data-dfil="${k}" class="${f === k ? 'on' : ''}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
+    return h + (rows.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Raised</th><th>Ref</th><th>Match</th><th>Problem</th><th>Status</th></tr></thead><tbody>
+      ${rows.map(d => `<tr class="clk" data-go="#dispute:${esc(d.id)}" tabindex="0"><td class="sm">${esc(when(d.raised_at))}${d.status !== 'resolved' ? `<div class="${d.hours_open >= 12 ? 'ad-err-t' : 'ad-muted'}">${esc(d.hours_open)}h open</div>` : ''}</td>
+        <td class="mono">${esc(d.ref)}</td><td><b>${esc(d.raiser || '—')}</b> <span class="ad-muted">v</span> ${esc(d.opponent || '—')}<div class="sm">${esc(d.tournament || '')}${d.stage ? ' · ' + esc(STAGE[d.stage] || d.stage) : ''}${d.during_play ? ' · during play' : ''}</div>${d.mine ? '<div class="sm ad-err-t">You played in this match</div>' : ''}</td>
+        <td class="sm">${esc(DCAT[d.category] || d.category)}</td><td>${badge(d.status === 'resolved' ? 'ok' : d.status === 'under_review' ? 'open' : 'refund_due', DSTAT[d.status] || d.status)}</td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="ad-clear">${f === 'open' ? 'No open disputes.' : 'Nothing here.'}</div>`);
+  }
+  async function viewDispute(id){
+    const x = await rpc('admin_dispute', { p_id: id }); A.ddata = x;
+    if(!x) return `<a class="ad-back" href="#disputes">← Disputes</a><div class="ad-clear">That dispute doesn't exist.</div>`;
+    const d = x.dispute, m = x.match || {}, ev = x.events || [], sn = d.snapshot || {};
+    const t0 = ev.length ? new Date(ev[0].at).getTime() : null;
+    const rel = iso => { if(!t0) return ''; const s2 = Math.round((new Date(iso).getTime() - t0) / 1000); return '+' + Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'); };
+    const who = seat => seat === 'p1' ? (m.player1 || 'Player 1') : seat === 'p2' ? (m.player2 || 'Player 2') : 'server';
+    const act = a => { const y = Object.assign({}, a); const t = y.type; delete y.type; const r = JSON.stringify(y); return esc(t || '') + (r === '{}' ? '' : ' <span class="mono sm">' + esc(r) + '</span>'); };
+    let h = `<a class="ad-back" href="#disputes">← Disputes</a><h1 class="ad-h1">Dispute ${esc(d.ref)}</h1>
+      <p class="ad-sub">${badge(d.status === 'resolved' ? 'ok' : d.status === 'under_review' ? 'open' : 'refund_due', DSTAT[d.status] || d.status)} · raised ${esc(when(d.raised_at))} by <b>${esc(d.raiser || '—')}</b> ${d.during_play ? '(during play)' : '(after the match)'}${x.tournament ? ` · <a href="#tournament:${esc(x.tournament.id)}">${esc(x.tournament.name)}</a>` : ''}</p>`;
+    if(x.mine) h += `<div class="ad-banner">You played in this match, so you can't act on it — another admin must.</div>`;
+    h += `<section class="ad-sec"><h2>What they reported</h2><p><b>${esc(DCAT[d.category] || d.category)}</b></p><p style="white-space:pre-wrap">${esc(d.reason)}</p>
+      <p class="ad-muted sm">Kept their own recording: ${d.has_own_footage === true ? 'yes' : d.has_own_footage === false ? 'no' : 'not answered'}. Please don't ask players to send footage — Tournza doesn't collect it.</p></section>`;
+    const tile = (v, k) => `<div class="ad-tile"><b>${esc(v)}</b><span>${esc(k)}</span></div>`;
+    h += `<section class="ad-sec"><h2>The match</h2><div class="ad-tiles">${tile((m.player1 || '—') + ' v ' + (m.player2 || '—'), 'Players')}${tile(m.legs_p1 == null ? '—' : m.legs_p1 + '–' + m.legs_p2, 'Legs now')}
+      ${tile(sn.legs_p1 == null ? '—' : sn.legs_p1 + '–' + sn.legs_p2, 'Legs when reported')}${tile(m.winner || '—', 'Winner')}${tile(m.completed_at ? when(m.completed_at) : (m.status || '—'), 'Finished')}</div>
+      <p class="ad-muted sm">Code <span class="mono">${esc(m.code || '')}</span> · best of ${esc(m.best_of || '')} · started ${esc(when(m.started_at))}${x.fixture ? ' · ' + esc(STAGE[x.fixture.stage] || x.fixture.stage || '') + ' fixture ' + esc(x.fixture.status || '') : ''}${m.device_flag ? ' · <b>the two devices disagreed on the result</b>' : ''} · <a href="#match:${esc(m.id)}">Full match page</a></p></section>`;
+    if((x.others || []).length) h += `<section class="ad-sec"><h2>Other reports on this match</h2>${x.others.map(o => `<p><a href="#dispute:${esc(o.id)}" class="mono">${esc(o.ref)}</a> · ${esc(o.raiser || '')} · ${esc(DSTAT[o.status] || o.status)} · ${esc(when(o.raised_at))}</p>`).join('')}</section>`;
+    h += `<section class="ad-sec"><h2>Scoring log <span class="c">${ev.length}</span></h2><p class="ad-muted sm">Every action in order with the server's time. The report was made after action ${esc(sn.last_seq ?? '—')}.</p>
+      ${ev.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th class="num">#</th><th>Time</th><th>Who</th><th>Action</th></tr></thead><tbody>${ev.map(e => `<tr${sn.last_seq != null && e.seq > sn.last_seq ? ' class="ad-muted"' : ''}><td class="num">${esc(e.seq)}</td><td class="sm">${esc(rel(e.at))}</td><td class="sm">${esc(who(e.seat))}</td><td class="sm">${act(e.action || {})}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No scoring actions recorded.</div>'}</section>`;
+    if((x.history || []).length) h += `<section class="ad-sec"><h2>History</h2>${x.history.map(a => `<p class="sm">${esc(when(a.at))} · ${esc(a.action.replace('dispute.', ''))} · ${esc(a.by || 'player')}${a.outcome !== 'ok' ? ' · ' + esc(a.outcome) : ''}${a.reason ? ' — ' + esc(a.reason) : ''}</p>`).join('')}</section>`;
+    if(d.status === 'resolved') h += `<div class="ad-clear">Resolved by ${esc(d.resolved_by || '')} ${esc(when(d.resolved_at))}: result stands. ${esc(d.resolution_reason || '')}</div>`;
+    else if(can('disputes.manage') && !x.mine) h += `<div class="ad-row">${d.status === 'open' ? `<button type="button" class="ad-btn ghost" data-dact="review">Mark under review</button>` : ''}<button type="button" class="ad-btn" data-dact="uphold">Uphold result (result stands)</button></div>
+      <p class="ad-muted sm">Changing, replaying or voiding a result isn't available yet — if the result is genuinely wrong, note it here and contact the owners.</p>`;
+    return h;
+  }
+  function disputeModal(action){
+    const x = A.ddata; if(!x) return; const d = x.dispute;
+    actionModal({
+      title: action === 'review' ? `Mark ${d.ref} under review` : `Uphold result — ${d.ref}`, submit: action === 'review' ? 'Mark under review' : 'Uphold result',
+      intro: `<p class="ad-muted">${action === 'review' ? 'Shows other admins you’re looking at it. Prizes for the night stay held.' : 'Closes the dispute: the result stands. The player sees your reason. Prizes for the night become payable once no other dispute is open.'}</p>`,
+      reasonLabel: action === 'review' ? 'Note (kept in the audit log)' : 'Reason the result stands (the player will see this)',
+      confirm: action === 'uphold' ? 'I’ve checked the scoring log and the result stands' : '',
+      run: (f, reason) => rpc('admin_dispute_set', { p_id: d.id, p_action: action, p_reason: reason }),
+      done: () => action === 'review' ? 'Marked under review' : 'Resolved — result stands',
+    });
+  }
+
   // ---------- Matches ----------
   async function viewMatches(){
     const f = ['live','recent','disputed','all'].includes(A.arg) ? A.arg : 'live', type = A.mtype || 'all';
@@ -1231,6 +1296,8 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(t.matches('[data-refund-stripe]')){ refundStripeModal(t.dataset.refundStripe); return true; }
     if(t.matches('[data-refcheck]')){ refundCheck(t.dataset.refcheck, t); return true; }
     if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
+    if(t.matches('[data-dfil]')){ location.hash = '#disputes:' + t.dataset.dfil; return true; }
+    if(t.matches('[data-dact]')){ disputeModal(t.dataset.dact); return true; }
     if(t.matches('[data-prz-req]')){ prizeRequestModal(t.dataset.przReq); return true; }
     if(t.matches('[data-prz-appr]')){ prizeApproveModal(t.dataset.przAppr, t.dataset.id); return true; }
     if(t.matches('[data-prz-set]')){ prizeSetModal(t.dataset.przSet, t.dataset.id); return true; }
