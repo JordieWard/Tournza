@@ -786,12 +786,53 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     h += `<section class="ad-sec"><h2>Results <span class="c">${(p.results || []).length || ''}</span></h2>${(p.results || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Date</th><th>Tournament</th><th>Finish</th><th class="num">Points</th></tr></thead><tbody>
       ${p.results.map(r => `<tr class="clk" data-go="#tournament:${r.tournament_id}" tabindex="0"><td class="sm">${esc(day(r.date))}</td><td>${esc(r.name)}<div class="sm">${esc(r.region || '')}</div></td><td>${esc(OUTCOME[r.outcome] || r.outcome)}</td><td class="num"><b>${r.points == null ? '—' : r.points}</b></td></tr>`).join('')}
       </tbody></table></div>` : '<div class="ad-clear">No tournament results yet.</div>'}</section>`;
+    if(can('payments.view')){
+      let mp = []; try{ mp = await rpc('admin_member_payments', { p_player: p.id }) || []; }catch(_){ mp = null; }
+      A.mpay = mp || [];
+      if(mp && mp.length) h += `<section class="ad-sec"><h2>Membership payments <span class="c">${mp.length}</span></h2><div class="ad-tw"><table class="ad-t"><thead><tr><th>Paid</th><th>Payment</th><th class="num">Amount</th><th>Refund</th></tr></thead><tbody>
+        ${mp.map(m => { const q = m.request, co = m.cooling_off || {};
+          const refund = m.refunded_pence > 0 ? `${badge('ok', 'Refunded ' + pounds(m.refunded_pence))}`
+            : q && q.status === 'pending' ? `${badge('open','Processing')} <button type="button" class="ad-btn ghost sm" data-refcheck="${esc(q.id)}">Check status</button>`
+            : co.eligible && can('payments.refund') && !p.you ? `${q && q.status === 'failed' ? `<div class="sm ad-err-t">Refused: ${esc(q.error || '')}</div>` : ''}<button type="button" class="ad-btn sm" data-coolingoff="${esc(m.id)}">Cooling-off refund ${pounds(co.amount_pence)}</button><div class="sm ad-muted">Until ${esc(day(co.ends))}</div>`
+            : `<span class="sm ad-muted">${esc(co.why || '—')}</span>`;
+          return `<tr><td class="sm">${esc(when(m.paid_at))}</td><td>${m.kind === 'first' ? 'Joined' : 'Renewal'} · ${esc(m.plan === 'annual' ? 'Yearly' : m.plan === 'monthly' ? 'Monthly' : '—')}<div class="mono sm">…${esc(m.ref)}</div></td>
+            <td class="num"><b>${pounds(m.amount_pence)}</b></td><td>${refund}</td></tr>`; }).join('')}</tbody></table></div>
+        <p class="ad-muted sm">Within 14 days of joining a player can cancel and get back what they paid less the days they’ve had. After that, cancelling only stops the next renewal — no refund.</p></section>`;
+    }
     h += `<section class="ad-sec"><h2>Entries</h2>${(p.entries || []).length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Date</th><th>Tournament</th><th>Payment</th><th class="hide-s">Checked in</th></tr></thead><tbody>
       ${p.entries.map(e => `<tr class="clk" data-go="#tournament:${e.tournament_id}" tabindex="0"><td class="sm">${esc(day(e.date))}</td><td>${esc(e.name)} ${badge(e.phase)}</td><td>${badge(e.payment_status)}</td><td class="hide-s">${e.checked_in ? 'Yes' : 'No'}</td></tr>`).join('')}
       </tbody></table></div>` : '<div class="ad-clear">No entries.</div>'}</section>`;
     if(p.history) h += `<section class="ad-sec"><h2>Admin history</h2>${p.history.length ? `<div class="ad-tw"><table class="ad-t"><tbody>${p.history.map(a => `<tr><td class="sm">${esc(when(a.at))}</td><td>${esc(a.who)}</td><td class="mono sm">${esc(a.action)}</td><td>${badge(a.outcome)}</td><td class="sm">${esc(a.reason || '')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="ad-clear">No admin actions on this player.</div>'}</section>`;
     h += `<p class="ad-muted sm">Account created ${esc(when(p.signed_up))} · id <span class="mono">${esc(p.id)}</span></p>`;
     return h;
+  }
+  function coolingOffModal(id){
+    const p = A.pdata, m = (A.mpay || []).find(x => String(x.id) === String(id)); if(!m || !m.cooling_off) return;
+    const co = m.cooling_off;
+    actionModal({
+      title: 'Cooling-off refund', submit: `Refund ${pounds(co.amount_pence)} and end membership`, danger: true,
+      intro: `<p><b>${esc(p.name)}</b> joined ${esc(when(m.paid_at))} and paid <b>${pounds(m.amount_pence)}</b>.</p>
+        <p>Refund <b>${pounds(co.amount_pence)}</b> — they keep paying for the ${co.days_used} day${co.days_used === 1 ? '' : 's'} they’ve had (${pounds(co.kept_pence)}).</p>
+        <p class="ad-muted">Their membership ends straight away and won’t renew. The money goes back through the payment provider to the card that paid. It can only be refunded once.</p>`,
+      reasonLabel: 'Reason (e.g. “Asked to cancel by email on …”)', confirm: `End ${esc(p.name)}’s membership and refund ${pounds(co.amount_pence)}`,
+      run: async (f, reason) => {
+        const { data, error } = await A.sb.functions.invoke('admin-refund', { body: { action: 'membership_refund', id: m.id, reason } });
+        if(error){ let msg = error.message; try{ const j = await error.context.json(); msg = j.error || msg; }catch(_){} return { ok:false, error: msg }; }
+        return data && data.ok ? data : { ok:false, error: (data && data.error) || 'Refund didn’t go through' };
+      },
+      done: d => (d.status === 'succeeded' ? `Refunded ${pounds(co.amount_pence)} and membership ended` : 'Sent — still processing (check status later)') + (d.warning ? ' — ' + d.warning : ''),
+    });
+  }
+  function outsideCheckModal(id){
+    const r = (A.outside || []).find(x => String(x.id) === String(id)); if(!r) return;
+    actionModal({
+      title: 'Refund made outside Tournza', submit: 'Mark checked',
+      intro: `<p><b>${pounds(r.amount_pence)}</b> refunded directly in the payment provider${r.player ? ' to ' + esc(r.player) : ''}${r.tournament ? ' · ' + esc(r.tournament) : ''}.</p>
+        <p>What Tournza did: <b>${esc(r.action)}</b></p><p class="ad-muted">Check it was meant to happen (and sort out anything by hand if needed), then mark it checked.</p>`,
+      reasonLabel: 'What you checked or did',
+      run: (f, reason) => rpc('admin_outside_refund_check', { p_id: r.id, p_reason: reason }),
+      done: () => 'Marked checked — recorded in the audit log',
+    });
   }
   function suspendModal(){
     const p = A.pdata;
@@ -980,13 +1021,30 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(tab === 'finance') return h + await paymentsFinance();
     return h + await paymentsMembers();
   }
+  async function outsideRefunds(){
+    let rows = []; try{ rows = await rpc('admin_outside_refunds') || []; }catch(_){ return ''; }
+    A.outside = rows;
+    const open = rows.filter(r => r.status === 'open');
+    if(!rows.length) return '';
+    const KIND = { checkout:'Entry', cancelled:'Entry (cancelled night)', exception:'Payment problem', membership:'Membership', unknown:'Unknown payment' };
+    return `<section class="ad-sec"><h2>Refunded outside Tournza <span class="c">${open.length || ''}</span></h2>
+      <p class="ad-muted sm">Refunds someone made directly in the payment provider. Tournza has recorded each one and done what it safely could; check each and mark it checked.</p>
+      <div class="ad-tw"><table class="ad-t"><thead><tr><th>When</th><th>For</th><th class="num">Amount</th><th>What Tournza did</th><th></th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td class="sm">${esc(when(r.at))}<div class="mono">…${esc(r.ref)}</div></td>
+        <td>${esc(KIND[r.kind] || r.kind)}${r.player_id ? ` · <a href="#player:${esc(r.player_id)}">${esc(r.player || 'Player')}</a>` : ''}${r.tournament_id ? `<div class="sm"><a href="#tournament:${esc(r.tournament_id)}">${esc(r.tournament || '')}</a></div>` : ''}</td>
+        <td class="num"><b>${pounds(r.amount_pence)}</b></td><td class="sm">${esc(r.action)}</td>
+        <td>${r.status === 'open' ? (can('payments.refund') ? `<button type="button" class="ad-btn sm" data-outcheck="${esc(r.id)}">Mark checked</button>` : badge('refund_due', 'To check'))
+          : `${badge('ok', 'Checked')}<div class="sm">${esc(r.checked_by || '')} · ${esc(r.checked_reason || '')}</div>`}</td></tr>`).join('')}
+      </tbody></table></div></section>`;
+  }
   async function paymentsDue(){
     const rows = await rpc('admin_refunds'); A.refunds = rows;
     const total = rows.reduce((s, r) => s + Number(r.amount_pence || 0), 0);
+    const outside = await outsideRefunds();
     let h = `<p class="ad-sub">Refund straight from here — the money goes back through Stripe to the card that paid, and it’s marked refunded only once Stripe confirms. Already refunded by hand in Stripe? Use “Mark refunded”.</p>
-      <div class="ad-tiles"><div class="ad-tile${rows.length ? ' alert' : ''}"><b>${rows.length}</b><span>Refunds due</span></div><div class="ad-tile"><b>${pounds(total)}</b><span>To refund</span></div></div>`;
-    if(!rows.length) return h + `<div class="ad-clear">No refunds due.</div>`;
-    return h + `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>Tournament</th><th class="num">Amount</th><th class="hide-s">Why</th><th>Refund</th></tr></thead><tbody>
+      <div class="ad-tiles"><div class="ad-tile${rows.length ? ' alert' : ''}"><b>${rows.length}</b><span>Refunds due</span></div><div class="ad-tile"><b>${pounds(total)}</b><span>To refund</span></div>${(A.outside || []).some(r => r.status === 'open') ? `<div class="ad-tile alert"><b>${A.outside.filter(r => r.status === 'open').length}</b><span>Outside refunds to check</span></div>` : ''}</div>`;
+    if(!rows.length) return h + `<div class="ad-clear">No refunds due.</div>` + outside;
+    return h + outside + `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Player</th><th>Tournament</th><th class="num">Amount</th><th class="hide-s">Why</th><th>Refund</th></tr></thead><tbody>
       ${rows.map(r => { const q = r.request, st = q && q.status;
         const state = st === 'pending' ? `${badge('open','Processing')} <button type="button" class="ad-btn ghost sm" data-refcheck="${esc(q.id)}">Check status</button>`
           : st === 'requested' ? `${badge('refund_due','Not confirmed')} <button type="button" class="ad-btn sm" data-refund-stripe="${esc(r.id)}">Retry</button>`
@@ -1015,7 +1073,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     try{
       const { data, error } = await A.sb.functions.invoke('admin-refund', { body: { action: 'check', request: reqId } });
       if(error) throw error;
-      toast(data.status === 'succeeded' ? 'Stripe confirmed — marked refunded' : data.status === 'pending' ? 'Still processing at Stripe' : 'Stripe: ' + data.status, data.status === 'failed');
+      toast((data.status === 'succeeded' ? 'Stripe confirmed — marked refunded' : data.status === 'pending' ? 'Still processing at Stripe' : 'Stripe: ' + data.status) + (data.warning ? ' — ' + data.warning : ''), data.status === 'failed' || !!data.warning);
       render(true);
     }catch(e){ btn.disabled = false; toast(friendly(e), true); }
   }
@@ -1042,7 +1100,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       <section class="ad-sec"><h2>Memberships</h2><div class="ad-tiles">
         ${tile(bs.active || 0, 'Active')}${tile(m.renewing_30d || 0, 'Renewing in 30 days')}${tile(m.ending_30d || 0, 'Ending in 30 days (auto-renew off)', (m.ending_30d || 0) > 0)}
         ${Object.keys(bs).filter(k => k !== 'active' && k !== 'none').map(k => tile(bs[k], k)).join('')}</div>
-        <p class="ad-muted sm">Membership payments, renewals and refunds are handled in Stripe; this shows who is a member and when they renew.</p></section>`;
+        <p class="ad-muted sm">This shows who is a member and when they renew. Each player’s membership payments, and any cooling-off refund, are on their player page.</p></section>`;
   }
   async function paymentsMembers(){
     const filter = A.mfilter || 'active';
@@ -1351,6 +1409,8 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function ops3Click(t){
     if(t.matches('[data-refund-stripe]')){ refundStripeModal(t.dataset.refundStripe); return true; }
     if(t.matches('[data-refcheck]')){ refundCheck(t.dataset.refcheck, t); return true; }
+    if(t.matches('[data-coolingoff]')){ coolingOffModal(t.dataset.coolingoff); return true; }
+    if(t.matches('[data-outcheck]')){ outsideCheckModal(t.dataset.outcheck); return true; }
     if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
     if(t.matches('[data-dfil]')){ location.hash = '#disputes:' + t.dataset.dfil; return true; }
     if(t.matches('[data-dact]')){ disputeModal(t.dataset.dact); return true; }

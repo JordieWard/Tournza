@@ -2413,7 +2413,10 @@
       <p>You agree to play honestly, on camera, and follow our fair-play rules. We may disqualify, suspend or remove players for cheating, abuse or breaching these terms, without refund where appropriate.</p>
 
       <h3>6. Payments and refunds</h3>
-      <p>Payments are processed securely by Stripe. Except where required by law or stated above, membership fees and event entries are non-refundable once an event has started.</p>
+      <p>Payments are processed securely by our payment provider.</p>
+      <p><strong>Membership.</strong> You can cancel within 14 days of joining (your cooling-off period) by emailing <a href="mailto:admin@tournza.co.uk">admin@tournza.co.uk</a>. Your membership ends straight away and we refund what you paid, less a proportionate amount for the days you’ve had it. After those 14 days you can cancel at any time to stop your next renewal: your membership carries on until the end of the period you’ve paid for, and the rest of that period isn’t refunded.</p>
+      <p><strong>Tournament entries.</strong> Entry fees aren’t refunded if you withdraw or don’t check in. If a tournament is cancelled, or a payment couldn’t give you a place, your entry fee is refunded in full to the card you paid with.</p>
+      <p>Nothing in this section affects your statutory rights.</p>
 
       <h3>7. Prizes</h3>
       <p>Each event's prize pool is split: winner 50%, runner-up 30% and each losing semi-finalist 10%. A semi-finalist prize is only paid when it is at least the £8 entry fee (from 16 players); otherwise, and when only 4–5 players take part, there is no 3rd prize and it's winner 60% and runner-up 40%. Prizes are worked out to the penny; any leftover penny goes to the winner. If a prize place can't be awarded (for example, the final isn't played), that money is held and Tournza decides, with a recorded reason, how it is paid out or refunded — it is never simply kept.</p>
@@ -3703,11 +3706,13 @@ EVENTS = (data||[]).map(t => {
     code:    'T-' + String(t.id).padStart(4,'0'),         // no code column; derive a stable one from the id
     entry:   Number(t.entry_fee   || PRICE_ENTRY),
     cap:     Number(t.max_players || 32),
-    reg:     t.tournament_entries ? t.tournament_entries.length : 0,
+    // an entry refunded outside Tournza (PAY-08) no longer counts as entered
+    reg:     (t.tournament_entries||[]).filter(te => te.payment_status !== 'refunded').length,
     // The people who've actually paid to enter THIS tournament — a row
     // without a matched player (shouldn't normally happen; the webhook
     // creates one) is skipped rather than shown as a nameless entry.
     entrants: (t.tournament_entries||[])
+      .filter(te => te.payment_status !== 'refunded')
       .map(te => te.players)
       .filter(Boolean)
       .map(p => ({ id: p.id, name: p.name || 'Player', region: p.region || '' })),
@@ -4150,7 +4155,7 @@ async function evLoad(){
   try{
     const [t, en, gr, mem, fx] = await Promise.all([
       sb.from('tournaments').select('id, name, region, phase, cancel_reason, entrant_count, group_count, tournament_date').eq('id', id).maybeSingle(),
-      sb.from('tournament_entries').select('player_id, payment_status, checked_in, players(name)').eq('tournament_id', id),
+      sb.from('tournament_entries').select('player_id, payment_status, checked_in, players(name)').eq('tournament_id', id).neq('payment_status', 'refunded'),
       sb.from('tournament_groups').select('id, label, size, completed_at, tie_flag').eq('tournament_id', id).order('label'),
       sb.from('tournament_group_members').select('group_id, player_id, final_rank, outcome, eliminated_at').eq('tournament_id', id),
       sb.from('matches').select('id, stage, group_id, round, slot, player1_id, player2_id, status, winner_id, legs_p1, legs_p2, result_type, flag, source_p1, source_p2, best_of, ready_at, live_match_id').eq('tournament_id', id),
@@ -5335,7 +5340,7 @@ go((location.hash||'#home').slice(1)||'home');
   async function checkTournamentEntry(user, tournamentId){
     try{
       const { data, error } = await sb.from('tournament_entries')
-        .select('id').eq('player_id', user.id).eq('tournament_id', tournamentId).maybeSingle();
+        .select('id').eq('player_id', user.id).eq('tournament_id', tournamentId).neq('payment_status', 'refunded').maybeSingle();
       if(error){ console.warn('tournament_entries read failed:', error.message); return false; }
       return !!data;
     }catch(e){ console.warn('tournament_entries read failed:', e); return false; }
@@ -5449,7 +5454,7 @@ go((location.hash||'#home').slice(1)||'home');
           .eq('id', user.id).maybeSingle(),
         sb.from('tournament_entries')
           .select('id, tournaments(id, name, tournament_date, phase)')
-          .eq('player_id', user.id)
+          .eq('player_id', user.id).neq('payment_status', 'refunded')
       ]);
       const { data: player } = await sb.from('players').select('id').eq('id', user.id).maybeSingle();
       acctData = { profile: profile||{}, entries: entries||[], hasPlayerProfile: !!player };
