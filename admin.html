@@ -787,6 +787,10 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       ${p.results.map(r => `<tr class="clk" data-go="#tournament:${r.tournament_id}" tabindex="0"><td class="sm">${esc(day(r.date))}</td><td>${esc(r.name)}<div class="sm">${esc(r.region || '')}</div></td><td>${esc(OUTCOME[r.outcome] || r.outcome)}</td><td class="num"><b>${r.points == null ? '—' : r.points}</b></td></tr>`).join('')}
       </tbody></table></div>` : '<div class="ad-clear">No tournament results yet.</div>'}</section>`;
     if(can('payments.view')){
+      try{ const cb = await rpc('admin_player_chargebacks', { p_player: p.id });
+        if(cb && cb.items && cb.items.length) h += `<div class="${cb.block ? 'ad-warn' : 'ad-clear'}"><b>${cb.block ? 'Blocked by a chargeback' : 'Chargeback history'}</b> — ${cb.items.map(i => `${esc(i.ref)} ${esc(i.status)}${i.decision ? ' (' + esc(i.decision) + ')' : ''}, ${pounds(i.amount_pence)}`).join('; ')}.
+          ${cb.block ? 'They can’t enter tournaments or buy a membership, and unpaid prizes are held.' : ''} <a href="#payments:chargebacks">Chargebacks</a></div>`;
+      }catch(_){}
       let mp = []; try{ mp = await rpc('admin_member_payments', { p_player: p.id }) || []; }catch(_){ mp = null; }
       A.mpay = mp || [];
       if(mp && mp.length) h += `<section class="ad-sec"><h2>Membership payments <span class="c">${mp.length}</span></h2><div class="ad-tw"><table class="ad-t"><thead><tr><th>Paid</th><th>Payment</th><th class="num">Amount</th><th>Refund</th></tr></thead><tbody>
@@ -1011,15 +1015,54 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
   function download(name, text){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type:'text/csv' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
 
   // ---------- Payments: refunds due (refund through Stripe), refund history, finance, memberships ----------
-  const PAYTABS = [['due','Refunds due'], ['history','Refund history'], ['prizes','Prizes'], ['finance','Money'], ['members','Memberships']];
+  const PAYTABS = [['due','Refunds due'], ['history','Refund history'], ['prizes','Prizes'], ['chargebacks','Chargebacks'], ['finance','Money'], ['members','Memberships']];
   async function viewPayments3(){
     const tab = PAYTABS.some(t => t[0] === A.arg) ? A.arg : 'due';
     let h = `<h1 class="ad-h1">Payments</h1><div class="ad-tabs" role="group" aria-label="Show">${PAYTABS.map(([k,l]) => `<button type="button" data-paytab="${k}" class="${tab === k ? 'on' : ''}" aria-pressed="${tab === k}">${l}</button>`).join('')}</div>`;
     if(tab === 'due') return h + await paymentsDue();
     if(tab === 'history') return h + await paymentsHistory();
     if(tab === 'prizes') return h + await paymentsPrizes();
+    if(tab === 'chargebacks') return h + await paymentsChargebacks();
     if(tab === 'finance') return h + await paymentsFinance();
     return h + await paymentsMembers();
+  }
+  // PAY-09: chargebacks (a player disputed a card payment with their bank). Evidence goes in through the payment
+  // provider's own dashboard; here admins see each case, and decide what happens after a lost one.
+  async function paymentsChargebacks(){
+    const rows = await rpc('admin_chargebacks') || []; A.cbs = rows;
+    const open = rows.filter(r => r.status === 'open'), toDecide = rows.filter(r => r.status === 'lost' && !r.decision);
+    const lostSum = rows.filter(r => r.status === 'lost').reduce((s, r) => s + r.amount_pence + r.fee_pence, 0);
+    const KIND = { checkout:'Entry', membership:'Membership', exception:'Payment problem', unknown:'Unknown payment' };
+    let h = `<div class="ad-tiles"><div class="ad-tile${open.length ? ' alert' : ''}"><b>${open.length}</b><span>Open — send evidence</span></div>
+      <div class="ad-tile${toDecide.length ? ' alert' : ''}"><b>${toDecide.length}</b><span>Lost — decide</span></div>
+      <div class="ad-tile"><b>${pounds(lostSum)}</b><span>Lost incl. fees</span></div></div>
+      <p class="ad-muted sm">While a chargeback is open or lost-and-undecided, that player can’t enter tournaments or buy a membership, and their unpaid prizes are held. Send evidence (e.g. the match record and entry confirmation) in the payment provider’s dashboard before the deadline.</p>`;
+    if(!rows.length) return h + `<div class="ad-clear">No chargebacks.</div>`;
+    const status = r => r.status === 'open' ? badge('refund_due', 'Open') + (r.evidence_due_by ? `<div class="sm">Evidence by ${esc(when(r.evidence_due_by))}</div>` : '')
+      : r.status === 'won' ? badge('ok', 'Won')
+      : r.decision ? `${badge('cancelled', 'Lost')}<div class="sm">${r.decision === 'lifted' ? 'Block lifted' : 'Account suspended'} · ${esc(r.decided_by || '')}<br>${esc(r.decision_reason || '')}</div>`
+      : badge('refund_due', 'Lost — decide');
+    return h + `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Case</th><th>For</th><th class="num">Amount</th><th>What Tournza did</th><th>Status</th><th></th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td><b class="mono">${esc(r.ref)}</b><div class="sm">${esc(when(r.opened_at))}</div>${r.reason ? `<div class="sm ad-muted">Bank reason: ${esc(r.reason)}</div>` : ''}</td>
+        <td>${esc(KIND[r.kind] || r.kind)}${r.player_id ? ` · <a href="#player:${esc(r.player_id)}">${esc(r.player || 'Player')}</a>` : ''}${r.tournament_id ? `<div class="sm"><a href="#tournament:${esc(r.tournament_id)}">${esc(r.tournament || '')}</a></div>` : ''}<div class="mono sm">…${esc(r.payment)}</div></td>
+        <td class="num"><b>${pounds(r.amount_pence)}</b>${r.fee_pence ? `<div class="sm">+ ${pounds(r.fee_pence)} fee</div>` : ''}</td>
+        <td class="sm">${esc(r.action)}</td><td>${status(r)}</td>
+        <td>${r.status === 'lost' && !r.decision && can('payments.refund') ? `<button type="button" class="ad-btn sm" data-cbdecide="${esc(r.id)}">Decide…</button>` : ''}</td></tr>`).join('')}
+      </tbody></table></div>`;
+  }
+  function chargebackModal(id){
+    const r = (A.cbs || []).find(x => String(x.id) === String(id)); if(!r) return;
+    actionModal({
+      title: `Lost chargeback ${r.ref}`, submit: 'Confirm',
+      intro: `<p>The bank returned <b>${pounds(r.amount_pence)}</b> to ${esc(r.player || 'the player')}${r.fee_pence ? ` and the provider charged a <b>${pounds(r.fee_pence)}</b> fee` : ''}.</p>
+        <p class="ad-muted">They stay blocked from paid entries and memberships until you decide.</p>`,
+      fields: `<fieldset class="ad-dq"><legend class="ad-lab">Decision</legend>
+        <label class="ad-check"><input type="radio" name="cbd" value="lift" checked> <span><b>Lift the block</b> — e.g. they’ve repaid or it was a genuine mistake</span></label>
+        <label class="ad-check"><input type="radio" name="cbd" value="suspend"> <span><b>Suspend the account</b> — can be lifted later on the player page</span></label></fieldset>`,
+      reasonLabel: 'Reason (kept in the audit log)',
+      run: (f, reason) => rpc('admin_chargeback_decide', { p_id: r.id, p_action: (document.querySelector('input[name=cbd]:checked') || {}).value, p_reason: reason }),
+      done: () => 'Decision recorded in the audit log',
+    });
   }
   async function outsideRefunds(){
     let rows = []; try{ rows = await rpc('admin_outside_refunds') || []; }catch(_){ return ''; }
@@ -1121,6 +1164,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(s === 'void') return badge('cancelled', 'Replaced');
     if(s === 'in_dispute_window') return badge('open', 'Dispute window') + `<div class="sm">Payable from ${esc(when(p.eligible_at))}</div>`;
     if(s === 'dispute_open') return badge('refund_due', 'Dispute open');
+    if(s === 'payment_dispute') return badge('refund_due', 'Held: chargeback') + `<div class="sm"><a href="#payments:chargebacks">See chargebacks</a></div>`;
     if(s === 'dispute_check_failed') return badge('refused', 'Can’t check disputes');
     if(s === 'withheld') return badge('cancelled', 'On hold') + (p.hold_reason ? `<div class="sm">${esc(p.hold_reason)}</div>` : '');
     if(s === 'needs_decision') return badge('refund_due', 'Needs decision') + `<div class="sm">${esc(p.hold_reason || '')}</div>`;
@@ -1170,7 +1214,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
       : 'Every payout needs two admins: one requests, another approves.'}</p>`;
     h += `<div class="ad-tiles">${d.auto_enabled ? `${tile(n(autoPay), 'Paying automatically')}${tile(pounds(sum(autoPay)), 'Total paying automatically')}` : ''}
       ${tile(n(ready), d.auto_enabled ? 'Need two admins' : 'Prizes ready to pay', n(ready) > 0)}${d.auto_enabled ? '' : tile(pounds(sum(ready)), 'Total ready to pay')}${tile(n(waiting), 'Waiting for 2nd admin', n(waiting) > 0)}
-      ${tile(n(p => p.state === 'in_dispute_window'), 'In dispute window')}${tile(n(p => ['withheld','dispute_open','needs_decision','dispute_check_failed'].includes(p.state)), 'On hold / to decide', n(p => p.state === 'needs_decision') > 0)}</div>`;
+      ${tile(n(p => p.state === 'in_dispute_window'), 'In dispute window')}${tile(n(p => ['withheld','dispute_open','needs_decision','dispute_check_failed','payment_dispute'].includes(p.state)), 'On hold / to decide', n(p => p.state === 'needs_decision') > 0)}</div>`;
     h += A.prizes.length ? `<div class="ad-tw"><table class="ad-t"><thead><tr><th>Night</th><th>Place</th><th>Player</th><th class="num">Prize</th><th>State</th><th></th></tr></thead><tbody>
       ${A.prizes.map(p => `<tr><td>${p.tournament_id ? `<a href="#tournament:${esc(p.tournament_id)}">${esc(p.tournament || '')}</a>` : '—'}<div class="sm">${esc(day(p.date))}</div></td>
         <td>${esc(PLACE[p.place] || p.place)}</td><td>${p.player_id ? `<a href="#player:${esc(p.player_id)}">${esc(p.player)}</a>` : '<span class="ad-muted">—</span>'}</td>
@@ -1411,6 +1455,7 @@ details.ad-d pre{white-space:pre-wrap;font:12px/1.45 var(--mono);color:var(--ivo
     if(t.matches('[data-refcheck]')){ refundCheck(t.dataset.refcheck, t); return true; }
     if(t.matches('[data-coolingoff]')){ coolingOffModal(t.dataset.coolingoff); return true; }
     if(t.matches('[data-outcheck]')){ outsideCheckModal(t.dataset.outcheck); return true; }
+    if(t.matches('[data-cbdecide]')){ chargebackModal(t.dataset.cbdecide); return true; }
     if(t.matches('[data-paytab]')){ location.hash = '#payments:' + t.dataset.paytab; return true; }
     if(t.matches('[data-dfil]')){ location.hash = '#disputes:' + t.dataset.dfil; return true; }
     if(t.matches('[data-dact]')){ disputeModal(t.dataset.dact); return true; }
